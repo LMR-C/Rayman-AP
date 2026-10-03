@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
 
 class RaymanClient(BizHawkClient):
-    game="Rayman PS1"
+    game="Rayman"
     system = "PSX"
     patch_suffix = None  #no patches
 
