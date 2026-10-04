@@ -22,9 +22,10 @@ The word at ``0x125000`` must be equal to ``0x6D61672F``
 ## Effects
 
 | Name | Description | Implementation |
-|:---|:---:|---:|
+|:---|:---:|:---:|
 | Death Link | If a player die and death link is active Rayman die too | Set ``Rayman mode`` to 3 |
 | Number of tings to get a life | Change the amount of tings needed to get a life | If ``Tings counter`` >= X then increments ``Life counter`` |
+| Give Rayman magic seed | Rayman get the ability to plant Magic Seed | Set ``Rayman Events 1`` to ``Rayman Events 1`` \| 0x40 |
 
 ## Items
 
@@ -33,12 +34,14 @@ All the items a player can get
 ### Main
 
 | Name | Description | Implementation to give the item |
-|:---|:---:|---:|
+|:---|:---:|:---:|
 | Fist Power | Give Rayman the ability to throw his fist | ``Rayman Events 1`` =  ``Rayman Events 1`` \| 0x1 |
 | Hanging | Give Rayman the ability to hang on platforms | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x2 |
 | Grappling Fist | Give Rayman the ability to grab lives and pink rings | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x80 |
-| Helicopter Power | Give Rayman the ability to Helicopter with his hairs | ???|
-| Run Power | Give Rayman the ability to Run | ??? |
+| Helicopter Power | Give Rayman the ability to Helicopter with his hairs | ``Rayman Events 1`` =  ``Rayman Events 1`` \| 0x8 |
+| Run Power | Give Rayman the ability to Run | ``Rayman Events 2`` = ``Rayman Events 2`` \| 0x1 |
+| Magic Seed | Give Rayman the ability to plant Magic Seeds | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x40 |
+| Super Helicopter | Give Rayman the ability to fly with his hair | ``Rayman Events 1`` \| 0x8 |
 | Cage | One of the 102 cages in the game | Increments by 1 the ``Total cage counter`` variable |
 | Protoon piece | An imaginary item for Archipelago, if you got the necessary amount it unlocks access to Mr.Dark's Dare | Intern logic |
 | Level Unlock | Unlock access to a level from another | To implement by editing the world_info structure ? |
@@ -46,7 +49,7 @@ All the items a player can get
 ### Junk
 
 | Name | Description | Implementation |
-|:---|:---:|---:|
+|:---|:---:|:---:|
 | Simple Power | Give 1 HP to Rayman | Increments ``Health Points`` by 1 |
 | Double Power | Give 2 HP to Rayman | Increments ``Health Points`` by 2 |
 | Big Power | Restore Rayman's health completely and increase his health bar to 5 points. If Rayman loses a life, the effect is cancelled | Set ``Max Health Points`` and ``Health Points`` to 5 |
@@ -58,9 +61,9 @@ All the items a player can get
 ### Traps
 
 | Name | Description | Implementation |
-|:---|:---:|---:|
+|:---|:---:|:---:|
 | Reversed Controls | The player's controls will be reversed similar to the start of Mr.Dark's Dare 3 | ??? |
-| Elf Trap | For a limited time, Rayman will be temporarely shrunken, making him slower and his jumps lower | ??? |
+| Elf Trap | For a limited time, Rayman will be temporarely shrunken, making him slower and his jumps lower | Set ``Rayman Events 1`` to ``Rayman Events 1`` \| 0x2 (+ modify an other address for the sprite size)|
 
 ## Locations
 
@@ -68,13 +71,17 @@ All the items a player can get
 - Dependency : considering the whole level
 
 | Name | address | size | how to check | dependency |
-|:---|:---:|:---:|:---:|---:|
+|:---|:---:|:---:|:---:|:---:|
 | Fist Power (Betilla gift 1) | 0x1f43d0 | Byte | value & 0x1 == 0x1 | None |
 | Hanging (Betilla gift 2)| 0x1F43D0 | Byte | value & 0x2 == 0x2 | Fist Power |
 | Grappling Fist (Betilla gift 3)| 0x1F43D0 | Byte | value & 0x80 == 0x80 | Fist Power |
 | Helicopter | 0x1f43d0 |  byte | value & 0x4 == 0x4 | Fist Power, Hanging |
+| Run | 0x1F43D1 | Byte | 0x1 | Fist Power, Super Helicopter |
+| Magic Seed | 0x1f43d0 | Byte | 0x40 | None |
+| Super Helicopter | 0x1f43d0 | Byte | 0x8 | Fist Power |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x1 == 0x1 | Fist Power |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x2 == 0x2 | Fist Power |
+| Mr.Stone | 0x1F4EE8 | Byte | 0x8 | Fist Power, Super Helicopter |
 | Pink Plant Wood Screen 1 life 1 | 0x1F9AC8 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 1 | 0x1F9AE9 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 2 | 0x1F9AE9 | Byte | value & 0x40 == 0x40 | Hanging |
@@ -138,3 +145,32 @@ All the items a player can get
 | Allegro Presto Screen 3 life 1 | 0x1F9E6B | Byte | value & 0x4 == 0x4 | Hanging |
 | Allegro Presto Screen 3 life 2 | 0x1F9E6E | Byte | valeu & 0x80 == 0x80 | Fist Power |
 | Allegro Presto Screen 3 magician 1 | 0x1F7F46 | byte | value & 0x2 == 0x2 | Fist Power, Hanging |
+| Twilight Gulch Screen 1 cage 1 | 0x1F9FB3 | Byte | 0x80 | Fist Power |
+| Twilight Gulch Screen 1 cage 2 | 0x1F9FB3 | Byte | 0x20 | Fist Power |
+| Twilight Gulch Screen 1 cage 3 | 0x1F9FB2 | Byte | 0x2 | Fist Power |
+| Twilight Gulch Screen 1 cage 4 | 0x1F9FB3 | Byte | 0x40 | Fist Power, Grappling Fist |
+| Twilight Gulch Screen 1 cage 5 | 0x1F9FB2 | Byte | 0x4 | Fist Power, Grappling Fist, Run |
+| Twilight Gulch Screen 1 cage 6 | 0x1F9FB3 | Byte | 0x10 | Fist, Grappling Fist |
+| **missable** Twilight Gulch Screen 2 life 1 | 0x1F9FD3 | Byte | value & 0x80 == 0x80 | Fist Power, Grappling Fist |
+| The Hard Rocks Screen 1 cage 1 | 0x1F9FFF | Byte | valeu & 0x40 == 0x40 | Fist Power |
+| The Hard Rocks Screen 1 life 1 | 0x1F9FEB | Byte | value & 0x20 == 0x20 | Fist Power |
+| The Hard Rocks Screen 1 life 2 | 0x1F9FED | Byte | value & 0x2 == 0x2 | Fist Power, Grappling fist, Helicopter |
+| The Hard Rocks Screen 2 cage 1 | 0x1FA00C | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter |
+| The Hard Rocks Screen 2 cage 2 | 0x1FA00C | Byte | value & 0x40 == 0x40 | Fist Power, Helicopter |
+| The Hard Rocks Screen 2 life 1 | 0x1FA010 | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter, Grappling Fist |
+| The Hard Rocks Screen 2 magician 1 | 0x1F7F49 | Byte | value & 0x8 == 0x8 | Fist Power, Helicopter |
+| The Hard Rocks Screen 3 cage 1 | 0x1FA032 | Byte | value & 0x40 == 0x40 | Fist Power, Helicopter |
+| The Hard Rocks Screen 3 cage 2 | 0x1FA031 | Byte | value & 0x1 == 0x1 | Fist Power, Helicopter, Hanging |
+| The Hard Rocks Screen 3 cage 3 | 0x1FA031 | Byte | value & 0x2 == 0x2 | Fist Power, Helicopter |
+| The Hard Rocks Screen 3 life 1 | 0x1FA02F | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter |
+| The Hard Rocks Screen 3 life 2 | 0x1FA02C | Byte | value & 0x2 == 0x2 | Fist Power, Helicopter, Hanging |
+| The Hard Rocks Screen 3 life 3 | 0x1FA02C | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter |
+| Mr.Stone's Peaks Screen 1 cage 1 | 0x1FA058 | Byte | 0x2 | Fist Power, Super Helicopter |
+| Mr.Stone's Peaks Screen 1 cage 2 | 0x1FA058 | Byte | 0x1 | Fist Power, Super Helicopter |
+| Mr.Stone's Peaks Screen 1 life 1 | 0x1FA053 | Byte | 0x80 | Super Helicopter |
+| Mr.Stone's Peaks Screen 2 cage 1 | 0x1FA06D | Byte | 0x80 | Fist Power, Super Helicopter |
+| Mr.Stone's Peaks Screen 3 cage 1 | 0x1FA08E | Byte | 0x2 | Fist Power, Super Helicopter |
+| Mr.Stone's Peaks Screen 4 cage 1 | 0x1FA0BB | Byte | 0x1 | Fist Power, Super Helicopter |
+| Mr.Stone's Peaks Screen 4 cage 2 | 0x1FA0BC | Byte | 0x80 | Fist Power, Super Helicopter |
+| Mr.Stone's Peaks Screen 4 life 1 | 0x1FA0AC | Byte | 0x10 | Fist Power, Super Helicopter, Hanging |
+| Mr.Stone's Peaks Screen 4 magician 1 | 0x1F7F49 | Byte | 0x10 | Fist Power, Super Helicopter |

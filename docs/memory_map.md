@@ -55,6 +55,15 @@ All addresses here stands for the US version.
 | Allegro Presto Screen 3 | 2 | 9 |
 | Allegro Presto Screen 4 | 2 | 10 |
 | Allegro Presto Betilla | 2 | 11 |
+| Twilight Gulch Screen 1 | 3 | 1 |
+| Twilight Gulch Screen 2 | 3 | 2 |
+| The Hard Rocks Screen 1 | 3 | 3 |
+| The Hard Rocks Screen 2 | 3 | 4 |
+| The Hard Rocks Screen 3 | 3 | 5 |
+| Mr.Stone's Peaks Screen 1 | 3 | 6 |
+| Mr.Stone's Peaks Screen 2 | 3 | 7 |
+| Mr.Stone's Peaks Screen 3 | 3 | 8 |
+| Mr.Stone's Peaks Screen 4 | 3 | 9 |
 
 
 #### To test for fun

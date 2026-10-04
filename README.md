@@ -26,7 +26,6 @@ then beat Mr.Dark
     - Tings
 
 ## Locations
-Mandatory :
 - Powers
 - Cages
 - Boss
@@ -43,7 +42,7 @@ Mandatory :
 - Helicopter : Give Rayman the ability to helicopter with his hair
 - Running : Give Rayman the ability to run
 - Cages : One of the 102 cages in the game
-- Life status : One of the 64 unique life status in the game
+- Life status : One of the 65 unique life status in the game
 - Protoon piece : A fragment of the great protoon (custom Archipelago item)
 - Level Unlock : Unlock the acess to a level
 - Magic Seed : Find the Magic Seed so you can use it
