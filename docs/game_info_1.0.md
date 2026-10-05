@@ -83,6 +83,8 @@ All the items a player can get
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x2 == 0x2 | Fist Power |
 | Mr.Sax | 0x1F4EE8 | Byte | 0x4 | Fist, Hanging |
 | Mr.Stone | 0x1F4EE8 | Byte | 0x8 | Fist Power, Super Helicopter |
+| Viking Mama | 0x1F4EE8 | Byte | 0xA | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
+| Space Mama | 0x1F4EE8 | Byte | 0x20 |  Fist Power, Hanging, Helicopter, Grappling Fist |
 | Pink Plant Wood Screen 1 life 1 | 0x1F9AC8 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 1 | 0x1F9AE9 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 2 | 0x1F9AE9 | Byte | value & 0x40 == 0x40 | Hanging |
@@ -189,4 +191,38 @@ All the items a player can get
 | Mr.Stone's Peaks Screen 4 cage 2 | 0x1FA0BC | Byte | 0x80 | Fist Power, Super Helicopter |
 | Mr.Stone's Peaks Screen 4 life 1 | 0x1FA0AC | Byte | 0x10 | Fist Power, Super Helicopter, Hanging |
 | Mr.Stone's Peaks Screen 4 magician 1 | 0x1F7F49 | Byte | 0x10 | Fist Power, Super Helicopter |
-
+| Eraser Plains Screen 1 cage 1 | 0x1FA15B | Byte | 0x8 | Fist Power |
+| Eraser Plains Screen 1 cage 2 | 0x1FA15B | Byte | 0x10 | Fist Power |
+| Eraser Plains Screen 1 life 1 | 0x1FA148 | Byte | 0x1 | Fist Power, Grappling Fist, Helicopter, Run |
+| Eraser Plains Screen 2 cage 1 | 0x1FA17A | Byte | 0x8 | Fist Power, Helicopter or Run |
+| Eraser Plains Screen 2 life 1 | 0x1FA16B | Byte | 0x10 | Fist Power |
+| Eraser Plains Screen 2 life 2 | 0x1FA16A | Byte | 0x40 | Fist Power, Hanging |
+| Eraser Plains Screen 2 life 3 | 0x1FA16E | Byte | 0x4 | Fist Power, Hanging or Helicoper or Run, Grappling Fist |
+| Eraser Plains Screen 3 cage 1 | 0x1FA198 | Byte | 0x80 | Fist Power, Helicoper or Run, Grappling Fist |
+| Eraser Plains Screen 3 cage 2 | 0x1FA198 | Byte | 0x2 | Fist Power, Hanging, Helicoper, Grappling Fist |
+| Eraser Plains Screen 3 cage 3 | 0x1FA197 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Gappling Fist |
+| Eraser Plains Screen 3 life 1 | 0x1FA190 | Byte | 0x40 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Eraser Plains Screen 3 life 2 | 0x1FA193 | Byte | 0x40 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Eraser Plains Screen 3 magician 1 | 0x1F7F4D | Byte | 0x8 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
+| Pencil Pentathlon Screen 1 cage 1 | 0x1FA1DF | Byte | 0x4 | Fist Power, Hanging, Helicopter |
+| Pencil Pentathlon Screen 1 cage 2 | 0x1FA1DF | Byte | 0x2 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Pencil Pentathlon Screen 1 life 1 | 0x1FA1D3 | Byte | 0x1 | Fist Power, Hanging, Helicoper, Grappling Fist |
+| Pencil Pentathlon Screen 1 life 2 | 0x1FA1D0 | Byte | 0x1 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
+| Pencil Pentathlon Screen 1 life 3 | 0x1fA1F1 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
+| Pencil Pentathlon Screen 2 cage 1 | 0x1FA1F2 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
+| Pencil Pentathlon Screen 2 cage 2 | 0x1FA1F2 | Byte | 0x1 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
+| Pencil Pentathlon Screen 2 life 1 | 0x1FA1F0 | Byte | 0x40 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
+| Pencil Pentathlon Screen 3 cage 1 | 0x1FA214 | Byte | 0x80 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
+| Pencil Pentathlon Screen 3 cage 2 | 0x1FA213 | Byte | 0x2 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
+| Pencil Pentathlon Screen 3 life 1 | 0x1FA20B | Byte | 0x80 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
+| Space Mama's Crater Screen 1 cage 1 | 0x1FA230 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 1 cage 2 | 0x1FA230 | Byte | 0x8 | Fist Power, Hanging, Helicopter, Grappling Fist | 
+| Space Mama's Crater Screen 1 life 1 | 0x1FA22F | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
+| Space Mama's Crater Screen 1 life 2 | 0x1FA22C | Byte | 0x8 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 2 cage 1 | 0x1FA249 | Byte | 0x1 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 2 cage 2 | 0x1FA249 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 2 life 1 | 0x1FA257 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 2 Macigian 1 | 0x1F7F4D | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 3 cage 1 | 0x1FA27B | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 3 cage 2 | 0x1FA27B | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Space Mama's Crater Screen 3 life 1 | 0x1FA274 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |

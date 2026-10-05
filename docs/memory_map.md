@@ -68,6 +68,17 @@ All addresses here stands for the US version.
 | Mr.Stone's Peaks Screen 2 | 3 | 7 |
 | Mr.Stone's Peaks Screen 3 | 3 | 8 |
 | Mr.Stone's Peaks Screen 4 | 3 | 9 |
+| Eraser Plains Screen 1 | 4 | 1 |
+| Eraser Plains Screen 2 | 4 | 2 |
+| Eraser Plains Screen 3 | 4 | 3 |
+| Eraser Plains Screen 4 | 4 | 4 |
+| Pencil Pentathlon Screen 1 | 4 | 5 |
+| Pencil Pentathlon Screen 2 | 4 | 6 |
+| Pencil Pentathlon Screen 3 | 4 | 7 |
+| Space Mama's Crater Screen 1 | 4 | 8 |
+| Space Mama's Crater Screen 2 | 4 | 9 |
+| Space Mama's Crater Screen 3 | 4 | 10 |
+
 
 
 #### To test for fun
