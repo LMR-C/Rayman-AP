@@ -81,6 +81,7 @@ All the items a player can get
 | Super Helicopter | 0x1f43d0 | Byte | 0x8 | Fist Power |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x1 == 0x1 | Fist Power |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x2 == 0x2 | Fist Power |
+| Mr.Sax | 0x1F4EE8 | Byte | 0x4 | Fist, Hanging |
 | Mr.Stone | 0x1F4EE8 | Byte | 0x8 | Fist Power, Super Helicopter |
 | Pink Plant Wood Screen 1 life 1 | 0x1F9AC8 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 1 | 0x1F9AE9 | Byte | value & 0x80 == 0x80 | None |
@@ -145,6 +146,20 @@ All the items a player can get
 | Allegro Presto Screen 3 life 1 | 0x1F9E6B | Byte | value & 0x4 == 0x4 | Hanging |
 | Allegro Presto Screen 3 life 2 | 0x1F9E6E | Byte | valeu & 0x80 == 0x80 | Fist Power |
 | Allegro Presto Screen 3 magician 1 | 0x1F7F46 | byte | value & 0x2 == 0x2 | Fist Power, Hanging |
+| Gong Heights Screen 1 cage 1 | 0x1F9EC8 | Byte | 0x4 | Fist Power |
+| Gong Heights Screen 1 cage 2 | 0x1F9EC8 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Run |
+| Gong Heights Screen 1 cage 3 | 0x1F9EC8 | Byte | 0x10 | Fist Power |
+| Gong Heights Screen 1 cage 4 | 0x1F9EC8 | Byte | 0x80 | Fist Power, Hanging |
+| Gong Heights Screen 2 cage 1 | 0x1F9EE8 | Byte | 0x4 | Fist Power, Haning, Helicopter |
+| Gong Heights Screen 2 cage 2 | 0x1F9EE8 | Byte | 0x20 | Fist Power, Hanging, Helicopter |
+| Mr.Sax's Hullaballo Screen 1 cage 1 | 0x1F9F1C | Byte | 0x8 | Fist Power, Hanging |
+| Mr.Sax's Hullaballo Screen 1 cage 2 | 0x1F9F1B | Byte | 0x1 | Fist Power |
+| Mr.Sax's Hullaballo Screen 1 cage 3 | 0x1F9F1C | Byte | 0x20 | Fist Power, Hanging |
+| Mr.Sax's Hullaballo Screen 1 cage 4 | 0x1F9F1C | Byte | 0x80 | Fist Power |
+| Mr.Sax's Hullaballo Screen 1 cage 5 | 0x1F9F1C | Byte | 0x10 | Fist Power, Hanging, Grappling Fist |
+| Mr.Sax's Hullaballo Screen 1 cage 6 | 0x1F9F1C | Byte | 0x40 | Fist Power, Hanging |
+| Mr.Sax's Hullaballo Screen 1 life 1 | 0x1F9F0B | Byte | 0x10 | Fist Power, Hanging, Grappling Fist |
+| Mr.Sax's Hullaballo Screen 1 life 2 | 0x1F9F0F | Byte | 0x10 | Fist Power, Hanging, Grappling Fist |
 | Twilight Gulch Screen 1 cage 1 | 0x1F9FB3 | Byte | 0x80 | Fist Power |
 | Twilight Gulch Screen 1 cage 2 | 0x1F9FB3 | Byte | 0x20 | Fist Power |
 | Twilight Gulch Screen 1 cage 3 | 0x1F9FB2 | Byte | 0x2 | Fist Power |
@@ -174,3 +189,4 @@ All the items a player can get
 | Mr.Stone's Peaks Screen 4 cage 2 | 0x1FA0BC | Byte | 0x80 | Fist Power, Super Helicopter |
 | Mr.Stone's Peaks Screen 4 life 1 | 0x1FA0AC | Byte | 0x10 | Fist Power, Super Helicopter, Hanging |
 | Mr.Stone's Peaks Screen 4 magician 1 | 0x1F7F49 | Byte | 0x10 | Fist Power, Super Helicopter |
+
