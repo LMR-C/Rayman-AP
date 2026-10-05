@@ -18,8 +18,7 @@ class RaymanClient(BizHawkClient):
         super().__init__()
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
-        # no check for minimal test
-        hash_check = "BF460FE0"
+        hash_check = "BF460FE0" #hash received with BizHawk
         ctx.game = self.game
         ctx.items_handling= 0b111
         ctx.want_slot_data = False
