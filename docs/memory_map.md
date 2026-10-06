@@ -78,7 +78,19 @@ All addresses here stands for the US version.
 | Space Mama's Crater Screen 1 | 4 | 8 |
 | Space Mama's Crater Screen 2 | 4 | 9 |
 | Space Mama's Crater Screen 3 | 4 | 10 |
-
+| Crystal Palace Screen 1 | 5 | 1 |
+| Crystal Palace Screen 2 | 5 | 2 |
+| Eat at Joe's Screen 1 | 5 | 4 |
+| Eat at Joe's Screen 2 | 5 | 5 |
+| Eat at Joe's Screen 3 | 5 | 6 |
+| Eat at Joe's Screen 4 | 5 | 7 |
+| Eat at Joe's Screen 5 | 5 | 8 |
+| Mr.Skop's Stalactites Screen 1 | 5 | 9 |
+| Mr.Skops Phase 1 | 5 | 10 | 
+| Mr.Skops Phase 2 | 5 | 11 |
+| Mr.Dark's Dare Screen 1 | 6 | 1 |
+| Mr.Dark's Dare Screen 2 | 6 | 2 |
+| Mr.Dark's Dare Screen 3 | 6 | 3 |
 
 
 #### To test for fun

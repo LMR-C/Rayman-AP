@@ -42,6 +42,7 @@ All the items a player can get
 | Run Power | Give Rayman the ability to Run | ``Rayman Events 2`` = ``Rayman Events 2`` \| 0x1 |
 | Magic Seed | Give Rayman the ability to plant Magic Seeds | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x40 |
 | Super Helicopter | Give Rayman the ability to fly with his hair | ``Rayman Events 1`` \| 0x8 |
+| Light Fist | Give Rayman the ability to illumiate the darkness with his fist |  ``Rayman Events 2`` = ``Rayman Events 2`` \| 0x4 |
 | Cage | One of the 102 cages in the game | Increments by 1 the ``Total cage counter`` variable |
 | Protoon piece | An imaginary item for Archipelago, if you got the necessary amount it unlocks access to Mr.Dark's Dare | Intern logic |
 | Level Unlock | Unlock access to a level from another | To implement by editing the world_info structure ? |
@@ -62,8 +63,9 @@ All the items a player can get
 
 | Name | Description | Implementation |
 |:---|:---:|:---:|
-| Reversed Controls | The player's controls will be reversed similar to the start of Mr.Dark's Dare 3 | ??? |
+| Reversed Controls | The player's controls will be reversed similar to the start of Mr.Dark's Dare 3 | Set ``Rayman Events 2`` to ``Rayman Events 2`` \| 0x20 |
 | Elf Trap | For a limited time, Rayman will be temporarely shrunken, making him slower and his jumps lower | Set ``Rayman Events 1`` to ``Rayman Events 1`` \| 0x2 (+ modify an other address for the sprite size)|
+| Forced Run | For a limited time, Rayman will be force to run | Set ``Rayman Events 2`` to ``Rayman Events 2`` \| 0x10 |
 
 ## Locations
 
@@ -85,6 +87,8 @@ All the items a player can get
 | Mr.Stone | 0x1F4EE8 | Byte | 0x8 | Fist Power, Super Helicopter |
 | Viking Mama | 0x1F4EE8 | Byte | 0xA | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
 | Space Mama | 0x1F4EE8 | Byte | 0x20 |  Fist Power, Hanging, Helicopter, Grappling Fist |
+| Mr.Skops phase 1 | 0x1F4EE8 | Byte | 0x40 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
+| Mr.Dark | 0x1F4E8 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
 | Pink Plant Wood Screen 1 life 1 | 0x1F9AC8 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 1 | 0x1F9AE9 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 2 | 0x1F9AE9 | Byte | value & 0x40 == 0x40 | Hanging |
@@ -226,3 +230,36 @@ All the items a player can get
 | Space Mama's Crater Screen 3 cage 1 | 0x1FA27B | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
 | Space Mama's Crater Screen 3 cage 2 | 0x1FA27B | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist |
 | Space Mama's Crater Screen 3 life 1 | 0x1FA274 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
+| Crystal Palace Screen 1 cage 1 | 0x1FA2F4 | Byte | 0x2 | Fist Power |
+| Crystal Palace Screen 1 cage 2 | 0x1FA2F4 | Byte | 0x20 | Fist Power, Grappling Fist |
+| Crystal Palace Screen 1 cage 3 | 0x1FA2F4 | Byte | 0x10 | Fist Power, Grappling Fist |
+| Crystal Palace Screen 2 cage 1 | 0x1FA314 | Byte | 0x40 | Fist Power, Grappling Fist |
+| Crystal Palace Screen 2 cage 2 | 0X1fa313 | Byte | 0x1 | Fist Power, Hanging, Grappling Fist, Helicopter or Run |
+| Crystal Palace Screen 2 cage 3 | 0x1FA314 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter or Run |
+| Crystal Palace Screen 2 life 1 | 0x1FA30D | Byte | 0x20 | Fist Power, Grappling Fist |
+| Crystal Palace Screen 2 life 2 | 0x1FA309 | Byte | 0x4 | Fist Power, Hanging, Grappling Fist |
+| Crystal Palace Screen 2 magician 1 | 0x1F7F51 | Byte | 0x8 | Fist Power, Hanging, Grappling Fist, Helicopter |
+| Eat At Joe's Screen 1 cage 1 | 0x1FA34F | Byte | 0x8 | Fist Power, Helicopter |
+| Eat At Joe's Screen 1 life 1 | 0x1FA34C | Byte | 0x40 | Fist Power, Hanging, Helicopter |
+| Eat At Joe's Screen 1 life 2 | 0x1FA34C | Byte | 0x80 | Fist Power, Helicopter |
+| Eat At Joe's Screen 1 life 3 | 0x1FA34A | Byte | 0x10 | Fist Power, Hanging, Helicopter, Run |
+| Eat At Joe's Screen 2 cage 1 | 0x1FA379 | Byte | 0x8 | Fist Power, Grappling Fist, Helicopter | 
+| Eat At Joe's Screen 2 cage 2 | 0x1FA379 | Byte | 0x18 | Fist Power, Grappling Fist, Helicopter |
+| Eat At Joe's Screen 2 cage 3 | 0x1FA379 | Byte | 0x2 | Fist Power, Grappling Fist, Helicopter |
+| Eat At Joe's Screen 2 life 1 | 0x1FA373 | Byte | 0x10 | Fist Power, Grappling Fist, Helicopter | 
+| Eat At Joe's Screen 2 life 2 | 0x1FA372 | Byte | 0x10 | Fist Power, Grappling Fist, Helicopter | 
+| Eat At Joe's Screen 3 life 1 | 0x1FA389 | Byte | 0x8 | Fist Power, Grappling Fist, Helicopter |
+| Eat At Joe's Screen 4 cage 1 | 0x1FA3A8 | Byte | 0x40 | Fist Power, Grappling Fist, helicopter |
+| Eat At Joe's Screen 4 life 1 | 0x1FA3B2 | Byte | 0x8 | Fist Power, Grappling Fist, Helicopter |
+| Eat At Joe's Screen 5 cage 1 | 0x1FA3CE | Byte | 0x2 | Fist Power, Grappling Fist, Helicopter |
+| Mr.Skops' Stalactites Screen 1 cage 1 | 0x1FA3E8 | Byte | 0x8 | Fist Power |
+| Mr.Skops' Stalactites Screen 1 cage 2 | 0x1FA3E8 | Byte | 0x4 | Fist Power, Helicopter |
+| Mr.Skops' Stalactites Screen 1 cage 3 | 0x1FA3E8 | Byte | 0x20 | Fist Power, Helicopter, Grappling Fist |
+| Mr.Skops' Stalactites Screen 1 cage 4 | 0x1FA3E8 | Byte | 0x40 | Fist Power, Helicopter, Grappling Fist |
+| Mr.Skops' Stalactites Screen 1 cage 5 | 0x1FA3E8 | Byte | 0x10 | Fist Power, Helicopter, Grappling Fist |
+| Mr.Skops' Stalactites Screen 1 cage 6 | 0x1FA3E8 | Byte | 0x2 | Fist Power, Helicopter, Grappling Fist |
+| Mr.Skops' Stalactites Screen 1 life 1 | 0x1FA3EF | Byte | 0x40 | Fist Power, Helicopter, Grappling Fist |
+| Mr.Dark's Dare Screen 2 life 1 | 0x1FA48D | 0x4 | None |
+| Mr.Dark's Dare Screen 3 life 1 | 0x1FA4B5 | 0x8 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
+| Mr.Dark's Dare Screen 3 life 2 | 0x1FA4B7 | 0x40 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
+| Game End | 0x1D8B40 | Byte | 0x1 | |
