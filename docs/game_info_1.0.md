@@ -77,8 +77,8 @@ All the items a player can get
 | Fist Power (Betilla gift 1) | 0x1f43d0 | Byte | value & 0x1 == 0x1 | None |
 | Hanging (Betilla gift 2)| 0x1F43D0 | Byte | value & 0x2 == 0x2 | Fist Power |
 | Grappling Fist (Betilla gift 3)| 0x1F43D0 | Byte | value & 0x80 == 0x80 | Fist Power |
-| Helicopter | 0x1f43d0 |  byte | value & 0x4 == 0x4 | Fist Power, Hanging |
-| Run | 0x1F43D1 | Byte | 0x1 | Fist Power, Super Helicopter |
+| Helicopter (Betilla gift 4) | 0x1f43d0 |  byte | value & 0x4 == 0x4 | Fist Power, Hanging |
+| Run (Betilla gift 5) | 0x1F43D1 | Byte | 0x1 | Fist Power, Super Helicopter |
 | Magic Seed | 0x1f43d0 | Byte | 0x40 | None |
 | Super Helicopter | 0x1f43d0 | Byte | 0x8 | Fist Power |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x1 == 0x1 | Fist Power |
