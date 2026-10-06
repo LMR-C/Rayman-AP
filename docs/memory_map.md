@@ -2,6 +2,8 @@
 This is the main memory addresses used in the Rayman Archipalego world.
 All addresses here stands for the US version.
 
+## Main addresses
+
 | Meaning | Address | Values | Size |
 |:---|:---:|:---:|---:|
 | Tings counter | 0x1E4D56 | Indicate the number of tings you get | Byte |
@@ -13,17 +15,18 @@ All addresses here stands for the US version.
 | Menu State | 0x1f81a0 | 0: Title screen<br>1: Save type selection<br>3: Memory Card Save Slot choice<br>4: The rest of the game | Byte |
 | is Rayman drowning | 0x1E5950 | 0: Everything is ok<br>1: Rayman is drowning | Byte |
 | Rayman mode | 0x1E5420 | 1: Normal Mode<br>2: Moskito mode<br>3: Dying | Byte |
-| Fist Level | 0x1D8B34 | 1: Base, lack of knowledge on how it works. Another address for gold fist ? | Byte |
-| World index | 0x1e6330 | ??? | ??? |
-| World info | 0x1c335c | ??? | ??? |
+| Fist Level | 0x1D8B34 | min : 0x1<br>max : 0xC | Byte |
+| Gold Fist | 0xAE9C9 (level 1) | mirror of Fist Level. We need to find the address of the fist in each level | Byte |
+| World index | 0x1e6330 | See Worlds and Levels Indexes | Byte |
+| World info | 0x1c335c | See Worlds and Levels Indexes | Byte |
 | Rayman Events 1 | 0x1f43d0 | Bifield for powers : masks in rayman_archipelago_modelisation.md | Byte |
 | Rayman Events 2 | 0x1f43d1 | Bitfield for other special situation | Byte |
-| Boss encounter | 0x1f4ee8 | Bitfield for boss battle : masks in rayman_archipelago_modelisation.md | Byte ? |
+| Boss encounter | 0x1f4ee8 | Bitfield for boss battle : masks in game_info_1.0.md | Byte |
 | Total cage counter | 0x1F8138 | Indicate the number of cages broked in the game | Byte |
 | Current world id | 0x1FA688 | See Wolrds and levels table | Byte |
 | Current level id | 0x1F9A68 | See Wolrds and levels table | Byte |
 
-# Worlds and Levels indexes
+## Worlds and Levels ids
 
 | Zone | World id| Level id|
 |:---|:---:|---:|
@@ -92,6 +95,50 @@ All addresses here stands for the US version.
 | Mr.Dark's Dare Screen 2 | 6 | 2 |
 | Mr.Dark's Dare Screen 3 | 6 | 3 |
 
+## World map info
 
-#### To test for fun
-2 17 magician bongo hills
+### structure
+
+| Field | Address | Size | Description |
+|:---|:---:|:---:|:---:|
+| x_pos | 0x1C335C | Half-Word | x_position of the level on the map |
+| y_pos | +0x2 | Half-Word | y_position of the level on the map |
+| index_up | +0x4 | Byte | The index of the level to reach when pressing up |
+| index_down | +0x5 | Byte | The index of the level to reach when pressing down |
+| index_left | +0x6 | Byte | The index of the level to reach when pressing left |
+| index_right | +0x7 | Byte | The index of the level to reach when pressing left |
+| is_unlocked | +0x8 | Byte | 0: not unlocked<br>4: Unlocking<br>3: Unlocked |
+| nb_cage | +0x9 | Byte | The number of cages in the level |
+| world | +0xA | Byte | The world id of the level to load |
+| Level | +0xB | Byte | The level id of the level to load |
+| color | +0xC | Half-Word | The color for the level text |
+| is unlocking ??? | +0xE | Half-Word | ??? |
+| Level Name | +0x10 | Word | The pointer to the level name |
+
+### Level indexes and addresses
+
+| Index | Level Name | Address |
+|:---|:---:|:---:|
+| 0 | Pink Plant Woods | 0x1C335C |
+| 1 | Anguish Lagoon | 0x1C3370 |
+| 2 | The Swamps of forgetfulness | 0x1C3384 |
+| 3 | Moskito's Nest | 0x1C3398 |
+| 4 | Bongo Hills | 0x1C33AC |
+| 5 | Allegro Presto | 0x1C33C0 |
+| 6 | Gong Height | 0x1C33D4 |
+| 7 | Mr.Sax' Hullaballo | 0x1C33E8 |
+| 8 | Twilight Gulch | 0x1C33FC |
+| 9 | The Hard Rocks | 0x1C3410 |
+| A | MR.Stone's Peaks | 0x1C3424 | 
+| B | Eraser Plains | 0x1C3438 |
+| C | Pencil Pentathlon | 0x1C344C |
+| D | Space Mama's Crater | 0x1C3460 |
+| E | Crystal Palace | 0x1C3474 |
+| F | Eat At Joe's | 0x1C3488 |
+| 10 | Mr.Sops' Stalactites | 0x1C349C |
+| 11 | Mr.Dark's Dare | 0x1C34B0 |
+| 12 | First Save | 0x1C34C4 |
+| 13 | Second Save | 0x1C34D8 |
+| 14 | Third Save | 0x1C34EC |
+| 15 | Fourth Save | 0x1C3500 |
+| 16 | Fith Save | 0x1C3514 |

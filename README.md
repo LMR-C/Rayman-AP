@@ -11,6 +11,7 @@ how many cages needed to unlock Mr.Dark's Dare.
 - Great Protoon pieces : The Great Protoon has split into multiple pieces,
 find the pieces to complete the run, or additionally, find them all and 
 then beat Mr.Dark
+- Boss Rush : Find Mr.Dark's generals and defeat them, then beat Mr.Dark
 
 ## Game modifications
 
