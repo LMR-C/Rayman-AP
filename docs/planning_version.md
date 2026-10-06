@@ -27,6 +27,7 @@
 - Life status : One of the 64 unique life status in the game
 - Magic Seed : Find the Magic Seed so you can use it
 - Helicopter Potion : Find the Helicopter Potion so you can use it
+- Light Fist : Find the light fist so you can use it in Eat At Joe's first screen
 
 #### Junk items
 - Simple Power : Give 1 HP to Rayman
@@ -37,8 +38,7 @@
 
 #### Traps
 - Reversed Controls : The player's controls will be reversed similar to the start of Mr.Dark's Dare 3
-- Elf Trap : For a limited time, Rayman will be temporarely shrunken, making him
-slower and his jumps lower
+- Forced Run : For a limited time, Rayman will be temporarely forced to run
 
 ### Settings
 - Number of starting lives
@@ -111,6 +111,11 @@ Sub-level randomnization : Randomnize sub-level between levels
 #### Junk items
 - Speed Fist : Increase Rayman's fist range and speed
 - Gold Fist : Increase Rayman's fist strenght
+
+#### Traps
+
+- Elf Trap : For a limited time, Rayman will be temporarely shrunken, making him
+slower and his jumps lower
 
 ### Settings
 

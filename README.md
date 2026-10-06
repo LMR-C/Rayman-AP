@@ -48,6 +48,7 @@ then beat Mr.Dark
 - Level Unlock : Unlock the acess to a level
 - Magic Seed : Find the Magic Seed so you can use it
 - Helicopter Potion : Find the Helicopter Potion so you can use it
+- Light Fist : Find the light fist so you can use it in Eat At Joe's first screen
 
 ### Junk items
 - Simple Power : Give 1 HP to Rayman
