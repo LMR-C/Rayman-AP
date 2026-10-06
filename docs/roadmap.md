@@ -5,8 +5,8 @@ but it allows us to visualize where we are.
 
 ## 1.0
 
-- [ ] List the main memory addresses ~ 94%
-- [ ] Extract game information ~ 76%
+- [x] List the main memory addresses ~ 100%
+- [x] Extract game information ~ 100%
 - [ ] Client.py skeleton ~ 0%
 - [ ] Items implementation ~ 0%
 - [ ] Location implementation ~ 0%

@@ -32,8 +32,6 @@
 - Simple Power : Give 1 HP to Rayman
 - Double Power : Give 2 HP to Rayman
 - Big Power : Restore Rayman's health completely and increase his health bar to 5 points. If Rayman loses a life, the effect is cancelled
-- Speed Fist : Increase Rayman's fist range and speed
-- Gold Fist : Increase Rayman's fist strenght
 - Life : Increase Rayman's life counter by 1
 - 5 Tings : Increase by 5 the tings counter
 
@@ -81,6 +79,10 @@ Level order randomnization : the level order in the world map is randomnized
 
 ## 3.0
 
+### Goal
+
+- Boss Rush : Find Mr.Dark's generals and defeat them, then beat Mr.Dark
+
 ### Game modifications
 
 Sub-level randomnization : Randomnize sub-level between levels
@@ -103,6 +105,12 @@ Sub-level randomnization : Randomnize sub-level between levels
     - Sings
     - Checkpoints
     - Tings
+
+### Items
+
+#### Junk items
+- Speed Fist : Increase Rayman's fist range and speed
+- Gold Fist : Increase Rayman's fist strenght
 
 ### Settings
 
