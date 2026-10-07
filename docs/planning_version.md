@@ -16,7 +16,7 @@
 
 ### Items
 
-#### Key items
+#### Important items
 
 - Fist Power : Give Rayman the ability to throw his fist
 - Hanging : Give Rayman the ability to hang on platforms
@@ -29,7 +29,7 @@
 - Helicopter Potion : Find the Helicopter Potion so you can use it
 - Light Fist : Find the light fist so you can use it in Eat At Joe's first screen
 
-#### Junk items
+#### Filler items
 - Simple Power : Give 1 HP to Rayman
 - Double Power : Give 2 HP to Rayman
 - Big Power : Restore Rayman's health completely and increase his health bar to 5 points. If Rayman loses a life, the effect is cancelled
@@ -58,7 +58,7 @@ then beat Mr.Dark
 
 ### Items
 
-#### Key Items
+#### Important Items
 - Protoon piece : A fragment of the great protoon (custom Archipelago item)
 
 ### Settings
@@ -71,7 +71,7 @@ Level order randomnization : the level order in the world map is randomnized
 
 ### Items
 
-#### Key items
+#### Important items
 - Level Unlock : Unlock the acess to a level
 
 #### Settings
@@ -108,7 +108,7 @@ Sub-level randomnization : Randomnize sub-level between levels
 
 ### Items
 
-#### Junk items
+#### Filler items
 - Speed Fist : Increase Rayman's fist range and speed
 - Gold Fist : Increase Rayman's fist strenght
 

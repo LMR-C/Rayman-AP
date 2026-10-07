@@ -31,7 +31,7 @@ The word at ``0x125000`` must be equal to ``0x6D61672F``
 
 All the items a player can get
 
-### Main
+### Important
 
 | Name | Description | Implementation to give the item |
 |:---|:---:|:---:|
@@ -47,7 +47,7 @@ All the items a player can get
 | Protoon piece | An imaginary item for Archipelago, if you got the necessary amount it unlocks access to Mr.Dark's Dare | Intern logic |
 | Level Unlock | Unlock access to a level from another | To implement by editing the world_info structure ? |
 
-### Junk
+### Filler
 
 | Name | Description | Implementation |
 |:---|:---:|:---:|
@@ -262,4 +262,4 @@ All the items a player can get
 | Mr.Dark's Dare Screen 2 life 1 | 0x1FA48D | 0x4 | None |
 | Mr.Dark's Dare Screen 3 life 1 | 0x1FA4B5 | 0x8 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
 | Mr.Dark's Dare Screen 3 life 2 | 0x1FA4B7 | 0x40 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
-| Game End | 0x1D8B40 | Byte | 0x1 | |
+| Game End | 0x1D8B40 | Byte | 0x1 | Fist Power |
