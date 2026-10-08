@@ -70,9 +70,9 @@ All the items a player can get
 ## Locations
 
 - value = the value in the ``address`` column
-- Dependency : considering the whole level
+- rule : the rule to get the check in the screen
 
-| Name | address | size | how to check | dependency |
+| Name | address | size | how to check | rule |
 |:---|:---:|:---:|:---:|:---:|
 | Fist Power (Betilla gift 1) | 0x1f43d0 | Byte | value & 0x1 == 0x1 | None |
 | Hanging (Betilla gift 2)| 0x1F43D0 | Byte | value & 0x2 == 0x2 | Fist Power |
