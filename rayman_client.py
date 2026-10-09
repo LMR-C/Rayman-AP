@@ -26,8 +26,10 @@ class RaymanClient(BizHawkClient):
 
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None: 
         try :
-            code = (await bizhawk.read(ctx.bizhawk_ctx, [(0x1E4D50, 2, "MainRAM")]))[0]
-            nb_vies = int.from_bytes(code,"little",signed=True)
-            print(f"nombre de vide : {nb_vies}")
+            
+            print(ctx.missing_locations)
+        #    code = (await bizhawk.read(ctx.bizhawk_ctx, [(0x1E4D50, 2, "MainRAM")]))[0]
+        #    nb_vies = int.from_bytes(code,"little",signed=True)
+        #    print(f"nombre de vide : {nb_vies}")
         except Exception as e :
             logger.exception(e)
