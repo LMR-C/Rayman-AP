@@ -27,11 +27,12 @@ ITEMS = [
 ]
 
 def create_item_with_table(world : "RaymanWorld", name : str) -> RaymanItem :
-    data = ITEM_TABLE[name]
+    data = ITEM_NAME_TABLE[name]
     return RaymanItem(data.name,data.classification,data.id,world.player)
 
 # Can be deleted if useless in the future
-ITEM_TABLE = {item.name: item for item in ITEMS}
+ITEM_NAME_TABLE = {item.name: item for item in ITEMS}
+ITEM_ID_TABLE = { item.id: item for item in ITEMS}
 # Needed for AP
 ITEM_NAME_TO_ID = {item.name: item.id for item in ITEMS}
 
