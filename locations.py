@@ -20,7 +20,9 @@ LOCATIONS = [
 ]
 
 # Can be deleted if useless in the future
-LOCATION_TABLE = {loc.name: loc for loc in LOCATIONS}
+LOCATION_NAME_TABLE = {loc.name: loc for loc in LOCATIONS}
+LOCATION_ID_TABLE = {loc.id : loc for loc in LOCATIONS}
 # Needed for AP
 LOCATION_NAME_TO_ID = {loc.name: loc.id for loc in LOCATIONS}
+
 
