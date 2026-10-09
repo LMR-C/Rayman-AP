@@ -60,10 +60,16 @@ pip install -r requirements.txt
 4. Run `EmuHawkMono.sh`.
 5. Once: `Config > Firmware...` then **Scan** (green check expected), `Config > Preferred Cores > PSX` = **NymaShock**, and tick `Config > Customize > Run in background`.
 
-## 5. Launch the game
+## 5. Generate a Seed
+From `~/dev/Archipelago` with the venv active:
+1. Once: `python Launcher.py "Generate Template Options"`, then copy `Players/Templates/Rayman.yaml` to `Players/` and set `name:` (your slot name).
+2. Keep only this session's YAML files in `Players/`.
+3. `python Generate.py` writes `output/AP_<your_seed>.zip` (spoiler log included).
 
+## 6. Launch the game with local server
 1. In BizHawk, `File > Open ROM...` and pick your `.chd`.
 2. `Tools > Lua Console`, then open `~/dev/Archipelago/data/lua/connector_bizhawk_generic.lua`.
-3. From `~/dev/Archipelago` with the venv active, run `python BizHawkClient.py`. It should log `Connected to BizHawk`.
+3. From `~/dev/Archipelago` with the venv active, run `python MultiServer.py output/AP_<your_seed>.zip`. it is open on port 38281.
+4. From `~/dev/Archipelago` with the venv active, run `python BizHawkClient.py --connect localhost:38281`. It should log `Connected to BizHawk`.
 
 Client logs: `~/dev/Archipelago/logs/BizHawkClient_<date>.txt`.
