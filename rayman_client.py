@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 import logging
+from .locations import LOCATION_ID_TABLE
 
 logger = logging.getLogger("Client")
 
@@ -26,10 +27,17 @@ class RaymanClient(BizHawkClient):
 
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None: 
         try :
-            
-            print(ctx.missing_locations)
-        #    code = (await bizhawk.read(ctx.bizhawk_ctx, [(0x1E4D50, 2, "MainRAM")]))[0]
-        #    nb_vies = int.from_bytes(code,"little",signed=True)
-        #    print(f"nombre de vide : {nb_vies}")
+            #Location check part
+            id_list = list(ctx.missing_locations)
+            read_list =[(LOCATION_ID_TABLE[id].address, LOCATION_ID_TABLE[id].size.value, "MainRAM") for id in id_list]
+            locations_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
+            # if adress & mask =1 : adding loc_id in set
+            ids_to_check = {
+                loc_id for loc_id, data in zip(id_list, locations_from_game, strict=True)
+                if int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask
+            }
+            #send ids to server for checking
+            await ctx.check_locations(ids_to_check)
+
         except Exception as e :
             logger.exception(e)
