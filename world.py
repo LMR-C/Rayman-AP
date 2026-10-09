@@ -1,6 +1,6 @@
 from worlds.AutoWorld import World
 from .locations import LOCATION_NAME_TO_ID
-from .items import ITEM_NAME_TO_ID, ITEM_TABLE, RaymanItem
+from .items import ITEM_NAME_TO_ID, RaymanItem
 from . import regions,items
 
 class RaymanWorld(World):
