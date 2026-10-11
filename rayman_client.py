@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING,Any
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 import logging
@@ -6,6 +6,7 @@ from .locations import LOCATION_ID_TABLE
 from .items import ITEM_ID_TABLE
 from .utils import Effect
 from collections import defaultdict
+
 
 logger = logging.getLogger("Client")
 
@@ -20,14 +21,23 @@ class RaymanClient(BizHawkClient):
 
     def __init__(self) -> None:
         super().__init__()
-        
-    def create_effect_list(items_received):
-        add_dict = defaultdict(int)
-        set_bit_dict = defaultdict(int)
-        set_value_dict = defaultdict(int)
-        set_temporary_dict = defaultdict(int)
 
-        for index,network_item in enumerate(items_received):
+    def build_ram_operations(self, ctx:"BizHawkClientContext"):
+        """
+        Collect the pending RAM operations from all received items, grouped by address and effect type.
+
+        Unknown items are logged and skipped. Only SET_BIT is implemented (masks OR-ed per address).
+
+        :param ctx: BizHawk client context (reads ``items_received``).
+        :return: ``(add_dict, set_bit_dict, set_value_dict, set_temporary_dict)``, address -> value.
+        """
+
+        add_dict:defaultdict[int,int] = defaultdict(int)
+        set_bit_dict:defaultdict[Any,int]= defaultdict(int)
+        set_value_dict:defaultdict[Any,int] = defaultdict(int)
+        set_temporary_dict:defaultdict[Any,int] = defaultdict(int)
+
+        for index,network_item in enumerate(ctx.items_received):
             id_item = network_item.item
             item_in_table = ITEM_ID_TABLE.get(id_item)
 
@@ -38,7 +48,11 @@ class RaymanClient(BizHawkClient):
             match item_in_table.effect:
                 case Effect.ADD:
                     pass
+                    #Have to manage counter in memory and transformation
                 case Effect.SET_BIT:
+                    if item_in_table.address is None:
+                        logger.warning("item_in_table.id has no adresses")
+                        continue
                     set_bit_dict[item_in_table.address] |= item_in_table.value
                 case Effect.SET_VALUE:
                     pass
@@ -48,7 +62,7 @@ class RaymanClient(BizHawkClient):
                     pass
                 case _ :
                     logger.warning("Unknown item effect")
-        return (add_dict,set_bit_dict,set_value_dict,set_temporary_dict)
+        return add_dict,set_bit_dict,set_value_dict,set_temporary_dict
 
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
@@ -71,7 +85,6 @@ class RaymanClient(BizHawkClient):
             }
             #send ids to server for checking
             await ctx.check_locations(ids_to_check)
-
 
         except Exception as e :
             logger.exception(e)
