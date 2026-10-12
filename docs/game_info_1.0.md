@@ -38,14 +38,24 @@ All the items a player can get
 | Fist Power | Give Rayman the ability to throw his fist | ``Rayman Events 1`` =  ``Rayman Events 1`` \| 0x1 |
 | Hanging | Give Rayman the ability to hang on platforms | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x2 |
 | Grappling Fist | Give Rayman the ability to grab lives and pink rings | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x80 |
-| Helicopter Power | Give Rayman the ability to Helicopter with his hairs | ``Rayman Events 1`` =  ``Rayman Events 1`` \| 0x8 |
+| Helicopter Power | Give Rayman the ability to Helicopter with his hairs | ``Rayman Events 1`` =  ``Rayman Events 1`` \| 0x4 |
 | Run Power | Give Rayman the ability to Run | ``Rayman Events 2`` = ``Rayman Events 2`` \| 0x1 |
 | Magic Seed | Give Rayman the ability to plant Magic Seeds | ``Rayman Events 1`` = ``Rayman Events 1`` \| 0x40 |
 | Super Helicopter | Give Rayman the ability to fly with his hair | ``Rayman Events 1`` \| 0x8 |
 | Light Fist | Give Rayman the ability to illumiate the darkness with his fist |  ``Rayman Events 2`` = ``Rayman Events 2`` \| 0x4 |
 | Cage | One of the 102 cages in the game | Increments by 1 the ``Total cage counter`` variable |
 | Protoon piece | An imaginary item for Archipelago, if you got the necessary amount it unlocks access to Mr.Dark's Dare | Intern logic |
-| Level Unlock | Unlock access to a level from another | To implement by editing the world_info structure ? |
+| Anguish Lagoon Unlock | Unlock access to Anguish Lagoon | 0x1C3378 = 3 |
+| The Swamps of Forgetfulness Unlock | Unlock access to The Swamps of Forgetfulness | 0x1C3384 = 3 |
+| Bongo Hills Unlock | Unlock access to Bongo Hills | 0x1C33B4 = 3 |
+| Moskito's Nest Unlcok | Unlock access to Moskito's Nest | 0x1C33A0 = 3 |
+| Allegro Presto Unlock | Unlock access to Allegro Presto | 0x1C33C8 = 3 |
+| Gong Heights Unlock | Unlock access to Gong Height | 0x1f43d1 = 3 |
+| Mr Sax's Hullaballo Unlock | Unlock access to Mr Sax's Hullaballo | 0x1c33F0 = 3 |
+| Twilight Gulch Unlock | Unlock access to Twilight Gulch | 0x1C3404 = 3 |
+| The Hard Rocks Unlock | Unlock access to The Hard Rocks | 0x1C3418 = 3 |
+| Mr Stone's Peaks Unlock | Unlock access to Mr Stone's Peaks | 0x1C3410 = 3 |
+| Eraser Plains Unlock | Unlock access to Eraser Plains | 0x1C3440 = 3 |
 
 ### Filler
 
@@ -75,126 +85,135 @@ All the items a player can get
 | Name | address | size | how to check | rule |
 |:---|:---:|:---:|:---:|:---:|
 | Fist Power (Betilla gift 1) | 0x1f43d0 | Byte | value & 0x1 == 0x1 | None |
-| Hanging (Betilla gift 2)| 0x1F43D0 | Byte | value & 0x2 == 0x2 | Fist Power |
-| Grappling Fist (Betilla gift 3)| 0x1F43D0 | Byte | value & 0x80 == 0x80 | Fist Power |
-| Helicopter (Betilla gift 4) | 0x1f43d0 |  byte | value & 0x4 == 0x4 | Fist Power, Hanging |
-| Run (Betilla gift 5) | 0x1F43D1 | Byte | 0x1 | Fist Power, Super Helicopter |
+| Hanging (Betilla gift 2)| 0x1F43D0 | Byte | value & 0x2 == 0x2 | None |
+| Grappling Fist (Betilla gift 3)| 0x1F43D0 | Byte | value & 0x80 == 0x80 | None |
+| Helicopter (Betilla gift 4) | 0x1f43d0 |  byte | value & 0x4 == 0x4 | None |
+| Run (Betilla gift 5) | 0x1F43D1 | Byte | 0x1 | None |
 | Magic Seed | 0x1f43d0 | Byte | 0x40 | None |
-| Super Helicopter | 0x1f43d0 | Byte | 0x8 | Fist Power |
-| Moskito 1 | 0x1F4EE8 | Byte | value & 0x1 == 0x1 | Fist Power |
-| Moskito 1 | 0x1F4EE8 | Byte | value & 0x2 == 0x2 | Fist Power |
-| Mr.Sax | 0x1F4EE8 | Byte | 0x4 | Fist, Hanging |
-| Mr.Stone | 0x1F4EE8 | Byte | 0x8 | Fist Power, Super Helicopter |
+| Super Helicopter | 0x1f43d0 | Byte | 0x8 | has_fist |
+| Moskito 1 | 0x1F4EE8 | Byte | value & 0x1 == 0x1 | has_fist |
+| Moskito 1 | 0x1F4EE8 | Byte | value & 0x2 == 0x2 | has_fist |
+| Mr.Sax | 0x1F4EE8 | Byte | 0x4 | has_fist, has_hang |
+| Mr.Stone | 0x1F4EE8 | Byte | 0x8 | has_fist, has_super_helicopter |
 | Viking Mama | 0x1F4EE8 | Byte | 0xA | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
 | Space Mama | 0x1F4EE8 | Byte | 0x20 |  Fist Power, Hanging, Helicopter, Grappling Fist |
 | Mr.Skops phase 1 | 0x1F4EE8 | Byte | 0x40 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
 | Mr.Dark | 0x1F4E8 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
+| Pink Plant Wood finished | 0x1C3378 | Byte | 0x3 | entrance rule |
+| Anguish Lagoon finished | 0x1C3384 | Byte | 0x3 | entrance rule |
+| The Swamp of Forgetfulness finished | 0x1C33A0 | Byte | 0x3 | entrance rule |
+| Bongo Hills finished | 0x1C33C8 | Byte | 0x3 | entrance rule |
+| Allegro Presto finished | 0x1C33DC | Byte | 0x3 | entrance rule |
+| Gong Heights finished | 0x1c33F0 | Byte | 0x3 | entrance rule |
+| Twilight Gulch finished | 0x1C3418 | Byte | 0x3 | entrance rule |
+| The Hard Rocks finished | 0x1C342C | Byte | 0x3 | entrance rule |
+| Mr Stone's Peaks finished | 0x1C3440 | Byte | 0x3 | entrance rule |
 | Pink Plant Wood Screen 1 life 1 | 0x1F9AC8 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 1 | 0x1F9AE9 | Byte | value & 0x80 == 0x80 | None |
-| Pink Plant Wood Screen 2 life 2 | 0x1F9AE9 | Byte | value & 0x40 == 0x40 | Hanging |
-| Pink Plant Wood Screen 2 cage 1 | 0x1F9AF1 | Byte | value & 0x20 == 0x20 | Fist, Hanging |
-| Pink Plant Wood Screen 2 cage 2 | 0x1F9AF1 | Byte | value & 0x10 == 0x10 | Fist, Hanging |
-| Pink Plant Wood Screen 2 cage 3 | 0x1F9AF1 | Byte | value & 0x4 == 0x4 | Fist |
+| Pink Plant Wood Screen 2 life 2 | 0x1F9AE9 | Byte | value & 0x40 == 0x40 | has_hang |
+| Pink Plant Wood Screen 2 cage 1 | 0x1F9AF1 | Byte | value & 0x20 == 0x20 | has_fist and has_hang |
+| Pink Plant Wood Screen 2 cage 2 | 0x1F9AF1 | Byte | value & 0x10 == 0x10 | has_fist and has_hang |
+| Pink Plant Wood Screen 2 cage 3 | 0x1F9AF1 | Byte | value & 0x4 == 0x4 | has_fist |
 | Pink Plant Wood Screen 2 magician 1 | 0x1f7f40 | Word | value & 0x00100000 == 0x00100000 | None |
-| Pink Plant Wood Screen 3 life 1 | 0x1F9B28 | Byte | value & 0x80 == 0x80 | Fist Power |
+| Pink Plant Wood Screen 3 life 1 | 0x1F9B28 | Byte | value & 0x80 == 0x80 | has_fist |
 | Pink Plant Wood Screen 3 life 2 | 0x1F9B28 | Byte | value & 0x40 == 0x40 | None |
-| Pink Plant Wood Screen 3 life 3 | 0x1F9B2A | Byte | value & 0x20 == 0x20 | Fist Power |
-| Pink Plant Wood Screen 3 life 4 | 0x1F9B2A | Byte | value & 0x4 == 0x4 | Fist Power |
+| Pink Plant Wood Screen 3 life 3 | 0x1F9B2A | Byte | value & 0x20 == 0x20 | has_fist |
+| Pink Plant Wood Screen 3 life 4 | 0x1F9B2A | Byte | value & 0x4 == 0x4 | has_fist |
 | Pink Plant Wood Screen 3 life 5 | 0x1F9B28 | Byte | value & 0x10 == 0x10 | None |
-| Pink Plant Wood Screen 3 cage 1 | 0x1F9B31 | Half-Word | value & 0x2000 == 0x2000 | Fist Power |
-| Pink Plant Wood Screen 3 cage 2 | 0x1F9B31 | Half-Word | value & 0x01 == 0x01 | Fist Power |
-| Pink Plant Wood Screen 3 cage 3 | 0x1F9B31 | Half-Word | value & 0x8000 == 0x8000 | Fist Power |
-| Pink Plant Wood Screen 3 magician 1 | 0x1f7f40 | Word | value & 0x80000 == 0x80000 | Fist Power |
-| Anguish Lagoon Screen 1 cage 1 | 0x1F9B4C | Byte | value & 0x20 == 0x20 | Fist, Hanging |
-| Anguish Lagoon Screen 1 cage 2 | 0x1F9B4C | Byte | value & 0x40 == 0x40 | Fist, Hanging, Grappling fist|
-| Anguish Lagoon Screen 1 cage 3 | 0x1F9B4B | Half-Word | value & 0x1 == 0x1 | Fist Power |
-| Anguish Lagoon Screen 1 cage 4 | 0x1F9B4B | Half-Word | value & 0x8000 == 0x8000 | Fist Power |
-| Anguish Lagoon Screen 1 cage 5 | 0x1F9B4C | Byte | value & 0x8 == 0x8 | Fist |
-| Anguish Lagoon Screen 1 life 1 | 0x1F9B4A | Byte | value & 0x10 == 0x10 | Fist |
-| Anguish Lagoon Screen 3 life 1 | 0x1F9B92 | Byte | value & 0x4 == 0x4 | Fist Power |
-| Anguish Lagoon Screen 3 life 2 | 0xAF9B93 | Byte | value & 0x2 == 0x2 | Fist Power |
+| Pink Plant Wood Screen 3 cage 1 | 0x1F9B31 | Half-Word | value & 0x2000 == 0x2000 | has_fist |
+| Pink Plant Wood Screen 3 cage 2 | 0x1F9B31 | Half-Word | value & 0x01 == 0x01 | has_fist |
+| Pink Plant Wood Screen 3 cage 3 | 0x1F9B31 | Half-Word | value & 0x8000 == 0x8000 | has_fist |
+| Pink Plant Wood Screen 3 magician 1 | 0x1f7f40 | Word | value & 0x80000 == 0x80000 | has_fist |
+| Anguish Lagoon Screen 1 cage 1 | 0x1F9B4C | Byte | value & 0x20 == 0x20 | has_fist and (has_helicopter or has_grappling_fist)|
+| Anguish Lagoon Screen 1 cage 2 | 0x1F9B4C | Byte | value & 0x40 == 0x40 | has_fist and has_grappling_fist|
+| Anguish Lagoon Screen 1 cage 3 | 0x1F9B4B | Half-Word | value & 0x1 == 0x1 | has_fist |
+| Anguish Lagoon Screen 1 cage 4 | 0x1F9B4B | Half-Word | value & 0x8000 == 0x8000 | has_fist |
+| Anguish Lagoon Screen 1 cage 5 | 0x1F9B4C | Byte | value & 0x8 == 0x8 | has_fist |
+| Anguish Lagoon Screen 1 life 1 | 0x1F9B4A | Byte | value & 0x10 == 0x10 | has_fist |
+| Anguish Lagoon Screen 3 life 1 | 0x1F9B92 | Byte | value & 0x4 == 0x4 | None |
+| Anguish Lagoon Screen 3 life 2 | 0xAF9B93 | Byte | value & 0x2 == 0x2 | None |
 | Anguish Lagoon Screen 3 cage 1 | 0x1F9B8B | Half-Word | value & 0x40 == 0x40 | Fist Power |
-| The Swamp of Forgetfulness Screen 1 cage 1 | 0x1F9BC8 | Byte | value & 0x10 == 0x10 | Fist Power |
-| The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BCA | Byte | value & 0x20 == 0x20 | Fist Power |
-| The Swamp of Forgetfulness Screen 1 life 1 | 0x1F9BCA | Byte | value & 0x8 == 0x8 | Fist Power |
-| The Swamp of Forgetfulness Screen 2 cage 1 | 0x1F9BEE | Half-Word | value & 0x2 == 0x2 | Fist Power |
-| The Swamp of Forgetfulness Screen 2 cage 2 | 0x1F9BEE | Half-Word | value & 0x800 == 0x8000 | Fist Power |
-| The Swamp of Forgetfulness Screen 3 cage 1 | 0x1F9C10 | Byte | value & 0x4 == 0x4 | Fist Power |
-| The Swamp of Forgetfulness Screen 3 cage 2 | 0x1F9C10 | Byte | value & 0x2 == 0x2 | Fist Power |
+| The Swamp of Forgetfulness Screen 1 cage 1 | 0x1F9BC8 | Byte | value & 0x10 == 0x10 | has_fist and has_magic_seed |
+| The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BCA | Byte | value & 0x20 == 0x20 | has_fist and has_magic_seed |
+| The Swamp of Forgetfulness Screen 1 life 1 | 0x1F9BCA | Byte | value & 0x8 == 0x8 | has_fist and has_magic_seed |
+| The Swamp of Forgetfulness Screen 2 cage 1 | 0x1F9BEE | Half-Word | value & 0x2 == 0x2 | has_fist |
+| The Swamp of Forgetfulness Screen 2 cage 2 | 0x1F9BEE | Half-Word | value & 0x800 == 0x8000 | has_fist |
+| The Swamp of Forgetfulness Screen 3 cage 1 | 0x1F9C10 | Byte | value & 0x4 == 0x4 | has_fist |
+| The Swamp of Forgetfulness Screen 3 cage 2 | 0x1F9C10 | Byte | value & 0x2 == 0x2 | has_fist |
 | The Swamp of Forgetfulness Screen 3 magician 1 | 0x1f7f40 | Word | value & 0x20000 == 0x20000 | Fist Power |
 | Moskito's Nest Screen 1 cage 1 | 0x1F9C2F | Byte | value & 0x40 == 0x40 | Fist Power, Hanging, Grappling fist |
-| Moskito's Nest Screen 1 cage 2 | 0x1F9C2F | Byte | value & 0x8 == 0x8 | Fist Power |
-| Moskito's Nest Screen 1 cage 3 | 0x1F9C2F | Byte | value & 0x4 == 0x4 | Fist Power |
-| Moskito's Nest Screen 1 magician 1 | 0x1f7f40 | Byte | value & 0x40000 == 0x40000 | Fist Power |
-| Moskito's Nest Screen 2 cage 1 | 0x1F9C51 | Byte | value & 0x8 == 0x8 | Fist Power |
-| Moskito's Nest Screen 2 cage 2 | 0x1F9C51 | Byte | value & 0x2 == 0x2 | Fist Power |
-| Moskito's Nest Screen 2 cage 3 | 0x1F9C51 | Byte | value & 0x1 == 0x1 | Fist Power |
-| Moskito's Nest Screen 4 life 1 | 0x1F9C8D | Byte | value & 0x2 == 0x2 | Fist Power, Grappling Fist |
-| Bongo Hills Screen 1 cage 1 | 0x1F9D72 | Byte | value & 0x1 == 0x1 | Fist Power, Hanging |
+| Moskito's Nest Screen 1 cage 2 | 0x1F9C2F | Byte | value & 0x8 == 0x8 | has_fist |
+| Moskito's Nest Screen 1 cage 3 | 0x1F9C2F | Byte | value & 0x4 == 0x4 | has_fist |
+| Moskito's Nest Screen 1 magician 1 | 0x1f7f40 | Byte | value & 0x40000 == 0x40000 | has_fist |
+| Moskito's Nest Screen 2 cage 1 | 0x1F9C51 | Byte | value & 0x8 == 0x8 | has_fist |
+| Moskito's Nest Screen 2 cage 2 | 0x1F9C51 | Byte | value & 0x2 == 0x2 | has_fist |
+| Moskito's Nest Screen 2 cage 3 | 0x1F9C51 | Byte | value & 0x1 == 0x1 | has_fist |
+| Moskito's Nest Screen 4 life 1 | 0x1F9C8D | Byte | value & 0x2 == 0x2 | has_fist and has_grappling_fist |
+| Bongo Hills Screen 1 cage 1 | 0x1F9D72 | Byte | value & 0x1 == 0x1 | has_fist, has_hang |
 | Bongo Hills Screen 1 life 1 | 0x1F9D6B | Byte | value & 0x2 == 0x2 | None |
-| Bongo Hills Screen 2 cage 1 | 0x1F9D98 | Byte | value & 0x20 == 0x20 | Fist Power |
+| Bongo Hills Screen 2 cage 1 | 0x1F9D98 | Byte | value & 0x20 == 0x20 | has_fist and has_hang |
 | Bongo Hills Screen 2 life 1 | 0x1F9D90 | Byte | value & 0x80 == 0x80 | None |
-| Bongo Hills Screen 3 cage 1 | 0x1F9DB0 | Byte | value & 0x8 == 0x8 | Fist Power |
-| Bongo Hills Screen 3 life 1 | 0x1F9DA8 | Byte | valeu & 0x20 == 0x20 | None |
-| Bongo Hills Screen 4 cage 1 | 0x1F9DD8 | Byte | value & 0x8 == 0x8 | Fist Power, Grappling Fist |
-| Bongo Hills Screen 4 life 1 | 0x1F9DCA | Byte | value & 0x20 == 0x20 | Fist Power |
+| Bongo Hills Screen 3 cage 1 | 0x1F9DB0 | Byte | value & 0x8 == 0x8 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_fist |
+| Bongo Hills Screen 3 life 1 | 0x1F9DA8 | Byte | valeu & 0x20 == 0x20 | - options.difficulty_hard : has_fist and has_hang<br>- options.difficulty_hard : None |
+| Bongo Hills Screen 4 cage 1 | 0x1F9DD8 | Byte | value & 0x8 == 0x8 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist |
+| Bongo Hills Screen 4 life 1 | 0x1F9DCA | Byte | value & 0x20 == 0x20 | has_fist |
 | Bongo Hills Screen 4 magician 1 | 0x1F7F46 | Byte | value & 0x1 == 0x1 | None |
-| Bongo Hills Screen 5 cage 1 | 0x1F9DFA | Byte | value & 0x2 == 0x2 | Fist Power |
-| Bongo Hills Screen 5 cage 2 | 0x1F9DFA | Byte | value & 0x1 == 0x1 | Fist Power |
-| Bongo Hills Screen 6 life 1 |0x1F9E10 | Byte | value & 0x2 == 0x2 | Fist Power (but not mandatory) |
-| Allegro Presto Screen 1 cage 1 | 0x1F9E28 | Byte | value & 0x20 == 0x20 | Fist Power, hanging |
-| Allegro Presto Screen 1 cage 2 | 0x1F9E28 | Byte | value & 0x4 == 0x4 | Fist Power |
-| Allegro Presto Screen 1 cage 3 | 0x1F9E28 | Byte | value & 0x10 == 0x10 | Fist Power |
-| Allegro Presto Screen 2 cage 1 | 0x1F9E57 | Byte | valeu & 0x80 == 0x80 | Fist Power, Hanging |
-| Allegro Presto Screen 2 life 1 | 0x1F9E48 | Byte | value & 0x8 == 0x8 | None |
-| Allegro Presto Screen 3 cage 1 | 0x1F9E69 | Byte | value & 0x1 == 0x1 | Fist Power, Hanging |
-| Allegro Presto Screen 3 cage 2 | 0x1F9E69 | Byte | value & 0x4 == 0x4 | Fist Power |
-| Allegro Presto Screen 3 life 1 | 0x1F9E6B | Byte | value & 0x4 == 0x4 | Hanging |
-| Allegro Presto Screen 3 life 2 | 0x1F9E6E | Byte | valeu & 0x80 == 0x80 | Fist Power |
-| Allegro Presto Screen 3 magician 1 | 0x1F7F46 | byte | value & 0x2 == 0x2 | Fist Power, Hanging |
-| Gong Heights Screen 1 cage 1 | 0x1F9EC8 | Byte | 0x4 | Fist Power |
-| Gong Heights Screen 1 cage 2 | 0x1F9EC8 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Run |
-| Gong Heights Screen 1 cage 3 | 0x1F9EC8 | Byte | 0x10 | Fist Power |
-| Gong Heights Screen 1 cage 4 | 0x1F9EC8 | Byte | 0x80 | Fist Power, Hanging |
-| Gong Heights Screen 2 cage 1 | 0x1F9EE8 | Byte | 0x4 | Fist Power, Haning, Helicopter |
-| Gong Heights Screen 2 cage 2 | 0x1F9EE8 | Byte | 0x20 | Fist Power, Hanging, Helicopter |
-| Mr.Sax's Hullaballo Screen 1 cage 1 | 0x1F9F1C | Byte | 0x8 | Fist Power, Hanging |
-| Mr.Sax's Hullaballo Screen 1 cage 2 | 0x1F9F1B | Byte | 0x1 | Fist Power |
-| Mr.Sax's Hullaballo Screen 1 cage 3 | 0x1F9F1C | Byte | 0x20 | Fist Power, Hanging |
-| Mr.Sax's Hullaballo Screen 1 cage 4 | 0x1F9F1C | Byte | 0x80 | Fist Power |
-| Mr.Sax's Hullaballo Screen 1 cage 5 | 0x1F9F1C | Byte | 0x10 | Fist Power, Hanging, Grappling Fist |
-| Mr.Sax's Hullaballo Screen 1 cage 6 | 0x1F9F1C | Byte | 0x40 | Fist Power, Hanging |
-| Mr.Sax's Hullaballo Screen 1 life 1 | 0x1F9F0B | Byte | 0x10 | Fist Power, Hanging, Grappling Fist |
-| Mr.Sax's Hullaballo Screen 1 life 2 | 0x1F9F0F | Byte | 0x10 | Fist Power, Hanging, Grappling Fist |
-| Twilight Gulch Screen 1 cage 1 | 0x1F9FB3 | Byte | 0x80 | Fist Power |
-| Twilight Gulch Screen 1 cage 2 | 0x1F9FB3 | Byte | 0x20 | Fist Power |
-| Twilight Gulch Screen 1 cage 3 | 0x1F9FB2 | Byte | 0x2 | Fist Power |
-| Twilight Gulch Screen 1 cage 4 | 0x1F9FB3 | Byte | 0x40 | Fist Power, Grappling Fist |
-| Twilight Gulch Screen 1 cage 5 | 0x1F9FB2 | Byte | 0x4 | Fist Power, Grappling Fist, Run |
-| Twilight Gulch Screen 1 cage 6 | 0x1F9FB3 | Byte | 0x10 | Fist, Grappling Fist |
-| **missable** Twilight Gulch Screen 2 life 1 | 0x1F9FD3 | Byte | value & 0x80 == 0x80 | Fist Power, Grappling Fist |
-| The Hard Rocks Screen 1 cage 1 | 0x1F9FFF | Byte | valeu & 0x40 == 0x40 | Fist Power |
-| The Hard Rocks Screen 1 life 1 | 0x1F9FEB | Byte | value & 0x20 == 0x20 | Fist Power |
-| The Hard Rocks Screen 1 life 2 | 0x1F9FED | Byte | value & 0x2 == 0x2 | Fist Power, Grappling fist, Helicopter |
-| The Hard Rocks Screen 2 cage 1 | 0x1FA00C | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter |
-| The Hard Rocks Screen 2 cage 2 | 0x1FA00C | Byte | value & 0x40 == 0x40 | Fist Power, Helicopter |
-| The Hard Rocks Screen 2 life 1 | 0x1FA010 | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter, Grappling Fist |
-| The Hard Rocks Screen 2 magician 1 | 0x1F7F49 | Byte | value & 0x8 == 0x8 | Fist Power, Helicopter |
-| The Hard Rocks Screen 3 cage 1 | 0x1FA032 | Byte | value & 0x40 == 0x40 | Fist Power, Helicopter |
-| The Hard Rocks Screen 3 cage 2 | 0x1FA031 | Byte | value & 0x1 == 0x1 | Fist Power, Helicopter, Hanging |
-| The Hard Rocks Screen 3 cage 3 | 0x1FA031 | Byte | value & 0x2 == 0x2 | Fist Power, Helicopter |
-| The Hard Rocks Screen 3 life 1 | 0x1FA02F | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter |
-| The Hard Rocks Screen 3 life 2 | 0x1FA02C | Byte | value & 0x2 == 0x2 | Fist Power, Helicopter, Hanging |
-| The Hard Rocks Screen 3 life 3 | 0x1FA02C | Byte | value & 0x20 == 0x20 | Fist Power, Helicopter |
-| Mr.Stone's Peaks Screen 1 cage 1 | 0x1FA058 | Byte | 0x2 | Fist Power, Super Helicopter |
-| Mr.Stone's Peaks Screen 1 cage 2 | 0x1FA058 | Byte | 0x1 | Fist Power, Super Helicopter |
-| Mr.Stone's Peaks Screen 1 life 1 | 0x1FA053 | Byte | 0x80 | Super Helicopter |
-| Mr.Stone's Peaks Screen 2 cage 1 | 0x1FA06D | Byte | 0x80 | Fist Power, Super Helicopter |
-| Mr.Stone's Peaks Screen 3 cage 1 | 0x1FA08E | Byte | 0x2 | Fist Power, Super Helicopter |
-| Mr.Stone's Peaks Screen 4 cage 1 | 0x1FA0BB | Byte | 0x1 | Fist Power, Super Helicopter |
-| Mr.Stone's Peaks Screen 4 cage 2 | 0x1FA0BC | Byte | 0x80 | Fist Power, Super Helicopter |
-| Mr.Stone's Peaks Screen 4 life 1 | 0x1FA0AC | Byte | 0x10 | Fist Power, Super Helicopter, Hanging |
-| Mr.Stone's Peaks Screen 4 magician 1 | 0x1F7F49 | Byte | 0x10 | Fist Power, Super Helicopter |
+| Bongo Hills Screen 5 cage 1 | 0x1F9DFA | Byte | value & 0x2 == 0x2 | has_fist and has_hang |
+| Bongo Hills Screen 5 cage 2 | 0x1F9DFA | Byte | value & 0x1 == 0x1 | has_fist |
+| Bongo Hills Screen 6 life 1 |0x1F9E10 | Byte | value & 0x2 == 0x2 | - options.difficulty.normal : has_fist<br>- options.difficulty.hard : none |
+| Allegro Presto Screen 1 cage 1 | 0x1F9E28 | Byte | value & 0x20 == 0x20 | has_fist and has_hang |
+| Allegro Presto Screen 1 cage 2 | 0x1F9E28 | Byte | value & 0x4 == 0x4 | has_fist |
+| Allegro Presto Screen 1 cage 3 | 0x1F9E28 | Byte | value & 0x10 == 0x10 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_fist |
+| Allegro Presto Screen 2 cage 1 | 0x1F9E57 | Byte | value & 0x80 == 0x80 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : haas_fist |
+| Allegro Presto Screen 2 life 1 | 0x1F9E48 | Byte | value & 0x8 == 0x8 | - options.difficulty_normal : has_hang<br>- options.difficulty_hard : None |
+| Allegro Presto Screen 3 cage 1 | 0x1F9E69 | Byte | value & 0x1 == 0x1 | has_fist |
+| Allegro Presto Screen 3 cage 2 | 0x1F9E69 | Byte | value & 0x4 == 0x4 | has_fist |
+| Allegro Presto Screen 3 life 1 | 0x1F9E6B | Byte | value & 0x4 == 0x4 | has_hang |
+| Allegro Presto Screen 3 life 2 | 0x1F9E6E | Byte | valeu & 0x80 == 0x80 | None |
+| Allegro Presto Screen 3 magician 1 | 0x1F7F46 | byte | value & 0x2 == 0x2 | - options.difficulty_normal : has_hang<br>- options.difficulty_hard : None |
+| Gong Heights Screen 1 cage 1 | 0x1F9EC8 | Byte | 0x4 | has_fist and has_hang |
+| Gong Heights Screen 1 cage 2 | 0x1F9EC8 | Byte | 0x20 | has_fist and has_hang and has_helicopter and has_run |
+| Gong Heights Screen 1 cage 3 | 0x1F9EC8 | Byte | 0x10 | has_fist |
+| Gong Heights Screen 1 cage 4 | 0x1F9EC8 | Byte | 0x80 | has_fist and has_hang or has_run or has_helicopter |
+| Gong Heights Screen 2 cage 1 | 0x1F9EE8 | Byte | 0x4 | - options.difficulty.normal : has_fist and (has_run or has_helicopter)<br>- options.difficulty.hard : has_fist |
+| Gong Heights Screen 2 cage 2 | 0x1F9EE8 | Byte | 0x20 | has_fist and (has_helicopter or has_run) |
+| Mr.Sax's Hullaballo Screen 1 cage 1 | 0x1F9F1C | Byte | 0x8 | - options.difficulty.normal : has_fist and (has_run or has_hang or has_helicopter)<br>- options.difficulty.hard : has_fist |
+| Mr.Sax's Hullaballo Screen 1 cage 2 | 0x1F9F1B | Byte | 0x1 | has_fist |
+| Mr.Sax's Hullaballo Screen 1 cage 3 | 0x1F9F1C | Byte | 0x20 | - options.difficulty.normal : has_fist and (has_run or has_hang or has_helicopter)<br>- options.difficulty.hard : has_fist |
+| Mr.Sax's Hullaballo Screen 1 cage 4 | 0x1F9F1C | Byte | 0x80 | has_fist |
+| Mr.Sax's Hullaballo Screen 1 cage 5 | 0x1F9F1C | Byte | 0x10 | - options.difficulty.normal : has_fist and has_grappling_fist (has_run or has_hang or has_helicopter)<br>- options.difficulty.hard : has_fist and has_hang and has_grappling_fist |
+| Mr.Sax's Hullaballo Screen 1 cage 6 | 0x1F9F1C | Byte | 0x40 | - options.difficulty.normal : has_fist and (has_run or has_hang or has_helicopter)<br>- options.difficulty.hard : has_fist |
+| Mr.Sax's Hullaballo Screen 1 life 1 | 0x1F9F0B | Byte | 0x10 | None |
+| Mr.Sax's Hullaballo Screen 1 life 2 | 0x1F9F0F | Byte | 0x10 | - options.difficulty.normal : has_fist and has_hanging and has_helicopter<br>- options.difficulty.hard : has_fist and has_helicopter and has_gang and has_grapping_fist |
+| Twilight Gulch Screen 1 cage 1 | 0x1F9FB3 | Byte | 0x80 | has_fist |
+| Twilight Gulch Screen 1 cage 2 | 0x1F9FB3 | Byte | 0x20 | has_fist |
+| Twilight Gulch Screen 1 cage 3 | 0x1F9FB2 | Byte | 0x2 | has_fist |
+| Twilight Gulch Screen 1 cage 4 | 0x1F9FB3 | Byte | 0x40 | has_fist and has_grappling_fist and has_helicopter |
+| Twilight Gulch Screen 1 cage 5 | 0x1F9FB2 | Byte | 0x4 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter and has_run<br>- option.difficulty_hard : has_fist and has_grappling_fist and has_helicopter and has_run |
+| Twilight Gulch Screen 1 cage 6 | 0x1F9FB3 | Byte | 0x10 | has_fist and has_grappling and has_helicopter |
+| **missable** Twilight Gulch Screen 2 life 1 | 0x1F9FD3 | Byte | value & 0x80 == 0x80 | has_fist and has_grappling_fist |
+| The Hard Rocks Screen 1 cage 1 | 0x1F9FFF | Byte | value & 0x40 == 0x40 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_fist|
+| The Hard Rocks Screen 1 life 1 | 0x1F9FEB | Byte | value & 0x20 == 0x20 | - options_difficulty_normal : has_fist<br>- options.difficulty_hard : None |
+| The Hard Rocks Screen 1 life 2 | 0x1F9FED | Byte | value & 0x2 == 0x2 | - options.difficulty_normal : has_fist and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist |
+| The Hard Rocks Screen 2 cage 1 | 0x1FA00C | Byte | value & 0x20 == 0x20 | has_fist |
+| The Hard Rocks Screen 2 cage 2 | 0x1FA00C | Byte | value & 0x40 == 0x40 | has_fist and has_hang |
+| The Hard Rocks Screen 2 life 1 | 0x1FA010 | Byte | value & 0x20 == 0x20 | has_fist and has_hang and has_grappling_fist |
+| The Hard Rocks Screen 2 magician 1 | 0x1F7F49 | Byte | value & 0x8 == 0x8 | - otpions.difficulty_normal : has_helicopter<br>- options.difficulty_hard : none |
+| The Hard Rocks Screen 3 cage 1 | 0x1FA032 | Byte | value & 0x40 == 0x40 | has_fist |
+| The Hard Rocks Screen 3 cage 2 | 0x1FA031 | Byte | value & 0x1 == 0x1 | has_fist and has_hang |
+| The Hard Rocks Screen 3 cage 3 | 0x1FA031 | Byte | value & 0x2 == 0x2 | has_fist and has_hang|
+| The Hard Rocks Screen 3 life 1 | 0x1FA02F | Byte | value & 0x20 == 0x20 | None |
+| The Hard Rocks Screen 3 life 2 | 0x1FA02C | Byte | value & 0x2 == 0x2 | None |
+| The Hard Rocks Screen 3 life 3 | 0x1FA02C | Byte | value & 0x20 == 0x20 | has_helicopter |
+| Mr.Stone's Peaks Screen 1 cage 1 | 0x1FA058 | Byte | 0x2 | has_fist and has_super_helicopter |
+| Mr.Stone's Peaks Screen 1 cage 2 | 0x1FA058 | Byte | 0x1 | has_fist and has_super_helicopter |
+| Mr.Stone's Peaks Screen 1 life 1 | 0x1FA053 | Byte | 0x80 | has_fist and has_super_helicopter |
+| Mr.Stone's Peaks Screen 2 cage 1 | 0x1FA06D | Byte | 0x80 | has_fist and has_super_helicopter |
+| Mr.Stone's Peaks Screen 3 cage 1 | 0x1FA08E | Byte | 0x2 | has_fist and has_hang |
+| Mr.Stone's Peaks Screen 4 cage 1 | 0x1FA0BB | Byte | 0x1 | has_fist |
+| Mr.Stone's Peaks Screen 4 cage 2 | 0x1FA0BC | Byte | 0x80 | has_fist and has_hang |
+| Mr.Stone's Peaks Screen 4 life 1 | 0x1FA0AC | Byte | 0x10 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_hang |
+| Mr.Stone's Peaks Screen 4 magician 1 | 0x1F7F49 | Byte | 0x10 | None |
 | Eraser Plains Screen 1 cage 1 | 0x1FA15B | Byte | 0x8 | Fist Power |
 | Eraser Plains Screen 1 cage 2 | 0x1FA15B | Byte | 0x10 | Fist Power |
 | Eraser Plains Screen 1 life 1 | 0x1FA148 | Byte | 0x1 | Fist Power, Grappling Fist, Helicopter, Run |

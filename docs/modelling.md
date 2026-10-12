@@ -81,12 +81,12 @@ fist_power = ItemData(
 
 ##### level unlock
 
-maybe make unique item for each level ?
+For every level unlock
 
 - open world enabled : 
     - count : 0
 - open world disabled : 
-    - count : 17
+    - count : 1
 - classification : ItemClassification.progression
 
 #####  Life status
@@ -189,6 +189,7 @@ For classification :
 - magician : LocationProgressType.DEFAULT
 - Special items : LocationProgressType.DEFAULT
 - Level Unlock : LocationProgressType.DEFAULT
+- life in twilight gulch screen 2 : LocationProgressType.DEFAULT
 
 ## Region
 
@@ -217,6 +218,7 @@ For classification :
 - The Swamps of Forgetfulness Screen 3
 - Moskito's Nest Screen 1
 - Moskito's Nest Screen 2
+- Moskito's Nest Screen 3
 - Moskito's Nest Screen 4
 - Moskito's Nest Screen 5 (boss)
 - Moskito's Nest Betilla
@@ -229,6 +231,7 @@ For classification :
 - Allegro Presto Screen 1
 - Allegro Presto Screen 2
 - Allegro Presto Screen 3
+- Allegro Presto Screen 4
 - Allegro Presto Betilla
 - Bongo Heights Screen 1
 - Bongo Heights Screen 2
@@ -282,8 +285,59 @@ worldmap_to_ppw_s1 :
 - options.open_world_disabled : none
 - options.open_world_enabled : none
 
+worldmap_to_al_s1 :
+- options.open_world_disabled : can_access_anguish_lagoon
+- options.open_world_enabled : none
+
+worldmmap_to_sf_s1 :
+- options.open_world_disabled : can_access_swamps_of_forgetfulness
+- options.open_world_enabled : none
+
+worldmap_to_mn_s1 :
+- options.open_world_disabled : can_access_moskito_nest
+- options.open_wolrd_enabled : none
+
+worldmap_to_bhills_s1 :
+- options.open_world_disabled : can_access_bongo_hills
+- options.open_world_enabled : none
+
+worldmap_to_ap_s1 :
+- options.open_world_disabled : can_access_allegro_presto
+- options.open_world_enabled : none
+
+worldmap_to_bheights_s1 :
+- options.open_world_disabled : can_access_bongo_heights
+- options.open_world_enabled : none
+
+worldmap_to_sh_s1 :
+- options.open_world_disabled : can_access_sax_hullaballo
+- options.open_world_enabled : none
+
+worldmap_to_tg_s1 :
+- options.open_world_disabled : can_access_twilight gulch
+- options.open_world_enabled : none
+
+worldmap_to_thr_s1 :
+- options.open_world_disabled : can_access_hard_rocks
+- options.open_world_enabled : none
+
+worldmap_to_sp_s1 :
+- options.open_world_disabled : can_access_stone_peaks
+- options.open_world_enabled : none
+
 ### Back to worldmap from levels
-ppw_s1_to_worldmap : None
+
+- ppw_s1_to_worldmap : none
+- al_s1_to_worldmap : none
+- sf_s1_to_worldmap : none
+- mn_s1_to_worldmap : none
+- bhills_s1_to_worldmap : none
+- ap_s1_to_worldmap : none
+- bheights_s1_to_worldmap : none
+- sh_s1_to_worldmap : none
+- tg_s1_to_worldmap : none
+- thr_s1_to_worldmap : none
+- sp_s1_to_worldmap : none
 
 ### Levels connections
 
@@ -292,8 +346,101 @@ pink plant wood :
 - ppw_s2_to_ppw_betilla : none
 - ppw_betilla_to_ppw_s3 : has_fist or has_hang
 - ppw_s3_to_worldmap :
-    - option.difficulty_normal : has_fist
-    - option.difficulty_hard : none
+    - options.difficulty_normal : has_fist
+    - options.difficulty_hard : none
+
+Anguish Lagoon :
+- al_s1_to_al_s2 : has_fist
+- al_s2_to_al_s3 : has_fist
+- al_s3_to_al_betilla : none
+- al_betilla_to_worldmap : has_hang
+
+The Swamps of Forgetfullness :
+- sf_s1_to_sf_s2 : 
+    - options.difficulty_normal : has_magic_seed and has_fist
+    - options.difficulty_hard : has_magic_seed
+- sf_s2_to_sf_s3 :
+    - options.difficulty_normal : has_fist
+    - options.difficulty_hard : none
+- sf_s3_to_worlmap : has_fist
+
+Moskito's Nest :
+- mn_s1_to_mn_s2 : has_fist
+- mn_s2_to_mn_s3 : none
+- mn_s3_to_mn_s4 : none
+- mn_s4_to_mn_s5 : none
+- mn_s5_to_mn_betilla : has_fist
+- mn_betilla_to_worldmap : has_fist and has_hang and has_grappling_fist
+
+Bongo Hills :
+- bhills_s1_to_bhills_s2 : has_hang
+- bhills_s2_to_bhills_s3 : 
+    - options.difficulty_normal : has_fist and has_hang
+    - options.difficulty_hard : has_hang
+- bhills_s3_to_bhills_s4 : 
+    - options.difficulty_normal : has_hang
+    - options.difficulty_hard : none
+- bhills_s4_to_bhills_s5 :
+    - options.difficulty_normal : has_fist and has_hang
+    - options.difficulty_hard : none
+- bhills_s5_to_bhills_s6 :
+    - options.difficulty_normal : has_fist
+    - options.difficulty_hard : none
+- bhills_s6_to_worldmap : has_hang
+
+Allegro Presto :
+- ap_s1_to_ap_s2 : none
+- ap_s2_to_ap_s3 : 
+    - options.difficulty_normal : has_fist
+    - options.difficulty_hard : none
+- ap_s3_to_ap_s4 :
+    - options.difficulty_normal : has_hang
+    - options.difficulty_hard : has_fist
+- ap_s4_to_ap_betilla : none
+- ap_betilla_to_worldmap : has_helicopter or (has_hang and has_run)
+
+Bongo Heigths :
+- bhills_s1_to_bheights_s2 : has_hang or has_run or has_helicopter
+- bhills_s2_to_worldmap :
+    - options.difficulty_normal : has_helicopter or has_run
+    - options.difficulty_hard : has_helicopter or has_run
+
+Mr Sax's Hullaballo :
+- sh_s1_to_sh_s2 : 
+    - options.difficulty.normal : has_fist and (has_run or has_helicoper)
+    - options.difficulty.hard : has_fist and has_hang
+
+Mr Sax's Hullaballo :
+- sh_s1_to_sh_s2 : 
+    - options.difficulty_normal : has_fist and has_hang and (has_helicoper or has_run)
+    - options.difficulty_hard : has_fist
+- sh_s2_to_sh_s3 :
+
+Twilight_gulch :
+- tg_s1_to_tg_s2 : has_fist and has_grappling_fist and has_helicopter
+- tg_s1_to_tg_worlmap : 
+    - options.difficulty_normal : has_fist and has_hang and has_helicopter and has_grappling_fist
+    - options.difficulty_hard : has_fist and has_grappling_fist
+
+The Hard Rocks :
+- thr_s1_to_thr_s2 : 
+    - options.difficulty_normal : has_fist and has_helicopter
+    - options.difficulty_hard : has_fist
+- thr_s2_to_thr_s3 :
+    - options.difficulty_normal : has_fist and has_hang
+    - options.difficulty_hard : has_hang
+- thr_s3_to_worldmap : has_hang
+
+Mr Stone's Peaks :
+- sp_s1_to_sp_s2 : has_fist and has_super_helicopter
+- sp_s2_to_sp_s3 : has_super_helicopter
+- sp_s3_to_sp_s4 : has_hang and (has_helicoper or has_run)
+- sp_s4_to_sp_s5 : 
+    - options.difficulty_normal : has_fist and and has_hang
+    - options.difficulty_hard : has_hang
+- sp_s4_to_sp_betilla : has_fist
+- sp_betilla_to_worldmap : has_helicopter and has_run
+
 
 ## Options
 
@@ -333,7 +480,7 @@ Special items :
 Levels :
 - can_access_pink_plant_wood
 - can_access_anguish_lagoon
-- can_access_swalo_of_forgetfulness
+- can_access_swamps_of_forgetfulness
 - can_acess_moskito_nest
 - can_access_bongo_hills
 - can_access_allegro_presto
