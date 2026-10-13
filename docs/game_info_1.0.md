@@ -292,4 +292,4 @@ All the items a player can get
 | Mr.Dark's Dare Screen 2 life 1 | 0x1FA48D | 0x4 | None |
 | Mr.Dark's Dare Screen 3 life 1 | 0x1FA4B5 | 0x8 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_hang |
 | Mr.Dark's Dare Screen 3 life 2 | 0x1FA4B7 | 0x40 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_hang |
-| Game End | 0x1D8B40 | Byte | 0x1 | Fist Power |
+| Game End | 0x1D8B40 | Byte | 0x1 | has_fist and has_run |
