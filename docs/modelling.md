@@ -9,9 +9,16 @@ and rules of this world
     - item name : Use the name written in the [game_info_1.0.md](game_info_1.0.md) file
     - variable name : Use the name written in the [game_info_1.0.md](game_info_1.0.md) file but in snakecase
 - Id scheme : in decimal
-    - 1xx : Important items
-    - 2xx : Filler items
-    - 3xx : Trap items
+    - 1xxx : Powers
+    - 2xxx : Special items
+    - 3xxx : Cages
+    - 4xxx : Protoon pieces
+    - 5xxx : Level Unlocks
+    - 6xxx : Power (HP : simple, double and big)
+    - 7xxx : Fists (speed and gold)
+    - 8xxx : Life status and life
+    - 9xxx : 5 tings
+    - 10xxx : Traps
 - Fields :
     - id : to identify the item in the game (must be unique)
     - name : to show the name of the item
@@ -554,16 +561,20 @@ Mr Dark's Dare :
 | Difficulty | Options :<br>- Normal<br>- Hard | - Normal : Casual playthrough for progression, don't require damage boos, speedrun tricks or other tricky moves to get the checks<br>- Hard : progression and checks may require speedrun tricks, damage boost and other tricky moves |
 | Goal | Options :<br>- cages<br>- Great protoon pieces<br>Boss Rush | - Defeat Mr.Dark : Defeat Mr.Dark to save the Rayman's world ! You can choose how many cages needed to unlock Mr.Dark's Dare.<br>- Great Protoon pieces : The Great Protoon has split into multiple pieces, find the pieces to complete the run, or additionally, find them all and then beat Mr.Dark<br>- Boss Rush : Find Mr.Dark's generals and defeat them, then beat Mr.Dark |
 | Number of cages required | Range : <br>range_start = 25 <br> range_end = 102<br>default = 102 |Number of cages required to unlock Mr.Dark's Dare |
-| Number of great protoon piece required | Range : <br>range_start = tdb <br>range_end = tdb<br>default = tdb |Number of great protoon pieces required to unlock Mr.Dark's Dare |
+| Number of great protoon piece required | Range : <br>range_start = tdb <br>range_end = tdb<br>default = tdb | Number of great protoon pieces required to unlock Mr.Dark's Dare |
 | Include life status | Toggle :<br>True<br>False | Life status count as checks |
+| Number of life status locations required | Range :<br>range_start = 0<br>range_end = 60<br>default = 60 | How many status life locations are required |
 | Include magician challenges | Toggle :<br>True<br>False | Magician challenges count as checks |
+| Number of magician challenges locations required | Range :<br>range_start = 0<br>range_end = 10<br>default = 10 | How many magician challenges locations are required |
 | Shuffle objects position inside levels | Toggle :<br>True<br>False | Shuffle ennemies, life status, cages, and tings position in a level |
 | Open world | Toggle :<br>True<br>False | All levels are unlocked (except Mr.Dark's Dare) from the beginning of the game |
+| Level Unlock as locations and items | Toggle :<br>True<br>False | When you finish a level it counts as a location obtained. Unlocking access to a level require the associated item |
 | Randomnize level | Options :<br>- levels<br>- sub-level inside levels<br>- All sub-levels | - level : randomnize levels between each others<br>- sub-level inside levels : shuffle sub-levels inside a level<br>- All sub-levels : Randomnize every sub-levels between levels |
 | Trap fill percentage | Range : <br>range_start = 0 <br> range_end = 100<br>default = 0 | The percentage of filler items to replace by traps |
 | Reversed Controls weight | Options :<br>- None<br>- Low<br>- Medium<br>- High | the likelyhood of receiving a trap wich reverses controls |
 | Elf weight | Options :<br>- None<br>- Low<br>- Medium<br>- High | the likelyhood of receiving a trap wich shrinks Rayman |
 | Forced Run weight | Options :<br>- None<br>- Low<br>- Medium<br>- High | the likelyhood of receiving a trap wich forces Rayman to run |
+| Location to exlcude | | Allow the player to exclude locations from the game |
 
 ## Rules
 
