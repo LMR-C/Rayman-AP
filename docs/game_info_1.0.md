@@ -56,6 +56,12 @@ All the items a player can get
 | The Hard Rocks Unlock | Unlock access to The Hard Rocks | 0x1C3418 = 3 |
 | Mr Stone's Peaks Unlock | Unlock access to Mr Stone's Peaks | 0x1C3410 = 3 |
 | Eraser Plains Unlock | Unlock access to Eraser Plains | 0x1C3440 = 3 |
+| Pencil Pentathlon Unlock | Unlock access to Pencil Pentathlon | 0x1C3454 = 3 |
+| Space Mama's Crater Unlock | Unlock access to Space Mama's Crater | 0x1C3468 = 3 |
+| Crystal Palace Unlock | Unlock access to Crystal Palace | 0x1C347C = 3 |
+| Eat At Joe's Unlock | Unlock access to Eat At Joe's | 0x1C3490 = 3 |
+| Mr Skops' Stalactites Unlock | Unlock access to Mr Skops' Stalactites | 0x1C3A4 = 3 |
+
 
 ### Filler
 
@@ -93,11 +99,11 @@ All the items a player can get
 | Super Helicopter | 0x1f43d0 | Byte | 0x8 | has_fist |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x1 == 0x1 | has_fist |
 | Moskito 1 | 0x1F4EE8 | Byte | value & 0x2 == 0x2 | has_fist |
-| Mr.Sax | 0x1F4EE8 | Byte | 0x4 | has_fist, has_hang |
+| Mr.Sax | 0x1F4EE8 | Byte | 0x4 | has_fist |
 | Mr.Stone | 0x1F4EE8 | Byte | 0x8 | has_fist, has_super_helicopter |
-| Viking Mama | 0x1F4EE8 | Byte | 0xA | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
-| Space Mama | 0x1F4EE8 | Byte | 0x20 |  Fist Power, Hanging, Helicopter, Grappling Fist |
-| Mr.Skops phase 1 | 0x1F4EE8 | Byte | 0x40 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
+| Viking Mama | 0x1F4EE8 | Byte | 0xA | has_fist |
+| Space Mama | 0x1F4EE8 | Byte | 0x20 | - options.difficulty_normal : has_fist and has_run |
+| Mr.Skops phase 1 | 0x1F4EE8 | Byte | 0x40 | Fist Power,  |
 | Mr.Dark | 0x1F4E8 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
 | Pink Plant Wood finished | 0x1C3378 | Byte | 0x3 | entrance rule |
 | Anguish Lagoon finished | 0x1C3384 | Byte | 0x3 | entrance rule |
@@ -108,6 +114,11 @@ All the items a player can get
 | Twilight Gulch finished | 0x1C3418 | Byte | 0x3 | entrance rule |
 | The Hard Rocks finished | 0x1C342C | Byte | 0x3 | entrance rule |
 | Mr Stone's Peaks finished | 0x1C3440 | Byte | 0x3 | entrance rule |
+| Eraser Plains finished | 0x1C3454 | Byte | 0x3 | entrance rule |
+| Pencil Pentathlon finished | 0x1C3468 | Byte | 0x3 | entrance rule |
+| Space Mama's Crater finished | 0x1C347C | Byte | 0x3 | entrance rule |
+| Crystal Palace finished | 0x1C3490 | Byte | 0x3 | entrance rule |
+| Eat At Joe's finished | 0x1C3A4 | Byte | 0x3 | entrancce rule |
 | Pink Plant Wood Screen 1 life 1 | 0x1F9AC8 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 1 | 0x1F9AE9 | Byte | value & 0x80 == 0x80 | None |
 | Pink Plant Wood Screen 2 life 2 | 0x1F9AE9 | Byte | value & 0x40 == 0x40 | has_hang |
@@ -214,71 +225,71 @@ All the items a player can get
 | Mr.Stone's Peaks Screen 4 cage 2 | 0x1FA0BC | Byte | 0x80 | has_fist and has_hang |
 | Mr.Stone's Peaks Screen 4 life 1 | 0x1FA0AC | Byte | 0x10 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_hang |
 | Mr.Stone's Peaks Screen 4 magician 1 | 0x1F7F49 | Byte | 0x10 | None |
-| Eraser Plains Screen 1 cage 1 | 0x1FA15B | Byte | 0x8 | Fist Power |
-| Eraser Plains Screen 1 cage 2 | 0x1FA15B | Byte | 0x10 | Fist Power |
-| Eraser Plains Screen 1 life 1 | 0x1FA148 | Byte | 0x1 | Fist Power, Grappling Fist, Helicopter, Run |
-| Eraser Plains Screen 2 cage 1 | 0x1FA17A | Byte | 0x8 | Fist Power, Helicopter or Run |
-| Eraser Plains Screen 2 life 1 | 0x1FA16B | Byte | 0x10 | Fist Power |
-| Eraser Plains Screen 2 life 2 | 0x1FA16A | Byte | 0x40 | Fist Power, Hanging |
-| Eraser Plains Screen 2 life 3 | 0x1FA16E | Byte | 0x4 | Fist Power, Hanging or Helicoper or Run, Grappling Fist |
-| Eraser Plains Screen 3 cage 1 | 0x1FA198 | Byte | 0x80 | Fist Power, Helicoper or Run, Grappling Fist |
-| Eraser Plains Screen 3 cage 2 | 0x1FA198 | Byte | 0x2 | Fist Power, Hanging, Helicoper, Grappling Fist |
-| Eraser Plains Screen 3 cage 3 | 0x1FA197 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Gappling Fist |
-| Eraser Plains Screen 3 life 1 | 0x1FA190 | Byte | 0x40 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Eraser Plains Screen 3 life 2 | 0x1FA193 | Byte | 0x40 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Eraser Plains Screen 3 magician 1 | 0x1F7F4D | Byte | 0x8 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
-| Pencil Pentathlon Screen 1 cage 1 | 0x1FA1DF | Byte | 0x4 | Fist Power, Hanging, Helicopter |
-| Pencil Pentathlon Screen 1 cage 2 | 0x1FA1DF | Byte | 0x2 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Pencil Pentathlon Screen 1 life 1 | 0x1FA1D3 | Byte | 0x1 | Fist Power, Hanging, Helicoper, Grappling Fist |
-| Pencil Pentathlon Screen 1 life 2 | 0x1FA1D0 | Byte | 0x1 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
-| Pencil Pentathlon Screen 1 life 3 | 0x1fA1F1 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
-| Pencil Pentathlon Screen 2 cage 1 | 0x1FA1F2 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
-| Pencil Pentathlon Screen 2 cage 2 | 0x1FA1F2 | Byte | 0x1 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
-| Pencil Pentathlon Screen 2 life 1 | 0x1FA1F0 | Byte | 0x40 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
-| Pencil Pentathlon Screen 3 cage 1 | 0x1FA214 | Byte | 0x80 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
-| Pencil Pentathlon Screen 3 cage 2 | 0x1FA213 | Byte | 0x2 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
-| Pencil Pentathlon Screen 3 life 1 | 0x1FA20B | Byte | 0x80 | Fist Power, Hanging, Helicopter, Grappling Fist, Run, Super Helicopter |
-| Space Mama's Crater Screen 1 cage 1 | 0x1FA230 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 1 cage 2 | 0x1FA230 | Byte | 0x8 | Fist Power, Hanging, Helicopter, Grappling Fist | 
-| Space Mama's Crater Screen 1 life 1 | 0x1FA22F | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist, Run |
-| Space Mama's Crater Screen 1 life 2 | 0x1FA22C | Byte | 0x8 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 2 cage 1 | 0x1FA249 | Byte | 0x1 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 2 cage 2 | 0x1FA249 | Byte | 0x4 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 2 life 1 | 0x1FA257 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 2 Macigian 1 | 0x1F7F4D | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 3 cage 1 | 0x1FA27B | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 3 cage 2 | 0x1FA27B | Byte | 0x10 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Space Mama's Crater Screen 3 life 1 | 0x1FA274 | Byte | 0x20 | Fist Power, Hanging, Helicopter, Grappling Fist |
-| Crystal Palace Screen 1 cage 1 | 0x1FA2F4 | Byte | 0x2 | Fist Power |
-| Crystal Palace Screen 1 cage 2 | 0x1FA2F4 | Byte | 0x20 | Fist Power, Grappling Fist |
-| Crystal Palace Screen 1 cage 3 | 0x1FA2F4 | Byte | 0x10 | Fist Power, Grappling Fist |
-| Crystal Palace Screen 2 cage 1 | 0x1FA314 | Byte | 0x40 | Fist Power, Grappling Fist |
-| Crystal Palace Screen 2 cage 2 | 0X1fa313 | Byte | 0x1 | Fist Power, Hanging, Grappling Fist, Helicopter or Run |
-| Crystal Palace Screen 2 cage 3 | 0x1FA314 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter or Run |
-| Crystal Palace Screen 2 life 1 | 0x1FA30D | Byte | 0x20 | Fist Power, Grappling Fist |
-| Crystal Palace Screen 2 life 2 | 0x1FA309 | Byte | 0x4 | Fist Power, Hanging, Grappling Fist |
-| Crystal Palace Screen 2 magician 1 | 0x1F7F51 | Byte | 0x8 | Fist Power, Hanging, Grappling Fist, Helicopter |
-| Eat At Joe's Screen 1 cage 1 | 0x1FA34F | Byte | 0x8 | Fist Power, Helicopter |
-| Eat At Joe's Screen 1 life 1 | 0x1FA34C | Byte | 0x40 | Fist Power, Hanging, Helicopter |
-| Eat At Joe's Screen 1 life 2 | 0x1FA34C | Byte | 0x80 | Fist Power, Helicopter |
-| Eat At Joe's Screen 1 life 3 | 0x1FA34A | Byte | 0x10 | Fist Power, Hanging, Helicopter, Run |
-| Eat At Joe's Screen 2 cage 1 | 0x1FA379 | Byte | 0x8 | Fist Power, Grappling Fist, Helicopter | 
-| Eat At Joe's Screen 2 cage 2 | 0x1FA379 | Byte | 0x18 | Fist Power, Grappling Fist, Helicopter |
-| Eat At Joe's Screen 2 cage 3 | 0x1FA379 | Byte | 0x2 | Fist Power, Grappling Fist, Helicopter |
-| Eat At Joe's Screen 2 life 1 | 0x1FA373 | Byte | 0x10 | Fist Power, Grappling Fist, Helicopter | 
-| Eat At Joe's Screen 2 life 2 | 0x1FA372 | Byte | 0x10 | Fist Power, Grappling Fist, Helicopter | 
-| Eat At Joe's Screen 3 life 1 | 0x1FA389 | Byte | 0x8 | Fist Power, Grappling Fist, Helicopter |
-| Eat At Joe's Screen 4 cage 1 | 0x1FA3A8 | Byte | 0x40 | Fist Power, Grappling Fist, helicopter |
-| Eat At Joe's Screen 4 life 1 | 0x1FA3B2 | Byte | 0x8 | Fist Power, Grappling Fist, Helicopter |
-| Eat At Joe's Screen 5 cage 1 | 0x1FA3CE | Byte | 0x2 | Fist Power, Grappling Fist, Helicopter |
-| Mr.Skops' Stalactites Screen 1 cage 1 | 0x1FA3E8 | Byte | 0x8 | Fist Power |
-| Mr.Skops' Stalactites Screen 1 cage 2 | 0x1FA3E8 | Byte | 0x4 | Fist Power, Helicopter |
-| Mr.Skops' Stalactites Screen 1 cage 3 | 0x1FA3E8 | Byte | 0x20 | Fist Power, Helicopter, Grappling Fist |
-| Mr.Skops' Stalactites Screen 1 cage 4 | 0x1FA3E8 | Byte | 0x40 | Fist Power, Helicopter, Grappling Fist |
-| Mr.Skops' Stalactites Screen 1 cage 5 | 0x1FA3E8 | Byte | 0x10 | Fist Power, Helicopter, Grappling Fist |
-| Mr.Skops' Stalactites Screen 1 cage 6 | 0x1FA3E8 | Byte | 0x2 | Fist Power, Helicopter, Grappling Fist |
-| Mr.Skops' Stalactites Screen 1 life 1 | 0x1FA3EF | Byte | 0x40 | Fist Power, Helicopter, Grappling Fist |
+| Eraser Plains Screen 1 cage 1 | 0x1FA15B | Byte | 0x8 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist<br>- options.difficulty_hard : has_fist |
+| Eraser Plains Screen 1 cage 2 | 0x1FA15B | Byte | 0x10 | - options.difficulty_normal : has_fist and has_helicopter<br>- options.difficulty_hard : has_fist |
+| Eraser Plains Screen 1 life 1 | 0x1FA148 | Byte | 0x1 | has_fist |
+| Eraser Plains Screen 2 cage 1 | 0x1FA17A | Byte | 0x8 | has_fist |
+| Eraser Plains Screen 2 life 1 | 0x1FA16B | Byte | 0x10 | - options.difficulty_normal : has_fist<br>- options.difficulty_hard : None |
+| Eraser Plains Screen 2 life 2 | 0x1FA16A | Byte | 0x40 | has_fist and has_hang |
+| Eraser Plains Screen 2 life 3 | 0x1FA16E | Byte | 0x4 | has_fist and has_grappling_fist and has_hang |
+| Eraser Plains Screen 3 cage 1 | 0x1FA198 | Byte | 0x80 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_had : has_fist |
+| Eraser Plains Screen 3 cage 2 | 0x1FA198 | Byte | 0x2 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_had : has_fist |
+| Eraser Plains Screen 3 cage 3 | 0x1FA197 | Byte | 0x4 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_had : has_fist and has_helicopter |
+| Eraser Plains Screen 3 life 1 | 0x1FA190 | Byte | 0x40 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_had : none |
+| Eraser Plains Screen 3 life 2 | 0x1FA193 | Byte | 0x40 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_had : none |
+| Eraser Plains Screen 3 magician 1 | 0x1F7F4D | Byte | 0x8 | - options.difficulty_normal : has_fist and has_hang and has_helicopter and has_run<br>- options.difficulty_had : has_fist and has_helicopter and has_run|
+| Pencil Pentathlon Screen 1 cage 1 | 0x1FA1DF | Byte | 0x4 | - options.difficulty_normal : has_fist and has_helicopter<br>- options.difficulty_hard : has_fist and (has_helicopter or has_run) |
+| Pencil Pentathlon Screen 1 cage 2 | 0x1FA1DF | Byte | 0x2 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist<br>- options.difficulty_hard : has_fist and has_grappling_fist |
+| Pencil Pentathlon Screen 1 life 1 | 0x1FA1D3 | Byte | 0x1 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist<br>- options.difficulty_hard : has_fist and has_grappling_fist |
+| Pencil Pentathlon Screen 1 life 2 | 0x1FA1D0 | Byte | 0x1 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_run and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist and has_run and has_helicopter |
+| Pencil Pentathlon Screen 1 life 3 | 0x1fA1F1 | Byte | 0x20 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_run and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist and has_run and has_helicopter |
+| Pencil Pentathlon Screen 2 cage 1 | 0x1FA1F2 | Byte | 0x4 | has_fist and has_super_helicopter |
+| Pencil Pentathlon Screen 2 cage 2 | 0x1FA1F2 | Byte | 0x1 | has_fist and has_super_helicopter |
+| Pencil Pentathlon Screen 2 life 1 | 0x1FA1F0 | Byte | 0x40 | - options.difficulty_normal : has_fist and has_super_helicopter<br>- options.difficulty_hard : has_super_helicopter |
+| Pencil Pentathlon Screen 3 cage 1 | 0x1FA214 | Byte | 0x80 | has_fist and has_hang and has_helicopter |
+| Pencil Pentathlon Screen 3 cage 2 | 0x1FA213 | Byte | 0x2 | has_fist and has_hang and has_helicopter |
+| Pencil Pentathlon Screen 3 life 1 | 0x1FA20B | Byte | 0x80 | has_hang and has_helicopter |
+| Space Mama's Crater Screen 1 cage 1 | 0x1FA230 | Byte | 0x4 | has_fist and has_hang and has_grappling_fist and has_helicopter |
+| Space Mama's Crater Screen 1 cage 2 | 0x1FA230 | Byte | 0x8 | has_fist and has_hang and has_grappling_fist and has_helicopter | 
+| Space Mama's Crater Screen 1 life 1 | 0x1FA22F | Byte | 0x10 | has_fist and has_hang and has_grappling_fist and has_helicopter and has_run |
+| Space Mama's Crater Screen 1 life 2 | 0x1FA22C | Byte | 0x8 | has_fist and has_hang and has_grappling_fist and has_helicopter |
+| Space Mama's Crater Screen 2 cage 1 | 0x1FA249 | Byte | 0x1 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist<br>- options.difficulty_hard : has_fist and grappling_fist |
+| Space Mama's Crater Screen 2 cage 2 | 0x1FA249 | Byte | 0x4 | - options.difficulty_normal : has_fisft and has_hang and has_grappling_fist and has_helicopter<br> options.difficulty_hard : has_fist and has_grappling_fist |
+| Space Mama's Crater Screen 2 life 1 | 0x1FA257 | Byte | 0x20 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist and has_helicopter |
+| Space Mama's Crater Screen 2 Macigian 1 | 0x1F7F4D | Byte | 0x10 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist and has_helicopter |
+| Space Mama's Crater Screen 3 cage 1 | 0x1FA27B | Byte | 0x20 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.diffciculty_hard : has_fist and has_hang and has_grappling_fist |
+| Space Mama's Crater Screen 3 cage 2 | 0x1FA27B | Byte | 0x10 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.diffciculty_hard : has_fist and has_hang and has_grappling_fist |
+| Space Mama's Crater Screen 3 life 1 | 0x1FA274 | Byte | 0x20 | - options.difficulty_normal : has_hang and has_helicopter<br>- options.difficulty_hard : has_hang |
+| Crystal Palace Screen 1 cage 1 | 0x1FA2F4 | Byte | 0x2 | has_fist |
+| Crystal Palace Screen 1 cage 2 | 0x1FA2F4 | Byte | 0x20 | - options.difficulty_normal : has_fist and has_helicopter and has_grappling_fist<br>- options.difficulty_hard : has_fist and has_grappling_fist |
+| Crystal Palace Screen 1 cage 3 | 0x1FA2F4 | Byte | 0x10 | - options.difficulty_normal : has_fist and has_helicopter and has_grappling_fist<br>- options.difficulty_hard : has_fist and has_grappling_fist |
+| Crystal Palace Screen 2 cage 1 | 0x1FA314 | Byte | 0x40 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br> - options.difficulty_hard : has_fist  |
+| Crystal Palace Screen 2 cage 2 | 0X1fa313 | Byte | 0x1 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_hard : has_fist and has_hang and (has_helicopter or has_run) |
+| Crystal Palace Screen 2 cage 3 | 0x1FA314 | Byte | 0x80 | - options.difficulty_normal : has_fist and has_hang and has_helicopter<br>- options.difficulty_hard : has_fist and has_hang and (has_helicopter or has_run) |
+| Crystal Palace Screen 2 life 1 | 0x1FA30D | Byte | 0x20 | - options.difficulty_normal : has_hang has_helicopter<br> - options.difficulty_hard : None |
+| Crystal Palace Screen 2 life 2 | 0x1FA309 | Byte | 0x4 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and has_hang and has_grappling_fist |
+| Crystal Palace Screen 2 magician 1 | 0x1F7F51 | Byte | 0x8 | - options.difficulty_normal : has_fist and has_hang and has_helicopter and has_grappling fist<br>- options.difficulty_hard : has_fist and has_hang and has_grappling_fist |
+| Eat At Joe's Screen 1 cage 1 | 0x1FA34F | Byte | 0x8 | - options.difficulty_normal : has_fist and has_light_fist<br>- options.difficulty_hard : has_fist |
+| Eat At Joe's Screen 1 life 1 | 0x1FA34C | Byte | 0x40 | - options.difficulty_normal : has_fist and has_light_fist and has_hang<br>- options.difficulty_hard : has_hang |
+| Eat At Joe's Screen 1 life 2 | 0x1FA34C | Byte | 0x80 | - options.difficulty_normal : has_fist and has_light_fist<br>- options.difficulty_hard : None |
+| Eat At Joe's Screen 1 life 3 | 0x1FA34A | Byte | 0x10 | - options.difficulty_normal : has_fist and has_light_fist and has_helicopter and has_hang and has_run<br>- options.difficulty_hard : has_hang and has_helicopter and has_run |
+| Eat At Joe's Screen 2 cage 1 | 0x1FA379 | Byte | 0x8 | has_fist and has_hang and has_grappling_fist and has_helicopter | 
+| Eat At Joe's Screen 2 cage 2 | 0x1FA379 | Byte | 0x18 | has_fist and has_hang and has_grappling_fist and has_helicopter |
+| Eat At Joe's Screen 2 cage 3 | 0x1FA379 | Byte | 0x2 | - options.difficulty_normal : has_fist and has_grappling_fist and has_helicopter<br>- options.difficulty : has_fist and has_grappling_fist |
+| Eat At Joe's Screen 2 life 1 | 0x1FA373 | Byte | 0x10 | - options.difficulty_normal : has_fist and has_grappling_fist<br>- options.difficulty_hard : None | 
+| Eat At Joe's Screen 2 life 2 | 0x1FA372 | Byte | 0x10 | has_fist and has_hang and has_grappling_fist and has_helicopter | 
+| Eat At Joe's Screen 3 life 1 | 0x1FA389 | Byte | 0x8 | - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter<br>- options.difficulty : has_fist and has_grappling_fist |
+| Eat At Joe's Screen 4 cage 1 | 0x1FA3A8 | Byte | 0x40 | has_fist and has_grappling_fist |
+| Eat At Joe's Screen 4 life 1 | 0x1FA3B2 | Byte | 0x8 | has_fist and has_grappling_fist |
+| Eat At Joe's Screen 5 cage 1 | 0x1FA3CE | Byte | 0x2 | has_fist and has_helicopter |
+| Mr.Skops' Stalactites Screen 1 cage 1 | 0x1FA3E8 | Byte | 0x8 | has_fist |
+| Mr.Skops' Stalactites Screen 1 cage 2 | 0x1FA3E8 | Byte | 0x4 | - options.difficulty_normal : has_fist and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and (has_helicopter or has_grappling_fist) |
+| Mr.Skops' Stalactites Screen 1 cage 3 | 0x1FA3E8 | Byte | 0x20 | has_fist and has_grappling_fist |
+| Mr.Skops' Stalactites Screen 1 cage 4 | 0x1FA3E8 | Byte | 0x40 | has_fist and has_grappling_fist |
+| Mr.Skops' Stalactites Screen 1 cage 5 | 0x1FA3E8 | Byte | 0x10 | has_fist and has_grappling_fist |
+| Mr.Skops' Stalactites Screen 1 cage 6 | 0x1FA3E8 | Byte | 0x2 | - options.difficulty_normal : has_fist and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist |
+| Mr.Skops' Stalactites Screen 1 life 1 | 0x1FA3EF | Byte | 0x40 | - options.difficulty_normal : has_fist and has_grappling_fist and has_helicopter<br>- options.difficulty_hard : has_fist and has_grappling_fist |
 | Mr.Dark's Dare Screen 2 life 1 | 0x1FA48D | 0x4 | None |
-| Mr.Dark's Dare Screen 3 life 1 | 0x1FA4B5 | 0x8 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
-| Mr.Dark's Dare Screen 3 life 2 | 0x1FA4B7 | 0x40 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
+| Mr.Dark's Dare Screen 3 life 1 | 0x1FA4B5 | 0x8 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_hang |
+| Mr.Dark's Dare Screen 3 life 2 | 0x1FA4B7 | 0x40 | - options.difficulty_normal : has_fist and has_hang<br>- options.difficulty_hard : has_hang |
 | Game End | 0x1D8B40 | Byte | 0x1 | Fist Power |

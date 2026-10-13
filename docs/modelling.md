@@ -205,6 +205,7 @@ For classification :
 
 ### Regions list
 
+- worldmap
 - Pink Plant Woods Screen 1
 - Pink Plant Woods Screen 2
 - Pink Plant Woods Betilla
@@ -274,6 +275,7 @@ For classification :
 - Mr.Dark's Dare Screen 2
 - Mr.Dark's Dare Screen 3
 - Mr.Dark's Dare Screen 4 (boss)
+- Victory
 
 ## Entrances
 
@@ -325,6 +327,34 @@ worldmap_to_sp_s1 :
 - options.open_world_disabled : can_access_stone_peaks
 - options.open_world_enabled : none
 
+worlmap_to_ep_s1 : 
+- options.open_world_disabled : can_access_eraser_plains
+- options.open_world_enabled : none
+
+worldmap_to_pp_s1 :
+- options.open_world_disabled : can_access_pencil_pentathlon
+- options.open_world_enabled : none
+
+worldmap_to_spc_s1 :
+- options.open_world_disabled : can_access_space_mama_crater
+- options.open_world_enabled : none
+
+worldmap_to_cp_s1 :
+- options.open_world_disabled : can_access_crystal_palace
+- options.open_world_enabled : none
+
+worldmap_to_eaj_s1 :
+- options.open_world_disabled : can_access_eat_at_joe
+- options.open_world_enabled : none
+
+worldmap_to_mss_s1 :
+- options.open_world_disabled : can_access_skop_stalactites
+- options.open_world_enabled : none
+
+worldmap_to_dd_s1 :
+- options.open_world_disabled : can_access_dark_dare
+- options.open_world_enabled : none
+
 ### Back to worldmap from levels
 
 - ppw_s1_to_worldmap : none
@@ -338,6 +368,11 @@ worldmap_to_sp_s1 :
 - tg_s1_to_worldmap : none
 - thr_s1_to_worldmap : none
 - sp_s1_to_worldmap : none
+- ep_s1_to_worldmap : none
+- pp_s1_to_worldmap : none
+- spc_s1_to_worldmap : none
+- cp_s1_to_worldmap : none
+- eaj_s1_to_worlmap : none
 
 ### Levels connections
 
@@ -414,7 +449,8 @@ Mr Sax's Hullaballo :
 - sh_s1_to_sh_s2 : 
     - options.difficulty_normal : has_fist and has_hang and (has_helicoper or has_run)
     - options.difficulty_hard : has_fist
-- sh_s2_to_sh_s3 :
+- sh_s2_to_sh_s3 : has_fist
+- sh_s3_to_worldmap : has_fist
 
 Twilight_gulch :
 - tg_s1_to_tg_s2 : has_fist and has_grappling_fist and has_helicopter
@@ -441,6 +477,72 @@ Mr Stone's Peaks :
 - sp_s4_to_sp_betilla : has_fist
 - sp_betilla_to_worldmap : has_helicopter and has_run
 
+Eraser Plains :
+- ep_s1_to_ep_s2 :
+    - options.difficulty_normal : has_fist and has_helicopter
+    - options.difficulty_hard : has_fist
+- ep_s2_to_ep_s3 : has_fist and has_grappling_fist and has_hang 
+- ep_s3_to_ep_s4 : has_fist and has_hang and has_grappling_fist and has_helicopter and has_run
+- ep_s4_to_worldmap : has_fist
+
+Pencil Pentathlon :
+- pp_s1_to_pp_s2 : 
+    - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter and has_run
+    - options.difficulty_hard : has_fist and has_grappling_fist and has_helicopter and has_run
+- pp_s2_to_pp_s3 : 
+    - options.difficulty_normal : has_fist and has_super_helicopter
+    - options.difficulty_hard : has_super_helicopter
+- pp_s3_to_worldmap :
+    - options.difficulty_normal : has_fist and has_hang and has_grappling_fist and has_helicopter
+    - options.difficulty_hard : has_hang and has_helicopter
+
+Space Mama's Crater :
+- spc_s1_to_spc_s2 : has_fist and has_hang and has_grappling_fist and has_helicopter
+- spc_s2_to_spc_s3 :
+    - options.difficulty_normal : has_fist and has_hang and has_grappling_fist
+    - options.difficulty_hard : has_fist and has_grappling_fist
+- spc_s3_to_spc_s4 :
+    - options.difficulty_normal : has_fist and has_hang and has_helicopter
+    - options.difficulty_hard : has_fist and has_hang
+- spc_s4_to_worldmap :
+    - options.difficulty_normal : has_fist and has_run
+    - options.difficulty_hard : has_fist
+
+Crystal Palace :
+- cp_s1_to_cp_s2 : 
+    - options.difficulty_normal : has_fist and has_grappling_fist and has_helicoper
+    - options.difficulty_hard : has_fist and has_grappling_fist
+- cp_s2_to_worldmap :
+    - options.difficulty_normal : has_fist and has_hang and has_helicopter and has_grappling_fist
+    - options.difficulty_hard : has_fist and has_hang and has_grappling_fist
+
+Eat at Joe's :
+- eaj_s1_to_eaj_s2 :
+    - options.difficulty_normal : has_fist and has_light_fist
+    - options.difficulty_hard : none
+- eaj_s2_to_eaj_s3 :
+    - options.difficulty_normal : has_fist and has_grappling_fist and has_helicopter
+    - options.difficulty_hard : has_fist and has_grappling_fist
+- eaj_s3_to_eaj_s4 :
+    - options.difficulty_normal : has_fist and has_hang and has_grappling_fist
+    - options.difficulty_hard : has_fist and has_grappling_fist
+- eaj_s4_to_eaj_s5 : has_fist and has_grappling_fist
+- eaj_s5_to_worlmap : has_fist and has_grappling_fist and has_helicopter
+
+Mr Skops' Stalactites :
+- mss_s1_to_mss_s2 :
+    - options.difficulty_normal : has_fist and has_grappling_fist and has_helcopter
+    - options.difficulty_hard : has_fist and has_grappling_fist
+- mss_s2_to_mss_s3 : has_fist and has_hang and has_grappling_fist and has_helicopter and has_run
+- mss_s3_to_worlmap : has_fist
+
+Mr Dark's Dare :
+- dd_s1_to_dd_s2 : none
+- dd_s2_to_dd_s3 : has_fist and has_hang and has_grappling_fist and has_helicopter
+- dd_s3_to_dd_s4 : 
+    - options.difficulty_normal : has_fist and has_hang
+    - options.difficulty_hard : has_hang
+- dd_s4_to_victory : has_fist and has_run
 
 ## Options
 
