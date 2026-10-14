@@ -13,6 +13,28 @@ and retrieve (cancel the location) it from the game
     - if the location has already been obtained : give the power once Rayman is closed to the end sign
     in order to skip the betilla screen, once the region has changed, retrieve the power
 
+#### Preceding screen condition
+- coord_x : ``0x1F9A10``
+- coord_y : ``0x1F9A28``
+
+Pink Plant Wood screen 2 : if betilla hasn't been encountered then retrieve the fist
+  - 0xC51 <= x <= 0xC63
+  - 0x117 <= y <= 0x13A
+
+Anguish Lagoon screen 3 : if betilla hasn't been encountered then retrieve hang
+  - 0x2518 <= x <= 0x2548
+  - 0x2D <= y <= 0x45
+
+Moskito's Nest screen 5 : if betilla hasn't been encountered then retrieve grappling_fist
+during the moskito boss fight
+
+Allegro Presto screen 4 : if betilla hasn't been encountered then retrieve helicopter
+  - 0x18A9 <= x <= 0x18CD
+  - 0x470 <= y <= 0x48A
+
+Mr Stone's Peaks screen 5 : if betilla hasn't been encountered then retrieve run
+during the Mr Stone boss fight
+
 ### cage
 
 item: adds +1 to the total cage counter
@@ -133,3 +155,10 @@ If the game becomes desynchronized, re-trigger the locations so they can be repo
 
 Powers : keep a variable to record if the RayEvts address has been modify by the client.
 It is important to not check a location if it hasn't been obtained by the player
+
+## Level access
+
+For later version of this world level order will be shuffle and screen may be randomnize.
+In order to be sure that every screen is playable here is a liste of things to do :
+- when in allegro presto screen 3 : retrieve the Mr Sax's encounter to be able to enter
+screen 4
