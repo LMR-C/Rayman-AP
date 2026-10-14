@@ -8,6 +8,7 @@ class BlockSize(Enum):
 class Effect(Enum):
     SET_BIT ="set_bit"
     ADD = "add"
+    SUB = "sub"
     SET_VALUE = "set_value"
     TEMPORARY = "temporary"
     NONE = "none"

@@ -14,6 +14,7 @@ class ItemData :
     classification : ItemClassification
     count : int #To see with model
     effect : Effect
+    size: BlockSize = BlockSize.BYTE
     address : int  | None = None
     value : int = 0
 
@@ -22,7 +23,7 @@ class RaymanItem(Item) :
 
 
 ITEMS = [
-    ItemData("Fist Power", 1, ItemClassification.progression,1,Effect.SET_BIT,0X1F43D0,0X01),
+    ItemData("Fist Power", 1, ItemClassification.progression,1,Effect.SET_BIT,BlockSize.BYTE,0X1F43D0,0X01),
     ItemData("Nothing", 2, ItemClassification.filler, 0, Effect.NONE)
 ]
 

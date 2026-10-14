@@ -6,6 +6,7 @@ from .locations import LOCATION_ID_TABLE
 from .items import ITEM_ID_TABLE
 from .utils import Effect
 from collections import defaultdict
+from .ram_operation import RamOperation,build_item_operations
 
 
 logger = logging.getLogger("Client")
@@ -17,52 +18,13 @@ class RaymanClient(BizHawkClient):
     game="Rayman"
     system = "PSX"
     patch_suffix = None  #no patches
+    items_index_counter: int = 0
 
 
     def __init__(self) -> None:
         super().__init__()
+        self.items_index_counter = 0
 
-    def build_ram_operations(self, ctx:"BizHawkClientContext"):
-        """
-        Collect the pending RAM operations from all received items, grouped by address and effect type.
-
-        Unknown items are logged and skipped. Only SET_BIT is implemented (masks OR-ed per address).
-
-        :param ctx: BizHawk client context (reads ``items_received``).
-        :return: ``(add_dict, set_bit_dict, set_value_dict, set_temporary_dict)``, address -> value.
-        """
-
-        add_dict:defaultdict[int,int] = defaultdict(int)
-        set_bit_dict:defaultdict[Any,int]= defaultdict(int)
-        set_value_dict:defaultdict[Any,int] = defaultdict(int)
-        set_temporary_dict:defaultdict[Any,int] = defaultdict(int)
-
-        for index,network_item in enumerate(ctx.items_received):
-            id_item = network_item.item
-            item_in_table = ITEM_ID_TABLE.get(id_item)
-
-            if item_in_table is None :
-                logger.warning(f"item with id {id_item} doesn't exist in rayman item table")
-                continue
-
-            match item_in_table.effect:
-                case Effect.ADD:
-                    pass
-                    #Have to manage counter in memory and transformation
-                case Effect.SET_BIT:
-                    if item_in_table.address is None:
-                        logger.warning("item_in_table.id has no adresses")
-                        continue
-                    set_bit_dict[item_in_table.address] |= item_in_table.value
-                case Effect.SET_VALUE:
-                    pass
-                case Effect.TEMPORARY:
-                    pass
-                case Effect.NONE:
-                    pass
-                case _ :
-                    logger.warning("Unknown item effect")
-        return add_dict,set_bit_dict,set_value_dict,set_temporary_dict
 
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
@@ -72,7 +34,10 @@ class RaymanClient(BizHawkClient):
         ctx.want_slot_data = False
         return ctx.rom_hash == hash_check
 
-    async def game_watcher(self,ctx:"BizHawkClientContext") -> None: 
+    async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
+        if ctx.server is None or ctx.slot is None:
+            return
+
         try :
             #Location check part
             id_list = list(ctx.missing_locations)
@@ -85,8 +50,32 @@ class RaymanClient(BizHawkClient):
             }
             #send ids to server for checking
             await ctx.check_locations(ids_to_check)
+            #Op
+            item_id_list: list[int] = [item.item for item in ctx.items_received]
+            operations_item_dict = build_item_operations(item_id_list,self.items_index_counter)
 
-        except Exception as e :
+            #Reading item to modify
+            read_list = [(address, op.size, "MainRAM") for address, op in operations_item_dict.items()]
+
+            #building items modifications
+            write_list = []
+            guard_list = []
+            items_from_game = await bizhawk.read (ctx.bizhawk_ctx, read_list)
+            for (address, op), data in zip(operations_item_dict.items(),items_from_game,strict=True):
+                read_value = int.from_bytes(data,"little")
+                new_value,_overflow = op.apply(read_value)
+                if new_value != read_value :
+                    write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
+                    guard_list.append((address,data,"MainRAM"))
+            if write_list :
+                is_writed = await bizhawk.guarded_write(ctx.bizhawk_ctx,write_list,guard_list)
+                # Will be useless when counter will be on game's RAM
+                if is_writed :
+                    self.items_index_counter = len(item_id_list)
+            else :
+                self.items_index_counter = len(item_id_list)
+
+        except Exception as e:
             logger.exception(e)
 
 
