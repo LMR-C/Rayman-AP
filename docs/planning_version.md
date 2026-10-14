@@ -24,10 +24,11 @@
 - Helicopter : Give Rayman the ability to helicopter with his hair
 - Running : Give Rayman the ability to run
 - Cages : One of the 102 cages in the game
-- Life status : One of the 64 unique life status in the game
+- Life status : One of the 60 unique life status in the game
+- Magician challenges : One of the 10 unique magician challenge in the game
 - Magic Seed : Find the Magic Seed so you can use it
 - Helicopter Potion : Find the Helicopter Potion so you can use it
-- Light Fist : Find the light fist so you can use it in Eat At Joe's first screen
+- Firefly : Find the firefly so you can use it in Eat At Joe's first screen
 
 #### Filler items
 - Simple Power : Give 1 HP to Rayman
@@ -41,12 +42,28 @@
 - Forced Run : For a limited time, Rayman will be temporarely forced to run
 
 ### Settings
+
+quality of life :
 - Number of starting lives
-- Number of cages required to unlock Mr.Dark's Dare
+- Number of continue
 - Number of tings to get a new life
 
-### Quality of life
-- 99 continues
+General settings :
+- Difficulty
+
+Item Settings :
+- Trap fill percentage
+- Reversed Controls Weight
+- Force Run Weight
+- Magic Seed as item
+- Super Helicopter
+- Firefly as item
+
+Location settings :
+- Number of cages required to unlock Mr.Dark's Dare
+- Include life status
+- Include magician challenges
+- Location to exclude
 
 ## 1.1
 
@@ -62,6 +79,12 @@ then beat Mr.Dark
 - Protoon piece : A fragment of the great protoon (custom Archipelago item)
 
 ### Settings
+General settings :
+- Goal
+- Open World
+
+Location settings :
+- Level unlock as location and item
 - Number of great protoon piece to unlock Mr.Dark's Dare
 
 ## 2.0
@@ -75,7 +98,8 @@ Level order randomnization : the level order in the world map is randomnized
 - Level Unlock : Unlock the acess to a level
 
 #### Settings
-- Choice to randomnize levels
+General settings :
+- Randomnize Level
 
 ## 3.0
 
@@ -89,9 +113,9 @@ Sub-level randomnization : Randomnize sub-level between levels
 
 ### Settings
 
-- Choice to randomnize sub-levels:
-    - inside a level
-    - between levels
+General settings :
+- Goal
+- Randomnize Level
 
 ## 4.0
 
@@ -119,4 +143,5 @@ slower and his jumps lower
 
 ### Settings
 
-- Choice to shuffle object positions inside levels
+General settings :
+- Shuffle objects position inside levels

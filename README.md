@@ -16,6 +16,7 @@ then beat Mr.Dark
 ## Game modifications
 
 - Level order randomnization : the level order in the world map is randomnized
+- Level unlocks as items : you need to find an item to unlock each level
 - Sub-level randomnization : Randomnize sub-level between levels
 - Object shuffle : Shuffle in-level items position :
     - Cage
@@ -43,14 +44,15 @@ then beat Mr.Dark
 - Helicopter : Give Rayman the ability to helicopter with his hair
 - Running : Give Rayman the ability to run
 - Cages : One of the 102 cages in the game
-- Life status : One of the 65 unique life status in the game
+- Life status : One of the 60 unique life status in the game
+- Magician challenges : One of the 10 unique magician challenge in the game
 - Protoon piece : A fragment of the great protoon (custom Archipelago item)
 - Level Unlock : Unlock the acess to a level
 - Magic Seed : Find the Magic Seed so you can use it
 - Helicopter Potion : Find the Helicopter Potion so you can use it
-- Light Fist : Find the light fist so you can use it in Eat At Joe's first screen
+- Firefly : Find the firefly so you can use it in Eat At Joe's first screen
 
-### Junk items
+### Filler items
 - Simple Power : Give 1 HP to Rayman
 - Double Power : Give 2 HP to Rayman
 - Big Power : Restore Rayman's health completely and increase his health bar to 5 points. If Rayman loses a life, the effect is cancelled
@@ -61,19 +63,36 @@ then beat Mr.Dark
 
 ### Traps
 - Reversed Controls : The player's controls will be reversed similar to the start of Mr.Dark's Dare 3
+- Forced Run : For a limited time, Rayman will be temporarely forced to run
 - Elf Trap : For a limited time, Rayman will be temporarely shrunken, making him
 slower and his jumps lower
 
 ## Settings
+
+quality of life :
 - Number of starting lives
+- Number of continue
+- Number of tings to get a new life
+
+General settings :
+- Difficulty
+- Goal
+- Shuffle objects position inside levels
+- Open World
+- Randomnize Level
+
+Item settings :
+- Trap fill percentage
+- Reversed Controls Weight
+- Force Run Weight
+- Magic Seed as item
+- Super Helicopter
+- Firefly as item
+
+Location settings :
+- Level unlock as location and item
 - Number of cages required to unlock Mr.Dark's Dare
 - Number of great protoon piece to unlock Mr.Dark's Dare
-- Number of tings to get a new life
-- Choice to shuffle object positions inside levels
-- Choice to randomnize levels
-- Choice to randomnize sub-levels:
-    - inside a level
-    - between levels
-
-## Quality of life
-- 99 continues
+- Include life status
+- Include magician challenges
+- Location to exclude
