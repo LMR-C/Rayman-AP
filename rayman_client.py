@@ -1,17 +1,15 @@
-from typing import TYPE_CHECKING,Any
+import logging
+from typing import TYPE_CHECKING
+
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
-import logging
-from .locations import LOCATION_ID_TABLE
-from .items import ITEM_ID_TABLE
-from .utils import Effect
-from collections import defaultdict
-from .ram_operation import RamOperation,build_item_operations
 
+from .locations import LOCATION_ID_TABLE
+from .ram_operation import build_item_operations
 
 logger = logging.getLogger("Client")
 
-if TYPE_CHECKING: 
+if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
 
 class RaymanClient(BizHawkClient):

@@ -1,8 +1,8 @@
-from .utils import Effect
-from .items import ITEM_ID_TABLE
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 
+from .items import ITEM_ID_TABLE
+from .utils import Effect
 
 logger = logging.getLogger("RamOperation")
 

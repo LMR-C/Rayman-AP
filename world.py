@@ -1,7 +1,9 @@
 from worlds.AutoWorld import World
-from .locations import LOCATION_NAME_TO_ID
+
+from . import items, regions
 from .items import ITEM_NAME_TO_ID, RaymanItem
-from . import regions,items
+from .locations import LOCATION_NAME_TO_ID
+
 
 class RaymanWorld(World):
     game = "Rayman"

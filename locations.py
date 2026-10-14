@@ -1,6 +1,9 @@
-from .utils import BlockSize
 from dataclasses import dataclass
+
 from BaseClasses import Location
+
+from .utils import BlockSize
+
 
 @dataclass(frozen=True)
 class LocationData :

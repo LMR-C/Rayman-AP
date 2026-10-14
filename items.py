@@ -1,8 +1,9 @@
-from .utils import BlockSize, Effect
 from dataclasses import dataclass
-from BaseClasses import Item
-from BaseClasses import ItemClassification
 from typing import TYPE_CHECKING
+
+from BaseClasses import Item, ItemClassification
+
+from .utils import BlockSize, Effect
 
 if TYPE_CHECKING:
     from .world import RaymanWorld
@@ -41,21 +42,19 @@ def create_available_items(world : "RaymanWorld") -> list[Item] :
     #Creating items needed on game
     item_pool : list[Item] = []
     for data in ITEMS:
-        if data.count >= 1:
-            for _ in range(data.count):
-                item_pool.append(world.create_item(data.name))
+        item_pool.extend(world.create_item(data.name) for _ in range(data.count))
     return item_pool
 
 
 def create_all_items(world : "RaymanWorld") -> None :
     item_pool = create_available_items(world)
-    
+
     number_available_items = len(item_pool)
     number_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
     needed_number_filler_items = number_unfilled_locations - number_available_items
-    
+
     item_pool+= [world.create_filler() for _ in range (needed_number_filler_items)]
-    
+
     world.multiworld.itempool+=item_pool
 
 
