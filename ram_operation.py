@@ -72,7 +72,7 @@ def build_item_operations(item_ids: list[int], applied_count: int = 0) -> dict[i
             operations[item.address]=RamOperation(item.effect,item.size.value,item.value)
         else:
             if item.effect != op.effect:
-                raise ValueError(
+                logger.error(
                 f"Two different operation for same address, address:{item.address}, "
                 f"item.effect: {item.effect}, op.effect: {op.effect}"
                 )

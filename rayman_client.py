@@ -65,14 +65,15 @@ class RaymanClient(BizHawkClient):
                 if new_value != read_value :
                     write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
                     guard_list.append((address,data,"MainRAM"))
-            if write_list :
-                is_writed = await bizhawk.guarded_write(ctx.bizhawk_ctx,write_list,guard_list)
-                # Will be useless when counter will be on game's RAM
-                if is_writed :
-                    self.items_index_counter = len(item_id_list)
-            else :
-                self.items_index_counter = len(item_id_list)
+            #To change when counter will be in game's RAM
+            delivered = True
+            if write_list:
+                delivered = await bizhawk.guarded_write(ctx.bizhawk_ctx, write_list, guard_list)
+            if delivered:
+                self.items_index_counter = max(self.items_index_counter, len(item_id_list))
 
+        except bizhawk.RequestFailedError:
+            pass
         except Exception as e:
             logger.exception(e)
 
