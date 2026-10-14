@@ -30,18 +30,56 @@ location: send the location to the server, then decrement the life counter
 
 #### magic seed:
 
-if world id = 1 and level_id = 9, remove the seed's power
+if world id = 1 and level_id = 9, remove the seed's power and modify the text  
 if item found: let the game handle it
+
+to remove the seed : set ``0xAF63C`` to 0xFF (while Rayman is in the screen)
+and replace the text : 
+- ``0x12BAD1`` : Tarayzan gives Rayman a magic seed
+- ``0x12BAF9`` : Press the o button to use the seed
+
+to modify : 
+- ``0x12BAD1`` : Tarayzan lost the magic seed : ``74 61 72 61 79 71 61 6E 20 6C 6F 73 74 20 74 68 65 20 6D 61 67 69 63 20 73 65 65 64 2F 00``
+- ``0x12BAF9`` : You need to find it : ``79 6F 75 20 6E 65 65 64 20 74 34 20 66 69 6E 64 20 69 74 00``
+
+to restore :
+- Restore the 35 bytes of ``0x12BAD1``
+- Restore the 36 bytes of ``0x12BAF9``
 
 #### Super helicopter:
 
-if world id = 3 and level_id = 6, remove the Super Helicopter's power
+if world id = 3 and level_id = 6, remove the Super Helicopter potion and modify the text  
 if item found: let the game handle it
+
+to remove the potion : set ``0xA6769`` to 0x00
+and replace the text :
+- ``0x12BB21`` : The musician gives rayman
+- ``0x12BB3D`` : a super helicopter power
+
+to modify :
+- ``0x12BB21`` : "the potion has been lost" : ``74 68 65 20 70 6F 74 69 6F 6E 20 68 61 73 20 62 65 65 6E 20 6C 6F 73 74 00``
+- ``0x12BB3D`` : "you must find it" : ``79 6F 75 20 6D 75 73 74 20 66 6E 63 64 20 69 74 00``
+
+to restore :
+- 26 bytes of ``0x12BB21``
+- 25 bytes of ``0x12BB3D``
 
 #### light fist:
 
-if world id = 5 and level_id = 4, remove the Light Fist's power
+if world id = 5 and level_id = 4, remove the Light Fist's power (read [game_info_1.0md](game_info_1.0.md)) and replace text  
 if item found: let the game handle it
+
+replace the text :
+- ``0x12BBBD`` : Joe offers Rayman a firefly
+- ``0x12BBDD`` : to light up the dark
+
+to modify :
+- ``0x12BBBD`` : "joe lost the firefly" : ``6A 6F 65 20 6C 6F 73 74 20 74 68 65 20 66 69 72 65 66 6C 79 00``
+- ``0x12BBDD`` : "you must find it" : ``79 6F 75 20 6D 75 73 74 20 66 69 6E 64 20 69 74 00``
+
+to restore :
+- 29 bytes of ``0x12BBBD``
+- 21 bytes of ``0x12BBDD``
 
 ### Level Unlock
 
