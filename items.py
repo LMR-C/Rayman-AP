@@ -1,0 +1,63 @@
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+from BaseClasses import Item, ItemClassification
+
+from .utils import BlockSize, Effect
+
+if TYPE_CHECKING:
+    from .world import RaymanWorld
+
+@dataclass(frozen=True)
+class ItemData :
+    name : str
+    id : int
+    classification : ItemClassification
+    count : int #To see with model
+    effect : Effect
+    size: BlockSize = BlockSize.BYTE
+    address : int  | None = None
+    value : int = 0
+
+class RaymanItem(Item) :
+    game = "Rayman"
+
+
+ITEMS = [
+    ItemData("Fist Power", 1, ItemClassification.progression,1,Effect.SET_BIT,BlockSize.BYTE,0X1F43D0,0X01),
+    ItemData("Nothing", 2, ItemClassification.filler, 0, Effect.NONE)
+]
+
+def create_item_with_table(world : "RaymanWorld", name : str) -> RaymanItem :
+    data = ITEM_NAME_TABLE[name]
+    return RaymanItem(data.name,data.classification,data.id,world.player)
+
+# Can be deleted if useless in the future
+ITEM_NAME_TABLE = {item.name: item for item in ITEMS}
+ITEM_ID_TABLE = { item.id: item for item in ITEMS}
+# Needed for AP
+ITEM_NAME_TO_ID = {item.name: item.id for item in ITEMS}
+
+def create_available_items(world : "RaymanWorld") -> list[Item] :
+    #Creating items needed on game
+    item_pool : list[Item] = []
+    for data in ITEMS:
+        item_pool.extend(world.create_item(data.name) for _ in range(data.count))
+    return item_pool
+
+
+def create_all_items(world : "RaymanWorld") -> None :
+    item_pool = create_available_items(world)
+
+    number_available_items = len(item_pool)
+    number_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))
+    needed_number_filler_items = number_unfilled_locations - number_available_items
+
+    item_pool+= [world.create_filler() for _ in range (needed_number_filler_items)]
+
+    world.multiworld.itempool+=item_pool
+
+
+def get_filler_item_name() -> str :
+    # To change later
+    return "Nothing"
