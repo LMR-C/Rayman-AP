@@ -7,12 +7,10 @@ but it allows us to visualize where we are.
 
 - [x] List the main memory addresses ~ 100%
 - [x] Extract game information ~ 100%
-- [ ] Client.py skeleton ~ 0%
+- [x] Client.py skeleton ~ 100%
 - [ ] Items implementation ~ 0%
 - [ ] Location implementation ~ 0%
-- [ ] Main loop game logic ~ 0%
+- [ ] Main loop game logic ~ 5%
 - [ ] Region implementation ~ 0%
 - [ ] Logic implementation ~ 0%
-- [ ] YAML parser implementation ~ 0%
-- [ ] Main Loop Network implementation ~ 0%
 - [ ] Unit Test ~ 0%
