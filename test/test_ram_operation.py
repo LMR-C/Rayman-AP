@@ -8,7 +8,7 @@ from unittest.mock import patch
 from BaseClasses import ItemClassification
 
 from ..client_stuff.ram_operation import RamOperation, build_item_operations
-from ..items import ItemData
+from ..items import ITEM_NAME_TO_ID, ItemData
 from ..utils import BlockSize, Effect
 
 BIT_A = 10
@@ -162,4 +162,7 @@ class TestBuildItemOperations(unittest.TestCase):
 
 class TestBuildItemOperationsRealTable(unittest.TestCase):
     def test_fist_power(self) -> None:
-        self.assertEqual(build_item_operations([1]), {0x1F43D0: RamOperation(Effect.SET_BIT, 1, 0x01)})
+        self.assertEqual(
+            build_item_operations([ITEM_NAME_TO_ID["Fist Power"]]),
+            {0x1F43D0: RamOperation(Effect.SET_BIT, 1, 0x01)},
+        )
