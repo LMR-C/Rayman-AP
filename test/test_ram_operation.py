@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 from BaseClasses import ItemClassification
 
+from ..client_stuff.ram_operation import RamOperation, build_item_operations
 from ..items import ItemData
-from ..ram_operation import RamOperation, build_item_operations
 from ..utils import BlockSize, Effect
 
 BIT_A = 10
@@ -110,7 +110,7 @@ class TestRamOperationMerge(unittest.TestCase):
                 RamOperation(effect, 1, 1).merge(1)
 
 
-@patch.dict("worlds.rayman.ram_operation.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True)
+@patch.dict("worlds.rayman.client_stuff.ram_operation.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True)
 class TestBuildItemOperations(unittest.TestCase):
     def test_empty_list(self) -> None:
         self.assertEqual(build_item_operations([]), {})

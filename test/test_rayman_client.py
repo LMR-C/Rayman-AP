@@ -82,7 +82,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
             patch("worlds._bizhawk.read", self.read),
             patch("worlds._bizhawk.guarded_write", self.guarded_write),
             patch.dict("worlds.rayman.rayman_client.LOCATION_ID_TABLE", FAKE_LOCATION_ID_TABLE, clear=True),
-            patch.dict("worlds.rayman.ram_operation.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True),
+            patch.dict("worlds.rayman.client_stuff.ram_operation.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True),
         ]
         for patcher in patchers:
             patcher.start()

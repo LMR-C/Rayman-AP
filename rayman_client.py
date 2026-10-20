@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
+from .client_stuff.ram_operation import build_item_operations
 from .locations import LOCATION_ID_TABLE
-from .ram_operation import build_item_operations
 
 logger = logging.getLogger("Client")
 
