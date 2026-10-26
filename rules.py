@@ -5,9 +5,10 @@ from rule_builder.rules import Has, True_
 none = True_()
 
 # Powers
-has_fist = Has("Fist")
+has_fist = Has("Telescopic Fist")
 has_hang = Has("Hanging")
 has_grappling_fist = Has("Grappling Fist")
+has_helicopter = Has("Helicopter")
 
 # Special items
 has_magic_seed = Has("Magic Seed")
