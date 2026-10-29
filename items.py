@@ -36,9 +36,9 @@ def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
         ItemData(1004, "Helicopter", (0x1f43d0), BlockSize.BYTE, 0x4, 1, Effect.SET_BIT, ItemClassification.progression, None),
 
         # Level Unlock
-        ItemData(5001, "Anguish Lagoon Unlock", (0x1C3378), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
-        ItemData(5002, "The Swamps of Forgetfulness Unlock", (0x1C3384), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
-        ItemData(5003, "Moskito's Nest Unlock", (0x1C33A0), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
+        # ItemData(5001, "Anguish Lagoon Unlock", (0x1C3378), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
+        # ItemData(5002, "The Swamps of Forgetfulness Unlock", (0x1C3384), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
+        # ItemData(5003, "Moskito's Nest Unlock", (0x1C33A0), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
 
         # Special items
         ItemData(2001, "Magic Seed", (0x1f43d0), BlockSize.BYTE, 0x40, 1 if is_magic_seed else 0, Effect.SET_BIT, ItemClassification.progression, None),
