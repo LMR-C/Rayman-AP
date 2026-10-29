@@ -25,6 +25,17 @@ class RaymanWorld(World):
     item_name_to_id = ITEM_NAME_TO_ID
 
 
+    def fill_slot_data(self) -> dict:
+        return {
+            "number_of_starting_life": self.options.number_of_starting_life.value,
+            "number_of_continue": self.options.number_of_continue.value,
+            "number_of_tings_to_get_a_new_life": self.options.number_of_tings_to_get_a_new_life.value,
+            "magic_seed_as_item": self.options.magic_seed_as_item.value,
+            "include_life_status_in_location": self.options.include_life_status_in_location.value,
+            "include_magician_challenges_in_location": self.options.include_magician_challenges_in_location.value
+        }
+
+
     def add_completion_event(self, location_name: str, region: str, event_name: str) -> None:
         """Create a fictive item to verify if a location has been reached"""
 
