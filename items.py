@@ -65,3 +65,8 @@ ITEM_NAME_TABLE = {item.name: item for item in get_item_table()}
 ITEM_ID_TABLE = { item.id: item for item in get_item_table()}
 # Needed for AP
 ITEM_NAME_TO_ID = {item.name: item.id for item in get_item_table()}
+
+TRAP_ITEMS = {
+    "Reversed controls",
+    "Forced Run"
+}

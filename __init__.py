@@ -5,7 +5,8 @@ from .options import RaymanGameOptions, rayman_options_groups
 from .locations import get_location_table, RaymanLocation, LOCATION_NAME_TO_ID
 from .regions import REGIONS
 from .entrances import get_entrance_table
-from .items import ITEM_NAME_TO_ID, ITEM_NAME_TABLE, RaymanItem, get_item_table
+from .items import ITEM_NAME_TO_ID, ITEM_NAME_TABLE, RaymanItem, get_item_table, TRAP_ITEMS
+
 from . import rules
 
 from . import rayman_client as rayman_client
@@ -81,7 +82,6 @@ class RaymanWorld(World):
         victory_location.place_locked_item(victory_item)
         region.locations.append(victory_location)
 
-        # self.set_rule(victory_location, rules.can_acess_moskito_nest & rules.has_fist & rules.has_hang)
         self.set_rule(victory_location, rules.can_acess_moskito_nest)
 
         self.multiworld.completion_condition[self.player] = (
@@ -120,6 +120,10 @@ class RaymanWorld(World):
             location = RaymanLocation(self.player, data, regions[data.region])
             regions[data.region].locations.append(location)
             self.set_rule(location, data.rule)
+
+            # forbid trap item on specific locations
+            if (data.id >=3000 and data.id <= 3999) or (data.id >= 7000 and data.id <= 7999):
+                location.item_rule = lambda item: item.name not in TRAP_ITEMS
 
         # Define level complete events
         self.add_completion_event("Pink Plant Woods finished", "Pink Plant Woods Screen 3", "Pink Plant Woods finished")
