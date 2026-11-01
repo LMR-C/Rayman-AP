@@ -17,17 +17,25 @@ class ItemData :
     effect : Effect
     size: BlockSize = BlockSize.BYTE
     address : int  | None = None
-    value : int = 0
+    value : int = 0 # BIT: mask of the flag(s) / COUNTER: amount added
+
+    def __post_init__(self) -> None:
+        if self.effect is Effect.NONE:
+            return
+        if self.address is None:
+            raise ValueError(f"Item {self.name!r}: effect {self.effect} needs an address")
+        if self.value == 0:
+            raise ValueError(f"Item {self.name!r}: effect {self.effect} needs a non-zero value")
 
 class RaymanItem(Item) :
     game = "Rayman"
 
 
 ITEMS = [
-    ItemData("Fist Power", 1001, ItemClassification.progression,1,Effect.SET_BIT,BlockSize.BYTE,0X1F43D0,0X01),
-    ItemData("Hanging", 1002, ItemClassification.progression,1,Effect.SET_BIT,BlockSize.BYTE,0X1F43D0,0X02),
-    ItemData("Cage", 3001, ItemClassification.progression,1,Effect.ADD,BlockSize.BYTE,0x1F8138,1),
-    ItemData("Life", 8001, ItemClassification.useful,1,Effect.ADD,BlockSize.BYTE,0x1E4D50,1),
+    ItemData("Fist Power", 1001, ItemClassification.progression,1,Effect.BIT,BlockSize.BYTE,0X1F43D0,0X01),
+    ItemData("Hanging", 1002, ItemClassification.progression,1,Effect.BIT,BlockSize.BYTE,0X1F43D0,0X02),
+    ItemData("Cage", 3001, ItemClassification.progression,1,Effect.COUNTER,BlockSize.BYTE,0x1F8138,1),
+    ItemData("Life", 8001, ItemClassification.useful,1,Effect.COUNTER,BlockSize.BYTE,0x1E4D50,1),
     ItemData("Nothing", 2, ItemClassification.filler, 0, Effect.NONE)
 ]
 
