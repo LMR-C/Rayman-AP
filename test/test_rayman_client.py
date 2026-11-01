@@ -28,9 +28,9 @@ FAKE_LOCATION_ID_TABLE = {
 }
 
 FAKE_ITEM_ID_TABLE = {
-    BIT_ITEM: ItemData("Bit", BIT_ITEM, ItemClassification.progression, 1, Effect.SET_BIT, BlockSize.BYTE,
+    BIT_ITEM: ItemData("Bit", BIT_ITEM, ItemClassification.progression, 1, Effect.BIT, BlockSize.BYTE,
                        BIT_ADDRESS, 0x01),
-    COUNTER_ITEM: ItemData("Counter", COUNTER_ITEM, ItemClassification.filler, 1, Effect.ADD, BlockSize.BYTE,
+    COUNTER_ITEM: ItemData("Counter", COUNTER_ITEM, ItemClassification.filler, 1, Effect.COUNTER, BlockSize.BYTE,
                            COUNTER_ADDRESS, 1),
 }
 
@@ -82,7 +82,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
             patch("worlds._bizhawk.read", self.read),
             patch("worlds._bizhawk.guarded_write", self.guarded_write),
             patch.dict("worlds.rayman.rayman_client.LOCATION_ID_TABLE", FAKE_LOCATION_ID_TABLE, clear=True),
-            patch.dict("worlds.rayman.client_stuff.ram_operation.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True),
+            patch.dict("worlds.rayman.client_stuff.operation_builder.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True),
         ]
         for patcher in patchers:
             patcher.start()

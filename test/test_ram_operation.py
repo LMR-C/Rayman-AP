@@ -7,152 +7,190 @@ from unittest.mock import patch
 
 from BaseClasses import ItemClassification
 
-from ..client_stuff.ram_operation import RamOperation, build_item_operations
+from ..client_stuff.operation_builder import build_item_operations
+from ..client_stuff.ram_operation import DeltaOperation, MaskOperation, RamOperation
 from ..items import ITEM_NAME_TO_ID, ItemData
 from ..utils import BlockSize, Effect
 
 BIT_A = 10
 BIT_B = 11
 COUNTER = 20
-VALUE_A = 30
-VALUE_B = 31
 CONFLICT = 40
 NO_ADDRESS = 50
 HALF_WORD_COUNTER = 60
 
 FAKE_ITEM_ID_TABLE = {
-    BIT_A: ItemData("Bit A", BIT_A, ItemClassification.progression, 1, Effect.SET_BIT, BlockSize.BYTE, 0x100, 0x01),
-    BIT_B: ItemData("Bit B", BIT_B, ItemClassification.progression, 1, Effect.SET_BIT, BlockSize.BYTE, 0x100, 0x04),
-    COUNTER: ItemData("Counter", COUNTER, ItemClassification.filler, 1, Effect.ADD, BlockSize.BYTE, 0x200, 1),
-    VALUE_A: ItemData("Value A", VALUE_A, ItemClassification.useful, 1, Effect.SET_VALUE, BlockSize.BYTE, 0x300, 2),
-    VALUE_B: ItemData("Value B", VALUE_B, ItemClassification.useful, 1, Effect.SET_VALUE, BlockSize.BYTE, 0x300, 7),
+    BIT_A: ItemData("Bit A", BIT_A, ItemClassification.progression, 1, Effect.BIT, BlockSize.BYTE, 0x100, 0x01),
+    BIT_B: ItemData("Bit B", BIT_B, ItemClassification.progression, 1, Effect.BIT, BlockSize.BYTE, 0x100, 0x04),
+    COUNTER: ItemData("Counter", COUNTER, ItemClassification.filler, 1, Effect.COUNTER, BlockSize.BYTE, 0x200, 1),
     # Same address as BIT_A/BIT_B but different effect
-    CONFLICT: ItemData("Conflict", CONFLICT, ItemClassification.filler, 1, Effect.ADD, BlockSize.BYTE, 0x100, 1),
+    CONFLICT: ItemData("Conflict", CONFLICT, ItemClassification.filler, 1, Effect.COUNTER, BlockSize.BYTE, 0x100, 1),
     NO_ADDRESS: ItemData("No address", NO_ADDRESS, ItemClassification.filler, 1, Effect.NONE),
-    HALF_WORD_COUNTER: ItemData("Half word counter", HALF_WORD_COUNTER, ItemClassification.filler, 1, Effect.ADD,
+    HALF_WORD_COUNTER: ItemData("Half word counter", HALF_WORD_COUNTER, ItemClassification.filler, 1, Effect.COUNTER,
                                 BlockSize.HALF_WORD, 0x400, 1),
 }
 
 
-class TestRamOperationApply(unittest.TestCase):
+class TestMaskOperationApply(unittest.TestCase):
     def test_set_bit_adds_bit(self) -> None:
-        op = RamOperation(Effect.SET_BIT, 1, 0b0001)
-        self.assertEqual(op.apply(0b0100), (0b0101, 0))
+        self.assertEqual(MaskOperation(1, set_mask=0b0001).apply(0b0100), 0b0101)
 
     def test_set_bit_already_set(self) -> None:
-        op = RamOperation(Effect.SET_BIT, 1, 0b0001)
-        self.assertEqual(op.apply(0b0101), (0b0101, 0))
+        self.assertEqual(MaskOperation(1, set_mask=0b0001).apply(0b0101), 0b0101)
 
+    def test_clear_bit(self) -> None:
+        self.assertEqual(MaskOperation(1, clear_mask=0b0001).apply(0b0101), 0b0100)
+
+    def test_set_and_clear_different_bits(self) -> None:
+        self.assertEqual(MaskOperation(1, set_mask=0b0010, clear_mask=0b0001).apply(0b0101), 0b0110)
+
+    def test_bit_in_both_masks_ends_up_set(self) -> None:
+        self.assertEqual(MaskOperation(1, set_mask=0b0001, clear_mask=0b0001).apply(0), 0b0001)
+
+    def test_set_value_whole_byte_ignores_read(self) -> None:
+        op = MaskOperation(1, set_mask=7, clear_mask=0xFF)
+        self.assertEqual(op.apply(0), 7)
+        self.assertEqual(op.apply(42), 7)
+
+    def test_set_value_low_nibble_keeps_high_nibble(self) -> None:
+        self.assertEqual(MaskOperation(1, set_mask=0x05, clear_mask=0x0F).apply(0xAB), 0xA5)
+
+    def test_result_fits_in_size(self) -> None:
+        self.assertEqual(MaskOperation(1, set_mask=0x1FF).apply(0), 0xFF)
+
+
+class TestDeltaOperationApply(unittest.TestCase):
     def test_add(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 2)
-        self.assertEqual(op.apply(3), (5, 0))
+        self.assertEqual(DeltaOperation(1, delta=2).apply(3), 5)
 
     def test_add_bounded_by_size(self) -> None:
         # Without cap, the result must still fit in `size` bytes, otherwise to_bytes raises OverflowError
-        self.assertEqual(RamOperation(Effect.ADD, 1, 10).apply(250), (0xFF, 0))
-        self.assertEqual(RamOperation(Effect.ADD, 2, 10).apply(0xFFFA), (0xFFFF, 0))
-
-    def test_set_value_ignores_read(self) -> None:
-        op = RamOperation(Effect.SET_VALUE, 1, 7)
-        self.assertEqual(op.apply(0), (7, 0))
-        self.assertEqual(op.apply(42), (7, 0))
-
-    def test_unhandled_effects_raise(self) -> None:
-        for effect in (Effect.SUB, Effect.TEMPORARY, Effect.NONE):
-            with self.subTest(effect=effect), self.assertRaises(ValueError):
-                RamOperation(effect, 1, 1).apply(0)
+        self.assertEqual(DeltaOperation(1, delta=10).apply(250), 0xFF)
+        self.assertEqual(DeltaOperation(2, delta=10).apply(0xFFFA), 0xFFFF)
 
     def test_add_with_cap(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 5, cap=10)
-        self.assertEqual(op.apply(8), (10, 0))
+        self.assertEqual(DeltaOperation(1, delta=5, cap=10).apply(8), 10)
 
     def test_add_below_cap(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 1, cap=10)
-        self.assertEqual(op.apply(8), (9, 0))
+        self.assertEqual(DeltaOperation(1, delta=1, cap=10).apply(8), 9)
 
-    def test_add_with_overflow(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 10, overflow_step=100)
-        self.assertEqual(op.apply(95), (5, 1))
+    def test_cap_above_size_is_bounded_by_size(self) -> None:
+        self.assertEqual(DeltaOperation(1, delta=10, cap=1000).apply(250), 0xFF)
 
-    def test_add_with_exact_overflow(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 10, overflow_step=100)
-        self.assertEqual(op.apply(90), (0, 1))
+    def test_negative_delta(self) -> None:
+        self.assertEqual(DeltaOperation(1, delta=-2).apply(5), 3)
 
-    def test_add_with_multiple_overflows(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 250, overflow_step=100)
-        self.assertEqual(op.apply(0), (50, 2))
-
-    def test_add_with_cap_and_overflow(self) -> None:
-        # Design decision: overflow_step takes priority over cap, cap is ignored.
-        op = RamOperation(Effect.ADD, 1, 10, cap=50, overflow_step=100)
-        self.assertEqual(op.apply(95), (5, 1))
+    def test_negative_delta_bounded_at_zero(self) -> None:
+        self.assertEqual(DeltaOperation(1, delta=-3).apply(1), 0)
 
 
-class TestRamOperationMerge(unittest.TestCase):
-    def test_set_bit_merge(self) -> None:
-        op = RamOperation(Effect.SET_BIT, 1, 0x01)
-        op.merge(0x04)
-        self.assertEqual(op.value, 0x05)
+class TestMaskOperationMerge(unittest.TestCase):
+    def test_set_bits_merged(self) -> None:
+        op = MaskOperation(1, set_mask=0x01)
+        op.merge(MaskOperation(1, set_mask=0x04))
+        self.assertEqual(op, MaskOperation(1, set_mask=0x05))
 
-    def test_add_merge(self) -> None:
-        op = RamOperation(Effect.ADD, 1, 2)
-        op.merge(3)
-        self.assertEqual(op.value, 5)
+    def test_clear_masks_merged(self) -> None:
+        op = MaskOperation(1, clear_mask=0x01)
+        op.merge(MaskOperation(1, clear_mask=0x02))
+        self.assertEqual(op, MaskOperation(1, clear_mask=0x03))
 
-    def test_set_value_merge_last_wins(self) -> None:
-        op = RamOperation(Effect.SET_VALUE, 1, 2)
-        op.merge(7)
-        self.assertEqual(op.value, 7)
+    def test_set_wins_over_clear_whatever_the_order(self) -> None:
+        # Received item (set) always wins over a reverse (clear) on the same bit
+        for first, second in ((MaskOperation(1, clear_mask=0x01), MaskOperation(1, set_mask=0x01)),
+                              (MaskOperation(1, set_mask=0x01), MaskOperation(1, clear_mask=0x01))):
+            with self.subTest(first=first, second=second):
+                first.merge(second)
+                self.assertEqual(first.apply(0), 0x01)
+                self.assertEqual(first.apply(0x01), 0x01)
 
-    def test_unhandled_effects_raise(self) -> None:
-        for effect in (Effect.SUB, Effect.TEMPORARY, Effect.NONE):
-            with self.subTest(effect=effect), self.assertRaises(ValueError):
-                RamOperation(effect, 1, 1).merge(1)
+    def test_merge_is_commutative(self) -> None:
+        a1, b1 = MaskOperation(1, set_mask=0x30, clear_mask=0x0F), MaskOperation(1, set_mask=0x01, clear_mask=0x20)
+        a2, b2 = MaskOperation(1, set_mask=0x30, clear_mask=0x0F), MaskOperation(1, set_mask=0x01, clear_mask=0x20)
+        a1.merge(b1)
+        b2.merge(a2)
+        self.assertEqual(a1, b2)
 
 
-@patch.dict("worlds.rayman.client_stuff.ram_operation.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True)
+class TestDeltaOperationMerge(unittest.TestCase):
+    def test_deltas_summed(self) -> None:
+        op = DeltaOperation(1, delta=2)
+        op.merge(DeltaOperation(1, delta=3))
+        self.assertEqual(op, DeltaOperation(1, delta=5))
+
+    def test_positive_and_negative_deltas(self) -> None:
+        op = DeltaOperation(1, delta=5)
+        op.merge(DeltaOperation(1, delta=-5))
+        self.assertEqual(op.delta, 0)
+
+    def test_same_cap_kept(self) -> None:
+        op = DeltaOperation(1, delta=1, cap=99)
+        op.merge(DeltaOperation(1, delta=1, cap=99))
+        self.assertEqual(op, DeltaOperation(1, delta=2, cap=99))
+
+    def test_different_caps_raise(self) -> None:
+        with self.assertRaises(ValueError):
+            DeltaOperation(1, delta=1, cap=99).merge(DeltaOperation(1, delta=1, cap=50))
+
+
+class TestMergeErrors(unittest.TestCase):
+    def test_mask_and_delta_cannot_be_merged(self) -> None:
+        with self.assertRaises(TypeError):
+            MaskOperation(1, set_mask=1).merge(DeltaOperation(1, delta=1))
+        with self.assertRaises(TypeError):
+            DeltaOperation(1, delta=1).merge(MaskOperation(1, set_mask=1))
+
+    def test_different_sizes_raise(self) -> None:
+        with self.assertRaises(ValueError):
+            MaskOperation(1, set_mask=1).merge(MaskOperation(2, set_mask=1))
+        with self.assertRaises(ValueError):
+            DeltaOperation(1, delta=1).merge(DeltaOperation(2, delta=1))
+
+    def test_abstract_class_cannot_be_instantiated(self) -> None:
+        with self.assertRaises(TypeError):
+            RamOperation(1)  # type: ignore[abstract]
+
+
+@patch.dict("worlds.rayman.client_stuff.operation_builder.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True)
 class TestBuildItemOperations(unittest.TestCase):
     def test_empty_list(self) -> None:
         self.assertEqual(build_item_operations([]), {})
 
     def test_unknown_id_is_skipped_with_warning(self) -> None:
-        with self.assertLogs("RamOperation", level="WARNING"):
+        with self.assertLogs("OperationBuilder", level="WARNING"):
             self.assertEqual(build_item_operations([999]), {})
 
     def test_item_without_address_is_skipped(self) -> None:
         self.assertEqual(build_item_operations([NO_ADDRESS]), {})
 
     def test_set_bit_same_address_merged(self) -> None:
-        self.assertEqual(build_item_operations([BIT_A, BIT_B]), {0x100: RamOperation(Effect.SET_BIT, 1, 0x05)})
+        self.assertEqual(build_item_operations([BIT_A, BIT_B]), {0x100: MaskOperation(1, set_mask=0x05)})
 
     def test_add_same_address_summed(self) -> None:
-        self.assertEqual(build_item_operations([COUNTER] * 3), {0x200: RamOperation(Effect.ADD, 1, 3)})
-
-    def test_set_value_last_wins(self) -> None:
-        self.assertEqual(build_item_operations([VALUE_A, VALUE_B]), {0x300: RamOperation(Effect.SET_VALUE, 1, 7)})
+        self.assertEqual(build_item_operations([COUNTER] * 3), {0x200: DeltaOperation(1, delta=3)})
 
     def test_applied_count_skips_already_applied_add(self) -> None:
-        self.assertEqual(build_item_operations([COUNTER] * 3, applied_count=2), {0x200: RamOperation(Effect.ADD, 1, 1)})
+        self.assertEqual(build_item_operations([COUNTER] * 3, counter_state=2), {0x200: DeltaOperation(1, delta=1)})
 
     def test_applied_count_all_applied(self) -> None:
-        self.assertEqual(build_item_operations([COUNTER] * 3, applied_count=3), {})
+        self.assertEqual(build_item_operations([COUNTER] * 3, counter_state=3), {})
 
     def test_applied_count_ignored_for_set_bit(self) -> None:
-        ops = build_item_operations([BIT_A], applied_count=1)
-        self.assertEqual(ops, {0x100: RamOperation(Effect.SET_BIT, 1, 0x01)})
+        ops = build_item_operations([BIT_A], counter_state=1)
+        self.assertEqual(ops, {0x100: MaskOperation(1, set_mask=0x01)})
 
     def test_applied_count_uses_index_in_full_list(self) -> None:
         # Only the COUNTER at index 3 is new
-        ops = build_item_operations([COUNTER, BIT_A, COUNTER, COUNTER], applied_count=3)
+        ops = build_item_operations([COUNTER, BIT_A, COUNTER, COUNTER], counter_state=3)
         self.assertEqual(ops, {
-            0x100: RamOperation(Effect.SET_BIT, 1, 0x01),
-            0x200: RamOperation(Effect.ADD, 1, 1),
+            0x100: MaskOperation(1, set_mask=0x01),
+            0x200: DeltaOperation(1, delta=1),
         })
 
     def test_conflict_keeps_first_operation_and_logs_error(self) -> None:
-        with self.assertLogs("RamOperation", level="ERROR"):
+        with self.assertLogs("OperationBuilder", level="ERROR"):
             ops = build_item_operations([BIT_A, CONFLICT])
-        self.assertEqual(ops, {0x100: RamOperation(Effect.SET_BIT, 1, 0x01)})
+        self.assertEqual(ops, {0x100: MaskOperation(1, set_mask=0x01)})
 
     def test_size_is_block_size_value(self) -> None:
         ops = build_item_operations([HALF_WORD_COUNTER])
@@ -164,5 +202,5 @@ class TestBuildItemOperationsRealTable(unittest.TestCase):
     def test_fist_power(self) -> None:
         self.assertEqual(
             build_item_operations([ITEM_NAME_TO_ID["Fist Power"]]),
-            {0x1F43D0: RamOperation(Effect.SET_BIT, 1, 0x01)},
+            {0x1F43D0: MaskOperation(1, set_mask=0x01)},
         )
