@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
-from .client_stuff.ram_operation import build_item_operations
+from .client_stuff.operation_builder import build_item_operations
 from .locations import LOCATION_ID_TABLE
 
 logger = logging.getLogger("Client")
@@ -61,7 +61,7 @@ class RaymanClient(BizHawkClient):
             items_from_game = await bizhawk.read (ctx.bizhawk_ctx, read_list)
             for (address, op), data in zip(operations_item_dict.items(),items_from_game,strict=True):
                 read_value = int.from_bytes(data,"little")
-                new_value,_overflow = op.apply(read_value)
+                new_value = op.apply(read_value)
                 if new_value != read_value :
                     write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
                     guard_list.append((address,data,"MainRAM"))
