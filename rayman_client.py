@@ -4,8 +4,9 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
-from .client_stuff.operation_builder import build_ram_operations
+from .client_stuff.operation_builder import add_magic_seed_text_ram_operations, build_ram_operations
 from .locations import LOCATION_ID_TABLE
+from .client_stuff.ram_map import STATE_READS, IN_GAME
 
 logger = logging.getLogger("Client")
 
@@ -24,7 +25,6 @@ class RaymanClient(BizHawkClient):
         self.pending_reversed_ids: set[int] = set()
         self.is_init = False
 
-
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
         hash_check = "BF460FE0" #hash received with BizHawk
         ctx.game = self.game
@@ -33,20 +33,35 @@ class RaymanClient(BizHawkClient):
         return ctx.rom_hash == hash_check
 
 
-    def _init_game_config(self) -> None:
-        ctx.slot_data
-        
+
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
         if ctx.server is None or ctx.slot is None:
             return
 
+
         try :
+            #States to read 
+            state_read_list = [(address, size, "MainRAM") for address, size in STATE_READS.values()]
+
             #Location check part
             id_list = [loc_id for loc_id in ctx.missing_locations if loc_id in LOCATION_ID_TABLE]
-            read_list = [(LOCATION_ID_TABLE[loc_id].address, LOCATION_ID_TABLE[loc_id].size.value, "MainRAM")
+            loc_read_list = [(LOCATION_ID_TABLE[loc_id].address, LOCATION_ID_TABLE[loc_id].size.value, "MainRAM")
                          for loc_id in id_list]
-            locations_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
+
+            #Merging for one read_list
+            read_list = state_read_list + loc_read_list
+
+            reads_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
+
+            #Checking that we are at the first "game screen"
+            state = {
+                name: int.from_bytes(raw, "little") for name, raw in zip(STATE_READS, reads_from_game,strict=False)
+                }
+            if state["menu_state"]!=IN_GAME:
+                return
+            
             # if adress & mask =1 : adding loc_id in set
+            locations_from_game = reads_from_game[len(STATE_READS):]
             ids_to_check = {
                 loc_id for loc_id, data in zip(id_list, locations_from_game, strict=True)
                 if int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask
@@ -61,6 +76,12 @@ class RaymanClient(BizHawkClient):
                                                   self.items_index_counter,
                                                   checked_ids=ctx.checked_locations,  # no-op until resync is implemented
                                                   to_reverse=to_reverse)
+            # Special cases: added after the generic operations, merged in the same dict
+            add_magic_seed_text_ram_operations(operations_dict,
+                                               bool(ctx.slot_data.get("magic_seed_as_item", False)),
+                                               item_id_list,
+                                               state["world_id"],
+                                               state["level_id"])
 
             #Reading item to modify
             read_list = [(address, op.size, "MainRAM") for address, op in operations_dict.items()]
