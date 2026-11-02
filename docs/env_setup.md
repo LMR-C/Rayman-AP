@@ -44,7 +44,7 @@ Run this at the root of the Archipelago clone.
 
 ```bash
 cd ~/dev/Archipelago
-python3.12 -m venv .venv
+python3.12 -m venv .venv # python -m venv --system-site-packages .venv
 source .venv/bin/activate
 python ModuleUpdate.py --yes
 pip install -r requirements.txt

@@ -1,24 +1,26 @@
-from BaseClasses import Region
+from dataclasses import dataclass
 
-from .locations import LOCATIONS, RaymanLocation
+@dataclass(frozen=True)
+class RegionData:
+    name: str
 
-
-def create_regions(world) -> None:
-        #Overworld creation (Not in locations)
-        world.multiworld.regions.append(Region("Overworld",world.player,world.multiworld))
-
-        region_names = sorted({loc.region for loc in LOCATIONS})
-        #Gathering regions from LOCATIONS
-        for name in region_names:
-            world.multiworld.regions.append(Region(name,world.player,world.multiworld))
-
-        #Creating locations
-        for loc in LOCATIONS:
-            region = world.get_region(loc.region)
-            location = RaymanLocation(world.player,loc.name,loc.id,region)
-            region.locations.append(location)
-
-        #Connection
-        hub = world.get_region("Overworld")
-        hub.connect(world.get_region("Pink Plant Woods"))
-        #...
+REGIONS: tuple[RegionData, ...] = (
+    RegionData(name="worldmap"),
+    RegionData(name="Pink Plant Woods Screen 1"),
+    RegionData(name="Pink Plant Woods Screen 2"),
+    RegionData(name="Pink Plant Woods Betilla"),
+    RegionData(name="Pink Plant Woods Screen 3"),
+    RegionData(name="Anguish Lagoon Screen 1"),
+    RegionData(name="Anguish Lagoon Screen 2"),
+    RegionData(name="Anguish Lagoon Screen 3"),
+    RegionData(name="Anguish Lagoon Betilla"),
+    RegionData(name="The Swamps of Forgetfulness Screen 1"),
+    RegionData(name="The Swamps of Forgetfulness Screen 2"),
+    RegionData(name="The Swamps of Forgetfulness Screen 3"),
+    RegionData(name="Moskito's Nest Screen 1"),
+    RegionData(name="Moskito's Nest Screen 2"),
+    RegionData(name="Moskito's Nest Screen 3"),
+    RegionData(name="Moskito's Nest Screen 4"),
+    RegionData(name="Moskito's Nest Screen 5"),
+    RegionData(name="Moskito's Nest Betilla"),
+)
