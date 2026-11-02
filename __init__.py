@@ -1,5 +1,5 @@
-from worlds.AutoWorld import World, WebWorld
-from BaseClasses import Entrance, Region, Item, ItemClassification
+from worlds.AutoWorld import World, WebWorld 
+from BaseClasses import Entrance, Region, Item, ItemClassification, Tutorial
 
 from .options import RaymanGameOptions, rayman_options_groups
 from .locations import get_location_table, RaymanLocation, LOCATION_NAME_TO_ID
@@ -15,6 +15,15 @@ class RaymanWeb(WebWorld):
     theme = "grass"
     option_groups = rayman_options_groups
     # TODO: setup, tutorials, options_preset
+
+    setup_en = Tutorial(
+        "Multiworld Setup Guide",
+        "A guide to setting up the Rayman randomizer connected to an Archipelago Multiworld",
+        "English",
+        "setup_en.md",
+        "setup/en",
+        ["LMR"]
+    )
 
 
 class RaymanWorld(World):
