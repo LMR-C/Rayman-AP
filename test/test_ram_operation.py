@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from BaseClasses import ItemClassification
 
-from ..client_stuff.operation_builder import build_item_operations
+from ..client_stuff.operation_builder import _add_item_operations
 from ..client_stuff.ram_operation import DeltaOperation, MaskOperation, RamOperation
 from ..items import ITEM_NAME_TO_ID, ItemData
 from ..utils import BlockSize, Effect
@@ -29,6 +29,13 @@ FAKE_ITEM_ID_TABLE = {
     HALF_WORD_COUNTER: ItemData("Half word counter", HALF_WORD_COUNTER, ItemClassification.filler, 1, Effect.COUNTER,
                                 BlockSize.HALF_WORD, 0x400, 1),
 }
+
+
+def build_item_operations(items_received: list[int], counter_state: int = 0) -> dict[int, RamOperation]:
+    """Test helper: item operations alone, in a fresh dict."""
+    ops: dict[int, RamOperation] = {}
+    _add_item_operations(ops, items_received, counter_state)
+    return ops
 
 
 class TestMaskOperationApply(unittest.TestCase):

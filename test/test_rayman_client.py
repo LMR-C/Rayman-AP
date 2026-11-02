@@ -17,6 +17,10 @@ from ..utils import BlockSize, Effect
 LOCATION = 1
 LOCATION_ADDRESS = 0x1000
 LOCATION_MASK = 0x80
+# Location whose vanilla reward is COUNTER_ITEM (like a life status)
+VANILLA_LOCATION = 2
+VANILLA_LOCATION_ADDRESS = 0x1001
+VANILLA_LOCATION_MASK = 0x40
 
 BIT_ITEM = 1
 BIT_ADDRESS = 0x500
@@ -25,6 +29,8 @@ COUNTER_ADDRESS = 0x600
 
 FAKE_LOCATION_ID_TABLE = {
     LOCATION: LocationData("Location", LOCATION, "Region", LOCATION_ADDRESS, LOCATION_MASK, BlockSize.BYTE),
+    VANILLA_LOCATION: LocationData("Vanilla location", VANILLA_LOCATION, "Region", VANILLA_LOCATION_ADDRESS,
+                                   VANILLA_LOCATION_MASK, BlockSize.BYTE, vanilla_item_id=COUNTER_ITEM),
 }
 
 FAKE_ITEM_ID_TABLE = {
@@ -68,6 +74,7 @@ def make_ctx(missing_locations: set[int] | None = None, items: list[int] | None 
     ctx.server = object()
     ctx.slot = 1
     ctx.missing_locations = set() if missing_locations is None else missing_locations
+    ctx.checked_locations = set()
     ctx.items_received = [NetworkItem(item_id, 0, 1) for item_id in items or []]
     ctx.check_locations = AsyncMock()
     return ctx
@@ -83,6 +90,8 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
             patch("worlds._bizhawk.guarded_write", self.guarded_write),
             patch.dict("worlds.rayman.rayman_client.LOCATION_ID_TABLE", FAKE_LOCATION_ID_TABLE, clear=True),
             patch.dict("worlds.rayman.client_stuff.operation_builder.ITEM_ID_TABLE", FAKE_ITEM_ID_TABLE, clear=True),
+            patch.dict("worlds.rayman.client_stuff.operation_builder.LOCATION_ID_TABLE", FAKE_LOCATION_ID_TABLE,
+                       clear=True),
         ]
         for patcher in patchers:
             patcher.start()
@@ -179,6 +188,90 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         self.ram.set(BIT_ADDRESS, b"\x00")
         await self.client.game_watcher(ctx)
         self.assertEqual(self.ram.get(BIT_ADDRESS, 1), b"\x01")
+
+    async def test_unknown_missing_location_ignored(self) -> None:
+        ctx = make_ctx({999})
+        with self.assertNoLogs("Client", level="ERROR"):
+            await self.client.game_watcher(ctx)
+        ctx.check_locations.assert_awaited_once_with(set())
+
+    # Vanilla reward reverse
+
+    def pick_vanilla_location(self) -> None:
+        """Simulate the game: location flag set and vanilla reward (+1 counter) given."""
+        self.ram.set(VANILLA_LOCATION_ADDRESS, bytes([VANILLA_LOCATION_MASK]))
+        self.ram.set(COUNTER_ADDRESS, b"\x01")
+
+    async def test_vanilla_reward_reversed(self) -> None:
+        self.pick_vanilla_location()
+        ctx = make_ctx({VANILLA_LOCATION})
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
+        self.assertEqual(self.client.pending_reversed_ids, {VANILLA_LOCATION})
+        ctx.check_locations.assert_awaited_once_with({VANILLA_LOCATION})
+
+    async def test_vanilla_reward_reversed_once_while_server_has_not_confirmed(self) -> None:
+        # The location stays in missing_locations until the server answers: must not be reversed on every tick
+        self.pick_vanilla_location()
+        self.ram.set(COUNTER_ADDRESS, b"\x05")
+        ctx = make_ctx({VANILLA_LOCATION})
+        for _ in range(3):
+            await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x04")
+        self.guarded_write.assert_awaited_once()
+
+    async def test_reverse_not_redone_after_server_confirmation(self) -> None:
+        self.pick_vanilla_location()
+        ctx = make_ctx({VANILLA_LOCATION})
+        await self.client.game_watcher(ctx)
+        # Server answer (RoomUpdate)
+        ctx.missing_locations.discard(VANILLA_LOCATION)
+        ctx.checked_locations.add(VANILLA_LOCATION)
+        self.ram.set(COUNTER_ADDRESS, b"\x03")
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x03")
+        self.assertEqual(self.client.pending_reversed_ids, set())
+
+    async def test_failed_guard_no_check_then_retried(self) -> None:
+        self.pick_vanilla_location()
+        self.ram.guard_fails = True
+        ctx = make_ctx({VANILLA_LOCATION})
+        await self.client.game_watcher(ctx)
+        ctx.check_locations.assert_not_awaited()
+        self.assertEqual(self.client.pending_reversed_ids, set())
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+
+        self.ram.guard_fails = False
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
+        ctx.check_locations.assert_awaited_once_with({VANILLA_LOCATION})
+
+    async def test_location_sent_after_reverse_written(self) -> None:
+        calls: list[str] = []
+
+        async def recording_write(*args) -> bool:
+            calls.append("write")
+            return await self.ram.guarded_write(*args)
+
+        self.guarded_write.side_effect = recording_write
+        self.pick_vanilla_location()
+        ctx = make_ctx({VANILLA_LOCATION})
+        ctx.check_locations.side_effect = lambda *_args: calls.append("check")
+        await self.client.game_watcher(ctx)
+        self.assertEqual(calls, ["write", "check"])
+
+    async def test_received_item_and_vanilla_pickup_same_tick_no_write(self) -> None:
+        # +1 from Archipelago, -1 reverse of the vanilla reward: nothing to write
+        self.pick_vanilla_location()
+        ctx = make_ctx({VANILLA_LOCATION}, [COUNTER_ITEM])
+        await self.client.game_watcher(ctx)
+        self.guarded_write.assert_not_awaited()
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+        self.assertEqual(self.client.items_index_counter, 1)
+        self.assertEqual(self.client.pending_reversed_ids, {VANILLA_LOCATION})
+
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
 
     # Errors
 
