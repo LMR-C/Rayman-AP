@@ -1,10 +1,10 @@
 import logging
 
-from ..items import ITEM_ID_TABLE
+from ..items import ITEM_ID_TABLE, ITEM_NAME_TABLE
 from ..locations import LOCATION_ID_TABLE
 from .effect_strategy import STRATEGIES, RamOps
-from .ram_operation import RamOperation
-
+from .ram_operation import RamOperation,SetOperation
+from . import ram_map as rm
 logger = logging.getLogger("OperationBuilder")
 
 def _merge_into(ops: dict[int, RamOperation], new_ops: RamOps) -> None:
@@ -83,6 +83,30 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
     pass
 
 
+
+def _text_operation(text: bytes) -> SetOperation:
+    """Write ``text`` (raw bytes) as a single SetOperation of ``len(text)`` bytes."""
+    return SetOperation(len(text), int.from_bytes(text, "little"))
+
+
+def add_magic_seed_text_ram_operations(ops:dict[int,RamOperation],
+                                       is_magic_seed_item:bool,
+                                       item_received: list[int],
+                                       world_id : int,
+                                       level_id : int,
+                                       ) -> None:
+    if not is_magic_seed_item or world_id!=1 or level_id!=9:
+        return
+
+    received = ITEM_NAME_TABLE["Magic Seed"].id in item_received
+    text_1 = rm.MAGIC_SEED_TEXT_1_ORIGINAL if received else rm.MAGIC_SEED_TEXT_1_REPLACEMENT
+    text_2 = rm.MAGIC_SEED_TEXT_2_ORIGINAL if received else rm.MAGIC_SEED_TEXT_2_REPLACEMENT
+    _merge_into(ops, [
+        (rm.MAGIC_SEED_TEXT_1_ADDRESS, _text_operation(text_1)),
+        (rm.MAGIC_SEED_TEXT_2_ADDRESS, _text_operation(text_2)),
+    ])
+
+
 def build_ram_operations(items_received: list[int], counter_state: int,
                          checked_ids: set[int], to_reverse: set[int]) -> dict[int, RamOperation]:
     """Build every RAM operation of a tick, merged by address.
@@ -101,3 +125,5 @@ def build_ram_operations(items_received: list[int], counter_state: int,
     _add_location_resync_operations(ops, checked_ids)
     _add_location_reverse_operations(ops, to_reverse)
     return ops
+
+
