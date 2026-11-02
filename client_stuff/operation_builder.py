@@ -59,7 +59,7 @@ def _add_location_reverse_operations(ops: dict[int, RamOperation], to_reverse: s
         if loc is None:
             logger.warning(f"Unknown id in LOCATION_ID_TABLE: {loc_id}")
             continue
-        item_id = loc.vanilla_item_id
+        item_id = loc.vanilla_item
         if item_id is None:
             continue
         item = ITEM_ID_TABLE.get(item_id)

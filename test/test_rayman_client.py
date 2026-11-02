@@ -6,13 +6,11 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import worlds._bizhawk as bizhawk
-from BaseClasses import ItemClassification
 from NetUtils import NetworkItem
 
-from ..items import ItemData
-from ..locations import LocationData
 from ..rayman_client import RaymanClient
-from ..utils import BlockSize, Effect
+from ..utils import Effect
+from .fakes import fake_item, fake_location
 
 LOCATION = 1
 LOCATION_ADDRESS = 0x1000
@@ -28,16 +26,14 @@ COUNTER_ITEM = 2
 COUNTER_ADDRESS = 0x600
 
 FAKE_LOCATION_ID_TABLE = {
-    LOCATION: LocationData("Location", LOCATION, "Region", LOCATION_ADDRESS, LOCATION_MASK, BlockSize.BYTE),
-    VANILLA_LOCATION: LocationData("Vanilla location", VANILLA_LOCATION, "Region", VANILLA_LOCATION_ADDRESS,
-                                   VANILLA_LOCATION_MASK, BlockSize.BYTE, vanilla_item_id=COUNTER_ITEM),
+    LOCATION: fake_location(LOCATION, LOCATION_ADDRESS, LOCATION_MASK),
+    VANILLA_LOCATION: fake_location(VANILLA_LOCATION, VANILLA_LOCATION_ADDRESS, VANILLA_LOCATION_MASK,
+                                    vanilla_item=COUNTER_ITEM),
 }
 
 FAKE_ITEM_ID_TABLE = {
-    BIT_ITEM: ItemData("Bit", BIT_ITEM, ItemClassification.progression, 1, Effect.BIT, BlockSize.BYTE,
-                       BIT_ADDRESS, 0x01),
-    COUNTER_ITEM: ItemData("Counter", COUNTER_ITEM, ItemClassification.filler, 1, Effect.COUNTER, BlockSize.BYTE,
-                           COUNTER_ADDRESS, 1),
+    BIT_ITEM: fake_item(BIT_ITEM, Effect.BIT, BIT_ADDRESS, mask=0x01),
+    COUNTER_ITEM: fake_item(COUNTER_ITEM, Effect.COUNTER, COUNTER_ADDRESS, value=1),
 }
 
 
@@ -182,7 +178,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.client.items_index_counter, 2)
 
     async def test_set_bit_restored_after_game_reset(self) -> None:
-        # SET_BIT is idempotent: re-applied whenever the bit is missing, whatever the counter
+        # BIT is idempotent: re-applied whenever the bit is missing, whatever the counter
         ctx = make_ctx(items=[BIT_ITEM])
         await self.client.game_watcher(ctx)
         self.ram.set(BIT_ADDRESS, b"\x00")

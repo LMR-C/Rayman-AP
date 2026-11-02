@@ -89,7 +89,7 @@ def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData,
             None, LocationProgressType.PRIORITY
         ),
         LocationData(
-            7002, "Anguish Lagoon finished", 0x1C3384, BlockSize.BYTE, 0x3, 1, 8,
+            7002, "Anguish Lagoon finished", 0x1C3378, BlockSize.BYTE, 0x3, 1, 8,
             "Anguish Lagoon Betilla",
             rules.has_hang,
             None, LocationProgressType.PRIORITY
@@ -196,7 +196,7 @@ def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData,
             "Anguish Lagoon Screen 3", rules.none, 8001, LocationProgressType.PRIORITY
         ),
         LocationData(
-            4011, "Anguish Lagoon Screen 3 life 2", 0xAF9B93, BlockSize.BYTE, 0x2, 1, 7,
+            4011, "Anguish Lagoon Screen 3 life 2", 0x1F9B93, BlockSize.BYTE, 0x2, 1, 7,
             "Anguish Lagoon Screen 3", rules.none, 8001, LocationProgressType.PRIORITY
         ),
         LocationData(

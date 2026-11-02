@@ -101,3 +101,19 @@ class DeltaOperation(RamOperation):
 
     def apply(self, read: int) -> int:
         return max(0, min(read + self.delta, self.upper_bound))
+
+
+@dataclass
+class SetOperation(RamOperation):
+    """Write a fixed ``value``, whatever is currently in RAM."""
+    value: int = 0
+
+    def merge(self, other: RamOperation) -> None:
+        """Same value twice is fine; two different values on one address is a conflict."""
+        self._check_mergeable(other)
+        assert isinstance(other, SetOperation)
+        if other.value != self.value:
+            raise ValueError(f"Cannot set two different values: {self.value} and {other.value}")
+
+    def apply(self, read: int) -> int:
+        return self.value & self.max_value

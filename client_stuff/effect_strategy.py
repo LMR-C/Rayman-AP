@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from ..items import ItemData
 from ..utils import Effect
-from .ram_operation import DeltaOperation, MaskOperation, RamOperation
+from .ram_operation import DeltaOperation, MaskOperation, RamOperation, SetOperation
 
 RamOps = list[tuple[int, RamOperation]]  # (address, operation)
 
@@ -43,10 +43,10 @@ class EffectStrategy(ABC):
 
 class BitStrategy(EffectStrategy):
     def forward(self, item: ItemData) -> RamOps:
-        return [(item.address, MaskOperation(size=item.size.value, set_mask=item.value))]
+        return [(item.address, MaskOperation(size=item.size.value, set_mask=item.mask))]
 
     def reverse(self, item: ItemData) -> RamOps:
-        return [(item.address, MaskOperation(size=item.size.value, clear_mask=item.value))]
+        return [(item.address, MaskOperation(size=item.size.value, clear_mask=item.mask))]
 
 
 class CounterStrategy(EffectStrategy):
@@ -60,7 +60,6 @@ class CounterStrategy(EffectStrategy):
 
     @staticmethod
     def _delta(item: ItemData, delta: int) -> DeltaOperation:
-        # ItemData.__post_init__ guarantees an address for COUNTER items
         return DeltaOperation(size=item.size.value, delta=delta, cap=_rule_for(item.address).cap)
 
 
@@ -72,8 +71,25 @@ class NoneStrategy(EffectStrategy):
         return []
 
 
+def _addresses(item: ItemData) -> tuple[int, ...]:
+    """``item.address`` is either one address or a tuple of addresses in items.py."""
+    return item.address if isinstance(item.address, tuple) else (item.address,)
+
+
+class SetValueStrategy(EffectStrategy):
+    """Write ``item.value`` at every address of the item (e.g. Big Power: HP and max HP)."""
+    apply_once = True  # one-shot: re-applied on every tick it would lock the value (e.g. infinite HP)
+
+    def forward(self, item: ItemData) -> RamOps:
+        return [(address, SetOperation(size=item.size.value, value=item.value)) for address in _addresses(item)]
+
+    def reverse(self, item: ItemData) -> RamOps:
+        return []  # no vanilla location gives this kind of item yet
+
+
 STRATEGIES: dict[Effect, EffectStrategy] = {
     Effect.BIT: BitStrategy(),
     Effect.COUNTER: CounterStrategy(),
     Effect.NONE: NoneStrategy(),
+    Effect.SET_VALUE: SetValueStrategy(),
 }

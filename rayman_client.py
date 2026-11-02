@@ -22,16 +22,20 @@ class RaymanClient(BizHawkClient):
         self.items_index_counter: int = 0
         # Locations reversed but not yet confirmed by the server (avoids reversing them on every tick)
         self.pending_reversed_ids: set[int] = set()
-
+        self.is_init = False
 
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
         hash_check = "BF460FE0" #hash received with BizHawk
         ctx.game = self.game
         ctx.items_handling= 0b111
-        ctx.want_slot_data = False
+        ctx.want_slot_data = True
         return ctx.rom_hash == hash_check
 
+
+    def _init_game_config(self) -> None:
+        ctx.slot_data
+        
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
         if ctx.server is None or ctx.slot is None:
             return
@@ -52,7 +56,7 @@ class RaymanClient(BizHawkClient):
             to_reverse = ids_to_check - self.pending_reversed_ids
             #Op
             item_id_list: list[int] = [item.item for item in ctx.items_received]
-            
+
             operations_dict = build_ram_operations(item_id_list,
                                                   self.items_index_counter,
                                                   checked_ids=ctx.checked_locations,  # no-op until resync is implemented
