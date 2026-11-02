@@ -142,7 +142,7 @@ All the items a player can get
 | Anguish Lagoon Screen 1 cage 5 | 0x1F9B4C | Byte | value & 0x8 == 0x8 | has_fist |
 | Anguish Lagoon Screen 1 life 1 | 0x1F9B4A | Byte | value & 0x10 == 0x10 | has_fist |
 | Anguish Lagoon Screen 3 life 1 | 0x1F9B92 | Byte | value & 0x4 == 0x4 | None |
-| Anguish Lagoon Screen 3 life 2 | 0xAF9B93 | Byte | value & 0x2 == 0x2 | None |
+| Anguish Lagoon Screen 3 life 2 | 0x1F9B93 | Byte | value & 0x2 == 0x2 | None |
 | Anguish Lagoon Screen 3 cage 1 | 0x1F9B8B | Half-Word | value & 0x40 == 0x40 | Fist Power |
 | The Swamp of Forgetfulness Screen 1 cage 1 | 0x1F9BC8 | Byte | value & 0x10 == 0x10 | has_fist and has_magic_seed |
 | The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BCA | Byte | value & 0x20 == 0x20 | has_fist and has_magic_seed |
