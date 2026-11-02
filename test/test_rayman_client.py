@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import worlds._bizhawk as bizhawk
 from NetUtils import NetworkItem
 
+from ..client_stuff.ram_map import IN_GAME, MENU_STATE
 from ..rayman_client import RaymanClient
 from ..utils import Effect
 from .fakes import fake_item, fake_location
@@ -71,6 +72,7 @@ def make_ctx(missing_locations: set[int] | None = None, items: list[int] | None 
     ctx.slot = 1
     ctx.missing_locations = set() if missing_locations is None else missing_locations
     ctx.checked_locations = set()
+    ctx.slot_data = {"magic_seed_as_item": False}
     ctx.items_received = [NetworkItem(item_id, 0, 1) for item_id in items or []]
     ctx.check_locations = AsyncMock()
     return ctx
@@ -93,8 +95,18 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
         self.client = RaymanClient()
+        self.ram.set(MENU_STATE, bytes([IN_GAME]))  # the client only works in game
 
     # Guard
+
+    async def test_not_in_game_does_nothing(self) -> None:
+        self.ram.set(MENU_STATE, b"\x00")  # title screen
+        self.ram.set(LOCATION_ADDRESS, b"\x80")
+        ctx = make_ctx({LOCATION}, [BIT_ITEM])
+        await self.client.game_watcher(ctx)
+        self.guarded_write.assert_not_awaited()
+        ctx.check_locations.assert_not_awaited()
+        self.assertEqual(self.client.items_index_counter, 0)
 
     async def test_no_server_does_nothing(self) -> None:
         ctx = make_ctx({LOCATION}, [BIT_ITEM])
