@@ -69,7 +69,7 @@ From `~/dev/Archipelago` with the venv active:
 ## 6. Launch the game with local server
 1. In BizHawk, `File > Open ROM...` and pick your `.chd`.
 2. `Tools > Lua Console`, then open `~/dev/Archipelago/data/lua/connector_bizhawk_generic.lua`.
-3. From `~/dev/Archipelago` with the venv active, run `python MultiServer.py output/AP_<your_seed>.zip`. it is open on port 38281.
+3. From `~/dev/Archipelago` with the venv active, run `python MultiServer.py output/AP_<your_seed>.zip`. it is open on port 38281. You can use --disable_save as parameter.
 4. From `~/dev/Archipelago` with the venv active, run `python BizHawkClient.py --connect localhost:38281`. It should log `Connected to BizHawk`.
 
 Client logs: `~/dev/Archipelago/logs/BizHawkClient_<date>.txt`.
