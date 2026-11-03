@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
-from .client_stuff.operation_builder import add_magic_seed_text_ram_operations, build_ram_operations
+from .client_stuff.operation_builder import build_ram_operations
 from .locations import LOCATION_ID_TABLE
 from .client_stuff.ram_map import STATE_READS, IN_GAME
 
@@ -76,12 +76,9 @@ class RaymanClient(BizHawkClient):
                                                   self.items_index_counter,
                                                   checked_ids=ctx.checked_locations,  # no-op until resync is implemented
                                                   to_reverse=to_reverse)
-            # Special cases: added after the generic operations, merged in the same dict
-            add_magic_seed_text_ram_operations(operations_dict,
-                                               bool(ctx.slot_data.get("magic_seed_as_item", False)),
-                                               item_id_list,
-                                               state["world_id"],
-                                               state["level_id"])
+            # Special cases (game-specific operations that do not come from an item/location,
+            # e.g. depending on state["world_id"] / state["level_id"] or ctx.slot_data):
+            # add them HERE, after build_ram_operations and before the read, merged into operations_dict.
 
             #Reading item to modify
             read_list = [(address, op.size, "MainRAM") for address, op in operations_dict.items()]

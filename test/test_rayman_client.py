@@ -72,7 +72,6 @@ def make_ctx(missing_locations: set[int] | None = None, items: list[int] | None 
     ctx.slot = 1
     ctx.missing_locations = set() if missing_locations is None else missing_locations
     ctx.checked_locations = set()
-    ctx.slot_data = {"magic_seed_as_item": False}
     ctx.items_received = [NetworkItem(item_id, 0, 1) for item_id in items or []]
     ctx.check_locations = AsyncMock()
     return ctx
