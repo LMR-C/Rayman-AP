@@ -82,13 +82,6 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
     """
     pass
 
-
-
-def _text_operation(text: bytes) -> SetOperation:
-    """Write ``text`` (raw bytes) as a single SetOperation of ``len(text)`` bytes."""
-    return SetOperation(len(text), int.from_bytes(text, "little"))
-
-
 def add_magic_seed_text_ram_operations(ops:dict[int,RamOperation],
                                        is_magic_seed_item:bool,
                                        item_received: list[int],
@@ -102,8 +95,8 @@ def add_magic_seed_text_ram_operations(ops:dict[int,RamOperation],
     text_1 = rm.MAGIC_SEED_TEXT_1_ORIGINAL if received else rm.MAGIC_SEED_TEXT_1_REPLACEMENT
     text_2 = rm.MAGIC_SEED_TEXT_2_ORIGINAL if received else rm.MAGIC_SEED_TEXT_2_REPLACEMENT
     _merge_into(ops, [
-        (rm.MAGIC_SEED_TEXT_1_ADDRESS, _text_operation(text_1)),
-        (rm.MAGIC_SEED_TEXT_2_ADDRESS, _text_operation(text_2)),
+        (rm.MAGIC_SEED_TEXT_1_ADDRESS, SetOperation(len(text_1), int.from_bytes(text_1, "little"))),
+        (rm.MAGIC_SEED_TEXT_2_ADDRESS, SetOperation(len(text_2), int.from_bytes(text_2, "little")))
     ])
 
 
