@@ -46,7 +46,7 @@ All the items a player can get
 | Cage | One of the 102 cages in the game | Increments by 1 the ``Total cage counter`` variable |
 | Protoon piece | An imaginary item for Archipelago, if you got the necessary amount it unlocks access to Mr.Dark's Dare | Intern logic |
 | Anguish Lagoon Unlock | Unlock access to Anguish Lagoon | 0x1C3378 = 3 |
-| The Swamps of Forgetfulness Unlock | Unlock access to The Swamps of Forgetfulness | 0x1C3384 = 3 |
+| The Swamps of Forgetfulness Unlock | Unlock access to The Swamps of Forgetfulness | 0x1C338C = 3 |
 | Bongo Hills Unlock | Unlock access to Bongo Hills | 0x1C33B4 = 3 |
 | Moskito's Nest Unlcok | Unlock access to Moskito's Nest | 0x1C33A0 = 3 |
 | Allegro Presto Unlock | Unlock access to Allegro Presto | 0x1C33C8 = 3 |
