@@ -4,6 +4,7 @@ from ..items import ITEM_ID_TABLE
 from ..locations import LOCATION_ID_TABLE
 from .effect_strategy import STRATEGIES, RamOps
 from .ram_operation import RamOperation
+from ..utils import Effect
 logger = logging.getLogger("OperationBuilder")
 
 def _merge_into(ops: dict[int, RamOperation], new_ops: RamOps) -> None:
@@ -22,7 +23,11 @@ def _merge_into(ops: dict[int, RamOperation], new_ops: RamOps) -> None:
                 logger.error(f"Merging of {op} into {target_op} at {address:#x} failed, keeping the first one: {e}")
 
 
-def _add_item_operations(ops: dict[int, RamOperation], items_received: list[int], counter_state: int = 0) -> None:
+def _add_item_operations(ops: dict[int, RamOperation],
+                         items_received: list[int],
+                         to_ban: set[int],
+                         to_apply: set[int],
+                         counter_state: int = 0) -> None:
     """Merge the forward operations of the received items into ``ops`` (in place).
 
     Args:
@@ -32,6 +37,8 @@ def _add_item_operations(ops: dict[int, RamOperation], items_received: list[int]
             strategy with an index below it are skipped.
     """
     for index, item_id in enumerate(items_received):
+        if item_id in to_ban :
+            continue
         item = ITEM_ID_TABLE.get(item_id)
         if item is None:
             logger.warning(f"Unknown id in ITEM_ID_TABLE: {item_id}")
@@ -39,6 +46,17 @@ def _add_item_operations(ops: dict[int, RamOperation], items_received: list[int]
         strategy = STRATEGIES[item.effect]
         if strategy.apply_once and index < counter_state:
             continue
+        _merge_into(ops, strategy.forward(item))
+    #CASE to apply
+    for item_id in to_apply :
+        item = ITEM_ID_TABLE.get(item_id)
+        if item is None:
+            logger.warning(f"Unknown id in ITEM_ID_TABLE: {item_id}")
+            continue
+        if item.effect is not Effect.BIT :
+            logger.warning(f"Forbidden id for extra apply in ITEM_ID_TABLE: {item_id}")
+            continue
+        strategy = STRATEGIES[item.effect]
         _merge_into(ops, strategy.forward(item))
 
 def _add_location_reverse_operations(ops: dict[int, RamOperation], to_reverse: set[int]) -> None:
@@ -82,7 +100,7 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
     pass
 
 def build_ram_operations(items_received: list[int], counter_state: int,
-                         checked_ids: set[int], to_reverse: set[int]) -> dict[int, RamOperation]:
+                         checked_ids: set[int], to_reverse: set[int],to_ban : set[int],to_apply : set[int]) -> dict[int, RamOperation]:
     """Build every RAM operation of a tick, merged by address.
 
     Args:
@@ -95,7 +113,7 @@ def build_ram_operations(items_received: list[int], counter_state: int,
         One operation per address, ready to be read, applied and written by the client.
     """
     ops: dict[int, RamOperation] = {}
-    _add_item_operations(ops, items_received, counter_state)
+    _add_item_operations(ops, items_received, to_ban, to_apply, counter_state)
     _add_location_resync_operations(ops, checked_ids)
     _add_location_reverse_operations(ops, to_reverse)
     return ops
