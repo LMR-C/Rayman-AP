@@ -117,3 +117,29 @@ class SetOperation(RamOperation):
 
     def apply(self, read: int) -> int:
         return self.value & self.max_value
+
+
+@dataclass(init=False)
+class ReplaceIfOperation(RamOperation):
+    """Write ``new`` only if RAM currently holds exactly ``expected``, otherwise leave it untouched."""
+    expected: bytes
+    new: bytes
+
+    def __init__(self, expected: bytes, new: bytes) -> None:
+        if len(expected) != len(new):
+            raise ValueError(f"Cannot replace {len(expected)} bytes with {len(new)} bytes")
+        self.size = len(expected)
+        self.expected = expected
+        self.new = new
+
+    def merge(self, other: RamOperation) -> None:
+        """Same replacement twice is fine; anything else on one address is a conflict."""
+        self._check_mergeable(other)
+        assert isinstance(other, ReplaceIfOperation)
+        if other.expected != self.expected or other.new != self.new:
+            raise ValueError(f"Cannot apply two different replacements: {self} and {other}")
+
+    def apply(self, read: int) -> int:
+        if read == int.from_bytes(self.expected, "little"):
+            return int.from_bytes(self.new, "little")
+        return read

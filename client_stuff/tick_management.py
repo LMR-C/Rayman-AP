@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .ram_operation import RamOperation
+from .ram_operation import RamOperation, ReplaceIfOperation
 from collections.abc import Callable
 
 @dataclass(frozen=True)
@@ -17,6 +17,7 @@ class TickPlan:
     forward_cut: frozenset[int]        # items reçus, mais pas redonnés ce tick
     to_clear: frozenset[int]           # items dont le bit est remis à 0
     armed: frozenset[int]              # locations armées, reprises au tick suivant
+    raw_ops: tuple[tuple[int, RamOperation], ...] = ()  # (adresse, opération) sans item ni location
 
 @dataclass(frozen=True)
 class ForceWindow:
@@ -29,6 +30,31 @@ class GatedLocation:
     location_id: int
     item_id: int
     in_zone: Callable[[TickContext], bool]
+
+@dataclass(frozen=True)
+class RemoveWindow:
+    """Retire un item, même reçu, tant que ``active`` est vrai. Hors fenêtre : rien.
+
+    Pas de ban : à ne pas utiliser pour un item dont le bit détecte une location (voir GatedLocation).
+    """
+    item_id: int
+    active: Callable[[TickContext], bool]
+
+@dataclass(frozen=True)
+class TextPatch:
+    """Remplace ``original`` par ``replacement`` à ``address`` tant que ``active`` est vrai.
+
+    Hors fenêtre : rien, l'original n'est jamais réécrit.
+    """
+    address: int
+    original: bytes
+    replacement: bytes
+    active: Callable[[TickContext], bool]
+
+    def __post_init__(self) -> None:
+        if len(self.original) != len(self.replacement):
+            raise ValueError(f"Text sizes differ at {self.address:#x}: "
+                             f"{len(self.original)} and {len(self.replacement)}")
 
 @dataclass(frozen=True)
 class TrapSpec:
@@ -49,8 +75,9 @@ TRAPS: dict[int, TrapSpec] = {}
 
 def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
     forced_on, forward_cut, to_clear, banned, new_armed = set(), set(), set(), set(), set()
+    raw_ops: list[tuple[int, RamOperation]] = []
 
-    for w in FORCE_WINDOWS:            # seed, Betilla déjà faite
+    for w in FORCE_WINDOWS:           # seed, Betilla déjà faite
         if w.active(ctx):
             forced_on.add(w.item_id)
         elif w.item_id not in ctx.received and w.location_id not in ctx.missing:
@@ -69,8 +96,19 @@ def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
             banned.add(g.location_id)
             to_clear.add(g.item_id)            # efface seulement avant l'armement
 
+    for r in REMOVE_WINDOWS:           # retrait d'un item, même reçu
+        if r.active(ctx):
+            forward_cut.add(r.item_id)
+            to_clear.add(r.item_id)
+
+    for p in TEXT_PATCHES:             # une nouvelle opération à chaque tick
+        if p.active(ctx):
+            raw_ops.append((p.address, ReplaceIfOperation(p.original, p.replacement)))
+
+    forced_on -= to_clear              # le retrait l'emporte
+
     return TickPlan(frozenset(banned), frozenset(forced_on), frozenset(forward_cut),
-                    frozenset(to_clear), frozenset(new_armed))
+                    frozenset(to_clear), frozenset(new_armed), tuple(raw_ops))
 
 class TickTracker:
     def __init__(self) -> None:
@@ -99,6 +137,9 @@ def in_rect(x_min: int, x_max: int, y_min: int, y_max: int) -> Callable[[TickCon
 
 def all_of(*conds): return lambda c: all(cond(c) for cond in conds)
 def any_of(*conds): return lambda c: any(cond(c) for cond in conds)
+
+REMOVE_WINDOWS: tuple[RemoveWindow, ...] = ()
+TEXT_PATCHES: tuple[TextPatch, ...] = ()
 
 #zones
 

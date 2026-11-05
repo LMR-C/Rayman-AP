@@ -90,6 +90,7 @@ class RaymanClient(BizHawkClient):
                                                   to_ban =plan.forward_cut,
                                                   to_apply=plan.forced_on,
                                                   to_remove=plan.to_clear,
+                                                  raw_ops=plan.raw_ops,
                                                   counter_state=self.items_index_counter)
 
             # Special cases (game-specific operations that do not come from an item/location,

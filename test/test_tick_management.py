@@ -6,7 +6,9 @@ import unittest
 from collections.abc import Collection
 from unittest.mock import patch
 
-from ..client_stuff.tick_management import ForceWindow, GatedLocation, TickContext, TickPlan, TickTracker, plan_tick
+from ..client_stuff.ram_operation import ReplaceIfOperation
+from ..client_stuff.tick_management import (ForceWindow, GatedLocation, RemoveWindow, TextPatch, TickContext, TickPlan,
+                                            TickTracker, plan_tick)
 
 ITEM = 1
 LOCATION = 10
@@ -122,6 +124,56 @@ class TestForceWindow(unittest.TestCase):
         assert_plan(self, forced, forced_on={SEED})
         cleared = plan_tick(make_ctx(zone=False, received=False, missing=False), frozenset())
         assert_plan(self, cleared, to_clear={SEED})
+
+
+@patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
+@patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", ())
+@patch(f"{TICK_MANAGEMENT}.REMOVE_WINDOWS", (RemoveWindow(ITEM, in_zone),))
+class TestRemoveWindow(unittest.TestCase):
+    def test_active_removes_received_item(self) -> None:
+        plan = plan_tick(make_ctx(zone=True, received=True, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM}, to_clear={ITEM})
+
+    def test_active_removes_item_not_received(self) -> None:
+        plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM}, to_clear={ITEM})
+
+    def test_out_of_window_does_nothing(self) -> None:
+        for received in (False, True):
+            with self.subTest(received=received):
+                assert_plan(self, plan_tick(make_ctx(zone=False, received=received, missing=False), frozenset()))
+
+    def test_removal_wins_over_force_window(self) -> None:
+        with patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", (ForceWindow(ITEM, in_zone),)):
+            plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM}, to_clear={ITEM})
+
+
+ORIGINAL = b"abc\x00"
+REPLACEMENT = b"xy\x00\x00"
+
+
+@patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
+@patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", ())
+@patch(f"{TICK_MANAGEMENT}.TEXT_PATCHES", (TextPatch(0x300, ORIGINAL, REPLACEMENT, in_zone),))
+class TestTextPatch(unittest.TestCase):
+    def test_active_gives_replace_operation(self) -> None:
+        plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
+        self.assertEqual(plan.raw_ops, ((0x300, ReplaceIfOperation(ORIGINAL, REPLACEMENT)),))
+
+    def test_inactive_never_rewrites_original(self) -> None:
+        plan = plan_tick(make_ctx(zone=False, received=False, missing=False), frozenset())
+        self.assertEqual(plan.raw_ops, ())
+
+    def test_new_operation_on_every_tick(self) -> None:
+        ctx = make_ctx(zone=True, received=False, missing=False)
+        first = plan_tick(ctx, frozenset()).raw_ops[0][1]
+        second = plan_tick(ctx, frozenset()).raw_ops[0][1]
+        self.assertIsNot(first, second)
+
+    def test_different_text_sizes_refused(self) -> None:
+        with self.assertRaises(ValueError):
+            TextPatch(0x300, b"abc", b"ab", in_zone)
 
 
 @patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
