@@ -1,50 +1,91 @@
 from dataclasses import dataclass
 from .ram_operation import RamOperation, ReplaceIfOperation
 from collections.abc import Callable
+from .ram_map import MAGIC_SEED_ITEM_ID
+from .ram_map import MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_1_ORIGINAL, MAGIC_SEED_TEXT_1_REPLACEMENT
+from .ram_map import MAGIC_SEED_TEXT_2_ADDRESS, MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT
 
 @dataclass(frozen=True)
 class TickContext:
+    """Snapshot of the game and the server for one tick, taken from the first read."""
     state: dict[str, int]            # STATE_READS (world, level, x, y, menu, ...)
-    received: frozenset[int]         # ids des items reçus
-    missing: frozenset[int]          # locations pas encore checkées
-    location_bits: dict[int, bool]   # bit lu de chaque location manquante (1er read)
+    received: frozenset[int]         # ids of the received items
+    missing: frozenset[int]          # locations not checked yet
+    location_bits: dict[int, bool]   # bit read for each missing location (first read)
     slot_data: dict
 
 @dataclass(frozen=True)
 class TickPlan:
-    banned_locations: frozenset[int]   # ne partent pas au serveur ce tick
-    forced_on: frozenset[int]          # items posés à 1 sans être reçus
-    forward_cut: frozenset[int]        # items reçus, mais pas redonnés ce tick
-    to_clear: frozenset[int]           # items dont le bit est remis à 0
-    armed: frozenset[int]              # locations armées, reprises au tick suivant
-    raw_ops: tuple[tuple[int, RamOperation], ...] = ()  # (adresse, opération) sans item ni location
+    """What the special events decided for one tick, applied by the client and the builder."""
+    banned_locations: frozenset[int]   # not sent to the server this tick
+    forced_on: frozenset[int]          # items whose bit is set without being received
+    forward_cut: frozenset[int]        # received items not given again this tick
+    to_clear: frozenset[int]           # items whose bit is put back to 0
+    armed: frozenset[int]              # armed locations, kept for the next tick
+    raw_ops: tuple[tuple[int, RamOperation], ...] = ()  # (address, operation), tied to no item or location
 
 @dataclass(frozen=True)
 class ForceWindow:
+    """Set the bit of an item that is not received while ``active`` is true.
+
+    Out of the window, the bit is cleared if the item is still not received and its location
+    is not missing. Used to skip a Betilla scene when the location is already checked.
+
+    Attributes:
+        item_id: Item whose bit is forced.
+        active: Whether the window is open this tick.
+        location_id: Location tied to the item, None if it has none.
+    """
     item_id: int
     active: Callable[[TickContext], bool]
-    location_id: int | None = None   # location liée à l'item (None pour la seed)
+    location_id: int | None = None   # location tied to the item (None for an item without location)
 
 @dataclass(frozen=True)
 class GatedLocation:
+    """Protect a missing location detected on the bit of an item already received.
+
+    A set bit may come from the client, so the location stays banned. In the zone, the forward is cut
+    and the bit cleared; once the bit is read at 0 the location is armed, and the next set bit can only
+    come from the game, so it counts as a real check. Leaving the zone disarms the location.
+
+    Attributes:
+        location_id: Location to protect.
+        item_id: Item whose bit also detects the location.
+        in_zone: Whether Rayman is where the item must be removed for the game to give it.
+    """
     location_id: int
     item_id: int
     in_zone: Callable[[TickContext], bool]
 
 @dataclass(frozen=True)
 class RemoveWindow:
-    """Retire un item, même reçu, tant que ``active`` est vrai. Hors fenêtre : rien.
+    """Stop giving an item, even received, while ``active`` is true. Out of the window: nothing.
 
-    Pas de ban : à ne pas utiliser pour un item dont le bit détecte une location (voir GatedLocation).
+    No ban: not for an item whose bit detects a location (see GatedLocation).
+
+    Attributes:
+        item_id: Item to remove.
+        active: Whether the window is open this tick.
+        clear_bit: Also put the bit back to 0. If False, only the forward is cut,
+            so a bit set by the game is kept.
     """
     item_id: int
     active: Callable[[TickContext], bool]
-
+    clear_bit: bool = True
 @dataclass(frozen=True)
 class TextPatch:
-    """Remplace ``original`` par ``replacement`` à ``address`` tant que ``active`` est vrai.
+    """Replace ``original`` with ``replacement`` at ``address`` while ``active`` is true.
 
-    Hors fenêtre : rien, l'original n'est jamais réécrit.
+    Out of the window: nothing, the original is never written back.
+
+    Attributes:
+        address: Address of the text in RAM.
+        original: Bytes expected in RAM. Anything else is left untouched.
+        replacement: Bytes to write, same size as ``original``.
+        active: Whether the patch applies this tick.
+
+    Raises:
+        ValueError: If ``original`` and ``replacement`` have different sizes.
     """
     address: int
     original: bytes
@@ -58,6 +99,15 @@ class TextPatch:
 
 @dataclass(frozen=True)
 class TrapSpec:
+    """Temporary effect of a trap item. Not used by ``plan_tick`` yet.
+
+    Attributes:
+        item_id: Trap item.
+        duration_s: How long the effect lasts, in seconds.
+        apply: Operations starting the effect.
+        restore: Operations ending the effect.
+        can_start: Whether the trap can start this tick.
+    """
     item_id: int
     duration_s: float
     apply: Callable[[TickContext], list[RamOperation]]
@@ -65,25 +115,29 @@ class TrapSpec:
     can_start: Callable[[TickContext], bool]
 
 
-FORCE_WINDOWS: tuple[ForceWindow, ...] = (
-    ForceWindow(item_id=2001,
-                active=
-                ,location_id=None,)
-)
-GATED_LOCATIONS: tuple[GatedLocation, ...] = ()
-TRAPS: dict[int, TrapSpec] = {}
 
 def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
+    """Build the plan of one tick from the template tables.
+
+    Pure function: it only reads ``ctx``, ``armed`` and the tables. A removal wins over a forced bit.
+
+    Args:
+        ctx: Snapshot of the current tick.
+        armed: Locations armed at the previous tick.
+
+    Returns:
+        The plan of this tick, with the locations armed for the next one in ``armed``.
+    """
     forced_on, forward_cut, to_clear, banned, new_armed = set(), set(), set(), set(), set()
     raw_ops: list[tuple[int, RamOperation]] = []
 
-    for w in FORCE_WINDOWS:           # seed, Betilla déjà faite
+    for w in FORCE_WINDOWS:           # Betilla already checked
         if w.active(ctx):
             forced_on.add(w.item_id)
         elif w.item_id not in ctx.received and w.location_id not in ctx.missing:
-            to_clear.add(w.item_id)    # location_id=None pour la seed
+            to_clear.add(w.item_id)    # also true with location_id=None
 
-    for g in GATED_LOCATIONS:          # Betilla, item reçu
+    for g in GATED_LOCATIONS:          # Betilla, item received
         if g.location_id not in ctx.missing or g.item_id not in ctx.received:
             continue
         if not g.in_zone(ctx):
@@ -91,38 +145,47 @@ def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
             continue
         forward_cut.add(g.item_id)
         if g.location_id in armed or not ctx.location_bits.get(g.location_id, True):
-            new_armed.add(g.location_id)       # armée : on ne touche plus au bit
+            new_armed.add(g.location_id)       # armed: the bit is no longer touched
         else:
             banned.add(g.location_id)
-            to_clear.add(g.item_id)            # efface seulement avant l'armement
+            to_clear.add(g.item_id)            # cleared only before arming
 
-    for r in REMOVE_WINDOWS:           # retrait d'un item, même reçu
+    for r in REMOVE_WINDOWS:           # removal of an item, even received
         if r.active(ctx):
             forward_cut.add(r.item_id)
-            to_clear.add(r.item_id)
+            if r.clear_bit:
+                to_clear.add(r.item_id)
 
-    for p in TEXT_PATCHES:             # une nouvelle opération à chaque tick
+    for p in TEXT_PATCHES:             # a new operation on every tick
         if p.active(ctx):
             raw_ops.append((p.address, ReplaceIfOperation(p.original, p.replacement)))
 
-    forced_on -= to_clear              # le retrait l'emporte
+    forced_on -= to_clear              # removal wins
 
     return TickPlan(frozenset(banned), frozenset(forced_on), frozenset(forward_cut),
                     frozenset(to_clear), frozenset(new_armed), tuple(raw_ops))
 
 class TickTracker:
+    """Keep the memory needed between ticks (the armed locations) and build each plan."""
+
     def __init__(self) -> None:
         self.armed: frozenset[int] = frozenset()
 
     def plan(self, ctx: TickContext) -> TickPlan:
+        """Build the plan of this tick and remember its armed locations.
+
+        Args:
+            ctx: Snapshot of the current tick.
+
+        Returns:
+            The plan of this tick.
+        """
         plan = plan_tick(ctx, self.armed)
-        self.armed = plan.armed    # mis à jour tout de suite, pas de commit
+        self.armed = plan.armed    # updated right away: arming depends on what was read, not on the write
         return plan
 
 
 #--------Building blocks for callable object---#
-def on_world_map_level():
-    pass
 
 def in_level(world: int, level: int) -> Callable[[TickContext], bool]:
     def check(c: TickContext) -> bool:
@@ -135,11 +198,70 @@ def in_rect(x_min: int, x_max: int, y_min: int, y_max: int) -> Callable[[TickCon
                 and y_min <= c.state["pos_y"] <= y_max)
     return check
 
+def at_pos_x(x:int) -> Callable[[TickContext],bool]:
+    def check(c:TickContext) -> bool:
+        return (x == c.state["pos_x"])
+    return check
+
+def not_received(item_id: int) -> Callable[[TickContext], bool]:
+    return lambda c: item_id not in c.received
+
+def location_checked(location_id: int) -> Callable[[TickContext], bool]:
+    return lambda c: location_id not in c.missing
+
+def option_on(name: str) -> Callable[[TickContext], bool]:
+    return lambda c: bool(c.slot_data.get(name, 0))
+
+def received(item_id: int) -> Callable[[TickContext], bool]:
+    return lambda c: item_id in c.received
+
+def not_(cond: Callable[[TickContext], bool]) -> Callable[[TickContext], bool]:
+    return lambda c: not cond(c)
+
+   # levels where the seed is used
+
+
 def all_of(*conds): return lambda c: all(cond(c) for cond in conds)
 def any_of(*conds): return lambda c: any(cond(c) for cond in conds)
 
-REMOVE_WINDOWS: tuple[RemoveWindow, ...] = ()
-TEXT_PATCHES: tuple[TextPatch, ...] = ()
 
-#zones
+#-----States
+SEED_GIVEN = all_of(option_on("magic_seed_as_item"), received(MAGIC_SEED_ITEM_ID))
+#--------Zones
+SWAMPS_ZONE = in_level(1,9)
+
+#------SCENES
+LOST_SEED_SCENE = all_of(SWAMPS_ZONE,not_received(MAGIC_SEED_ITEM_ID),option_on("magic_seed_as_item"))
+NO_SEED_OUTSIDE_SWAMPS = all_of(option_on("magic_seed_as_item"),
+                             received(MAGIC_SEED_ITEM_ID),
+                             not_(SWAMPS_ZONE))
+SEED_TEXT_RESTORE = all_of(SWAMPS_ZONE, SEED_GIVEN)
+
+
+
+#-------collections of template data
+FORCE_WINDOWS: tuple[ForceWindow, ...] = ()
+GATED_LOCATIONS: tuple[GatedLocation, ...] = ()
+REMOVE_WINDOWS: tuple[RemoveWindow, ...] = (
+    #MAGIC_SEED
+    RemoveWindow(MAGIC_SEED_ITEM_ID, LOST_SEED_SCENE),                               # not received, in 1-9
+    RemoveWindow(MAGIC_SEED_ITEM_ID, NO_SEED_OUTSIDE_SWAMPS),                        # received, outside 1-9
+    # Tarayzan gives the seed back: no forward, and the bit set by the game is not cleared
+    RemoveWindow(MAGIC_SEED_ITEM_ID, SEED_GIVEN, clear_bit=False),
+
+)
+TEXT_PATCHES: tuple[TextPatch, ...] = (
+    #MAGIC_SEED
+    TextPatch(address=MAGIC_SEED_TEXT_1_ADDRESS,original=MAGIC_SEED_TEXT_1_ORIGINAL,
+              replacement=MAGIC_SEED_TEXT_1_REPLACEMENT,active=LOST_SEED_SCENE),
+    TextPatch(address=MAGIC_SEED_TEXT_2_ADDRESS,original=MAGIC_SEED_TEXT_2_ORIGINAL,
+                  replacement=MAGIC_SEED_TEXT_2_REPLACEMENT,active=LOST_SEED_SCENE),
+    # Seed received: put the original text back if the "lost" text is still in RAM
+    TextPatch(address=MAGIC_SEED_TEXT_1_ADDRESS,original=MAGIC_SEED_TEXT_1_REPLACEMENT,
+              replacement=MAGIC_SEED_TEXT_1_ORIGINAL,active=SEED_TEXT_RESTORE),
+    TextPatch(address=MAGIC_SEED_TEXT_2_ADDRESS,original=MAGIC_SEED_TEXT_2_REPLACEMENT,
+              replacement=MAGIC_SEED_TEXT_2_ORIGINAL,active=SEED_TEXT_RESTORE),
+)
+TRAPS: dict[int, TrapSpec] = {}
+
 
