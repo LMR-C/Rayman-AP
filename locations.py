@@ -89,7 +89,7 @@ def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData,
             None, LocationProgressType.PRIORITY
         ),
         LocationData(
-            7002, "Anguish Lagoon finished", 0x1C3378, BlockSize.BYTE, 0x3, 1, 8,
+            7002, "Anguish Lagoon finished", 0x1C338C, BlockSize.BYTE, 0x3, 1, 8,
             "Anguish Lagoon Betilla",
             rules.has_hang,
             None, LocationProgressType.PRIORITY
