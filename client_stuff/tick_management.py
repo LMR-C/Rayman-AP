@@ -1,10 +1,19 @@
+import time
 from dataclasses import dataclass
-from .ram_operation import RamOperation, ReplaceIfOperation
+from .ram_operation import RamOperation, ReplaceIfOperation, MaskOperation
 from collections.abc import Callable
 from .ram_map import MAGIC_SEED_ITEM_ID, FIST_ITEM_ID, HANG_ITEM_ID, GRAPPLING_FIST_ITEM_ID, HELICOPTER_ITEM_ID
 from .ram_map import BETILLA_GIFT_1_LOCATION_ID, BETILLA_GIFT_2_LOCATION_ID, BETILLA_GIFT_3_LOCATION_ID
+from .ram_map import REVERSED_CONTROL_ITEM_ID, FORCED_RUN_ITEM_ID
 from .ram_map import MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_1_ORIGINAL, MAGIC_SEED_TEXT_1_REPLACEMENT
 from .ram_map import MAGIC_SEED_TEXT_2_ADDRESS, MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT
+
+@dataclass(frozen=True)
+class TrapState:
+    seen: int = 0
+    queue: tuple[int, ...] = ()
+    active: int | None = None
+    remaining_s: float = 0.0
 
 @dataclass(frozen=True)
 class TickContext:
@@ -14,6 +23,7 @@ class TickContext:
     missing: frozenset[int]          # locations not checked yet
     location_bits: dict[int, bool]   # bit read for each missing location (first read)
     slot_data: dict
+    received_order: tuple[int, ...] = ()
 
 @dataclass(frozen=True)
 class TickPlan:
@@ -24,6 +34,7 @@ class TickPlan:
     to_clear: frozenset[int]           # items whose bit is put back to 0
     armed: frozenset[int]              # armed locations, kept for the next tick
     raw_ops: tuple[tuple[int, RamOperation], ...] = ()  # (address, operation), tied to no item or location
+    traps: TrapState = TrapState()
 
 @dataclass(frozen=True)
 class ForceWindow:
@@ -110,12 +121,12 @@ class TrapSpec:
         can_start: Whether the trap can start this tick.
     """
     item_id: int
-    duration_s: float
+    duration_s: int
     apply: Callable[[TickContext], list[RamOperation]]
     restore: Callable[[TickContext], list[RamOperation]]
     can_start: Callable[[TickContext], bool]
 
-def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
+def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: float) -> TickPlan:
     """Build the plan of one tick from the template tables.
 
     Pure function: it only reads ``ctx``, ``armed`` and the tables. A removal wins over a forced bit.
@@ -129,6 +140,9 @@ def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
     """
     forced_on, forward_cut, to_clear, banned, new_armed = set(), set(), set(), set(), set()
     raw_ops: list[tuple[int, RamOperation]] = []
+    queue = traps.queue + tuple(i for i in ctx.received_order[traps.seen:] if i in TRAPS)
+    active = traps.active
+    remaining = traps.remaining_s
 
     for w in FORCE_WINDOWS:           # Betilla already checked
         if w.active(ctx):
@@ -155,20 +169,44 @@ def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
             if r.clear_bit:
                 to_clear.add(r.item_id)
 
-    for p in TEXT_PATCHES:             # a new operation on every tick
+    for p in TEXT_PATCHES:             # a new operation on     every tick
         if p.active(ctx):
             raw_ops.append((p.address, ReplaceIfOperation(p.original, p.replacement)))
 
     forced_on -= to_clear              # removal wins
 
+    # Traps management
+    print("trap management")
+    if active is not None:
+        print("trap management")
+        spec = TRAPS[active]
+        if spec.can_start(ctx):
+            remaining -= dt
+        if remaining <= 0:
+            raw_ops.extend(spec.restore(ctx))
+            active, remaining = None, 0.0
+
+    if active is None and queue and TRAPS[queue[0]].can_start(ctx):
+        active = queue[0]
+        remaining = TRAPS[queue[0]].duration_s
+        queue = queue[1:]
+
+    if active is not None:
+        print("oui c'est bon")
+        raw_ops.extend(TRAPS[active].apply(ctx))
+
     return TickPlan(frozenset(banned), frozenset(forced_on), frozenset(forward_cut),
-                    frozenset(to_clear), frozenset(new_armed), tuple(raw_ops))
+                    frozenset(to_clear), frozenset(new_armed), tuple(raw_ops),
+                    traps=TrapState(len(ctx.received_order), queue, active, remaining))
 
 class TickTracker:
     """Keep the memory needed between ticks (the armed locations) and build each plan."""
 
-    def __init__(self) -> None:
+    def __init__(self, clock=time.monotonic) -> None:
         self.armed: frozenset[int] = frozenset()
+        self.traps = TrapState()
+        self.clock = clock
+        self.last_tick = clock()
 
     def plan(self, ctx: TickContext) -> TickPlan:
         """Build the plan of this tick and remember its armed locations.
@@ -179,8 +217,12 @@ class TickTracker:
         Returns:
             The plan of this tick.
         """
-        plan = plan_tick(ctx, self.armed)
+        now = self.clock()
+        dt = min(now - self.last_tick, 1)
+        self.last_tick = now
+        plan = plan_tick(ctx, self.armed, self.traps, dt)
         self.armed = plan.armed    # updated right away: arming depends on what was read, not on the write
+        self.traps = plan.traps
         return plan
 
 
@@ -293,4 +335,19 @@ TEXT_PATCHES: tuple[TextPatch, ...] = (
     TextPatch(address=MAGIC_SEED_TEXT_2_ADDRESS,original=MAGIC_SEED_TEXT_2_REPLACEMENT,
               replacement=MAGIC_SEED_TEXT_2_ORIGINAL,active=SEED_TEXT_RESTORE),
 )
-TRAPS: dict[int, TrapSpec] = {}
+TRAPS: dict[int, TrapSpec] = {
+    10001 : TrapSpec(
+        item_id=REVERSED_CONTROL_ITEM_ID,
+        duration_s=30.0,
+        apply=lambda c: [(0x1f43d1, MaskOperation(1, set_mask=0x20))],
+        restore=lambda c: [(0x1f43d1, MaskOperation(1, clear_mask=0x20))],
+        can_start=lambda c: True
+    ),
+    10002: TrapSpec(
+        item_id=FORCED_RUN_ITEM_ID,
+        duration_s=5.0,
+        apply=lambda c: [(0x1f43d1, MaskOperation(1, set_mask=0x10))],
+        restore=lambda c: [(0x1f43d1, MaskOperation(1, clear_mask=0x10))],
+        can_start=lambda c: True
+    ),
+}

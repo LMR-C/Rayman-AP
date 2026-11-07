@@ -75,6 +75,7 @@ class RaymanClient(BizHawkClient):
                     for loc_id, data in zip(id_list, reads_from_game[len(STATE_READS):], strict=True)
                 },
                 slot_data=ctx.slot_data or {},
+                received_order=tuple([item.item for item in ctx.items_received])
             )
             plan = self.tick_tracker.plan(tick_ctx)
 
