@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
+# from CommonClient import ClientStatus
 from .client_stuff.operation_builder import build_ram_operations
 from .locations import LOCATION_ID_TABLE
 from .client_stuff.ram_map import STATE_READS, IN_GAME
-from .client_stuff.tick_management import TickContext, TickPlan, TickTracker
+from .client_stuff.tick_management import TickContext, TickTracker
 from .client_stuff.tick_stats import TickStats
 logger = logging.getLogger("Client")
 
@@ -36,6 +37,18 @@ class RaymanClient(BizHawkClient):
         ctx.want_slot_data = True
         return ctx.rom_hash == hash_check
 
+    async def check_victory(self, ctx, loc_bits):
+        from CommonClient import ClientStatus
+
+        print("vicroty check")
+        if loc_bits[2003] and not ctx.finished_game:
+            print("Victory")
+            await ctx.send_msgs([
+                {
+                    "cmd": "StatusUpdate",
+                    "status": ClientStatus.CLIENT_GOAL
+                }
+            ])
 
 
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
@@ -66,14 +79,20 @@ class RaymanClient(BizHawkClient):
                 }
             if state["menu_state"] != IN_GAME:
                 return
+
+            loc_bits = {
+                    loc_id: bool(int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask)
+                    for loc_id, data in zip(id_list, reads_from_game[len(STATE_READS):], strict=True)
+                }
+
+            print("Check la victoire")
+            await self.check_victory(ctx, loc_bits)
+
             tick_ctx = TickContext(
                 state=state,
                 received=frozenset(item.item for item in ctx.items_received),
                 missing=frozenset(id_list),
-                location_bits={
-                    loc_id: bool(int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask)
-                    for loc_id, data in zip(id_list, reads_from_game[len(STATE_READS):], strict=True)
-                },
+                location_bits=loc_bits,
                 slot_data=ctx.slot_data or {},
                 received_order=tuple([item.item for item in ctx.items_received])
             )

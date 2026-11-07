@@ -176,9 +176,7 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: flo
     forced_on -= to_clear              # removal wins
 
     # Traps management
-    print("trap management")
     if active is not None:
-        print("trap management")
         spec = TRAPS[active]
         if spec.can_start(ctx):
             remaining -= dt
@@ -192,7 +190,6 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: flo
         queue = queue[1:]
 
     if active is not None:
-        print("oui c'est bon")
         raw_ops.extend(TRAPS[active].apply(ctx))
 
     return TickPlan(frozenset(banned), frozenset(forced_on), frozenset(forward_cut),
