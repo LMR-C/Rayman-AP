@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import TYPE_CHECKING
 
 import worlds._bizhawk as bizhawk
@@ -8,6 +9,7 @@ from .client_stuff.operation_builder import build_ram_operations
 from .locations import LOCATION_ID_TABLE
 from .client_stuff.ram_map import STATE_READS, IN_GAME
 from .client_stuff.tick_management import TickContext, TickPlan, TickTracker
+from .client_stuff.tick_stats import TickStats
 logger = logging.getLogger("Client")
 
 if TYPE_CHECKING:
@@ -25,6 +27,7 @@ class RaymanClient(BizHawkClient):
         self.pending_reversed_ids: set[int] = set()
         self.is_init = False
         self.tick_tracker = TickTracker()
+        self.tick_stats = TickStats()
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
         hash_check = "BF460FE0" #hash received with BizHawk
@@ -52,7 +55,10 @@ class RaymanClient(BizHawkClient):
             #Merging for one read_list
             read_list = state_read_list + loc_read_list
 
+            tick_durations: dict[str, float] = {}
+            start = time.perf_counter()
             reads_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
+            tick_durations["read_state"] = time.perf_counter() - start
 
             #Checking that we are at the first "game screen"
             state = {
@@ -90,6 +96,7 @@ class RaymanClient(BizHawkClient):
                                                   to_ban =plan.forward_cut,
                                                   to_apply=plan.forced_on,
                                                   to_remove=plan.to_clear,
+                                                  raw_ops=plan.raw_ops,
                                                   counter_state=self.items_index_counter)
 
             # Special cases (game-specific operations that do not come from an item/location,
@@ -102,7 +109,9 @@ class RaymanClient(BizHawkClient):
             #building items modifications
             write_list = []
             guard_list = []
+            start = time.perf_counter()
             items_from_game = await bizhawk.read (ctx.bizhawk_ctx, read_list)
+            tick_durations["read_ops"] = time.perf_counter() - start
             for (address, op), data in zip(operations_dict.items(),items_from_game,strict=True):
                 read_value = int.from_bytes(data,"little")
                 new_value = op.apply(read_value)
@@ -112,7 +121,10 @@ class RaymanClient(BizHawkClient):
             #To change when counter will be in game's RAM
             delivered = True
             if write_list:
+                start = time.perf_counter()
                 delivered = await bizhawk.guarded_write(ctx.bizhawk_ctx, write_list, guard_list)
+                tick_durations["write"] = time.perf_counter() - start
+            self.tick_stats.end_tick(tick_durations)
             if delivered:
                 self.items_index_counter = max(self.items_index_counter, len(item_id_list))
                 self.pending_reversed_ids |= to_reverse

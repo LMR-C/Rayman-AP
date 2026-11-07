@@ -9,7 +9,7 @@ import worlds._bizhawk as bizhawk
 from NetUtils import NetworkItem
 
 from ..client_stuff.ram_map import CURRENT_LEVEL_ID, IN_GAME, MENU_STATE
-from ..client_stuff.tick_management import ForceWindow, GatedLocation, TickContext
+from ..client_stuff.tick_management import ForceWindow, GatedLocation, RemoveWindow, TextPatch, TickContext
 from ..rayman_client import RaymanClient
 from ..utils import Effect
 from .fakes import fake_item, fake_location
@@ -442,3 +442,51 @@ class TestTickPlanInClient(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.bit(), b"\x00")
         for call in ctx.check_locations.await_args_list:
             self.assertEqual(call.args, (set(),))
+
+    async def test_remove_window_then_item_comes_back(self) -> None:
+        removal = (RemoveWindow(GATED_ITEM, in_test_zone),)
+        with patch("worlds.rayman.client_stuff.tick_management.REMOVE_WINDOWS", removal), \
+                patch("worlds.rayman.client_stuff.tick_management.GATED_LOCATIONS", ()):
+            ctx = make_ctx(items=[GATED_ITEM])
+            self.ram.set(BIT_ADDRESS, b"\x01")
+            self.go_to(ZONE_LEVEL)
+            await self.client.game_watcher(ctx)
+            self.assertEqual(self.bit(), b"\x00")
+
+            self.go_to(OUTSIDE_LEVEL)
+            await self.client.game_watcher(ctx)
+            self.assertEqual(self.bit(), b"\x01")
+
+    async def test_text_patch_replaces_once_and_never_restores(self) -> None:
+        address = 0x700
+        original, replacement = b"abc\x00", b"xy\x00\x00"
+        texts = (TextPatch(address, original, replacement, in_test_zone),)
+        with patch("worlds.rayman.client_stuff.tick_management.TEXT_PATCHES", texts), \
+                patch("worlds.rayman.client_stuff.tick_management.FORCE_WINDOWS", ()):
+            self.ram.set(address, original)
+            ctx = make_ctx()
+            await self.client.game_watcher(ctx)  # out of the window
+            self.assertEqual(self.ram.get(address, 4), original)
+
+            self.go_to(ZONE_LEVEL)
+            await self.client.game_watcher(ctx)
+            self.assertEqual(self.ram.get(address, 4), replacement)
+            self.guarded_write.assert_awaited_once()
+
+            await self.client.game_watcher(ctx)  # already replaced: no new write
+            self.guarded_write.assert_awaited_once()
+
+            self.go_to(OUTSIDE_LEVEL)
+            await self.client.game_watcher(ctx)
+            self.assertEqual(self.ram.get(address, 4), replacement)
+
+    async def test_text_patch_leaves_unexpected_text_untouched(self) -> None:
+        address = 0x700
+        texts = (TextPatch(address, b"abc\x00", b"xy\x00\x00", in_test_zone),)
+        with patch("worlds.rayman.client_stuff.tick_management.TEXT_PATCHES", texts), \
+                patch("worlds.rayman.client_stuff.tick_management.FORCE_WINDOWS", ()):
+            self.ram.set(address, b"zzz\x00")
+            self.go_to(ZONE_LEVEL)
+            await self.client.game_watcher(make_ctx())
+            self.assertEqual(self.ram.get(address, 4), b"zzz\x00")
+            self.guarded_write.assert_not_awaited()

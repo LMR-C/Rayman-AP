@@ -106,7 +106,7 @@ All the items a player can get
 | Mr.Skops phase 1 | 0x1F4EE8 | Byte | 0x40 | Fist Power,  |
 | Mr.Dark | 0x1F4E8 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
 | Pink Plant Wood finished | 0x1C3378 | Byte | 0x3 | entrance rule |
-| Anguish Lagoon finished | 0x1C3384 | Byte | 0x3 | entrance rule |
+| Anguish Lagoon finished | 0x1C338C | Byte | 0x3 | entrance rule |
 | The Swamp of Forgetfulness finished | 0x1C33A0 | Byte | 0x3 | entrance rule |
 | Bongo Hills finished | 0x1C33C8 | Byte | 0x3 | entrance rule |
 | Allegro Presto finished | 0x1C33DC | Byte | 0x3 | entrance rule |

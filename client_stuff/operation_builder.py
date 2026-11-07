@@ -115,7 +115,8 @@ def build_ram_operations(items_received: list[int],
                          to_reverse: set[int],
                          to_ban : Collection[int] = frozenset(),
                          to_apply : Collection[int] = frozenset(),
-                         to_remove : Collection[int] = frozenset()) -> dict[int, RamOperation]:
+                         to_remove : Collection[int] = frozenset(),
+                         raw_ops : Collection[tuple[int, RamOperation]] = ()) -> dict[int, RamOperation]:
     """Build every RAM operation of a tick, merged by address.
 
     Args:
@@ -123,6 +124,7 @@ def build_ram_operations(items_received: list[int],
         counter_state: Number of items already applied (see ``_add_item_operations``).
         checked_ids: Ids of the locations already checked on the server.
         to_reverse: Ids of the locations whose vanilla item must be reversed.
+        raw_ops: Ready-made (address, operation) pairs from the tick plan, not tied to an item or a location.
 
     Returns:
         One operation per address, ready to be read, applied and written by the client.
@@ -130,6 +132,7 @@ def build_ram_operations(items_received: list[int],
     ops: dict[int, RamOperation] = {}
     _add_item_operations(ops, items_received, counter_state, to_ban)
     _add_event_operations(ops, to_apply, to_remove)
+    _merge_into(ops, raw_ops)
     _add_location_resync_operations(ops, checked_ids)
     _add_location_reverse_operations(ops, to_reverse)
 

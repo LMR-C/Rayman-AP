@@ -6,7 +6,12 @@ import unittest
 from collections.abc import Collection
 from unittest.mock import patch
 
-from ..client_stuff.tick_management import ForceWindow, GatedLocation, TickContext, TickPlan, TickTracker, plan_tick
+from ..client_stuff.ram_map import (MAGIC_SEED_ITEM_ID, MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_1_ORIGINAL,
+                                    MAGIC_SEED_TEXT_1_REPLACEMENT, MAGIC_SEED_TEXT_2_ADDRESS,
+                                    MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT)
+from ..client_stuff.ram_operation import ReplaceIfOperation
+from ..client_stuff.tick_management import (ForceWindow, GatedLocation, RemoveWindow, TextPatch, TickContext, TickPlan,
+                                            TickTracker, plan_tick)
 
 ITEM = 1
 LOCATION = 10
@@ -43,7 +48,17 @@ def assert_plan(test: unittest.TestCase, plan: TickPlan, *, banned: Collection[i
                                     frozenset(to_clear), frozenset(armed)))
 
 
-class TestEmptyTables(unittest.TestCase):
+class EmptyTablesTestCase(unittest.TestCase):
+    """Starts each test with empty tables, so the real ones can't leak in. Tests patch what they need on top."""
+
+    def setUp(self) -> None:
+        for table in ("FORCE_WINDOWS", "GATED_LOCATIONS", "REMOVE_WINDOWS", "TEXT_PATCHES"):
+            patcher = patch(f"{TICK_MANAGEMENT}.{table}", ())
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+
+class TestEmptyTables(EmptyTablesTestCase):
     def test_empty_tables_give_empty_plan(self) -> None:
         with patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", ()), patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ()):
             assert_plan(self, plan_tick(make_ctx(zone=True, received=True, missing=True, bit=True), frozenset()))
@@ -51,7 +66,7 @@ class TestEmptyTables(unittest.TestCase):
 
 @patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
 @patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", GATE)
-class TestGatedLocation(unittest.TestCase):
+class TestGatedLocation(EmptyTablesTestCase):
     def test_received_out_of_zone_is_banned(self) -> None:
         plan = plan_tick(make_ctx(zone=False, received=True, missing=True, bit=True), frozenset())
         assert_plan(self, plan, banned={LOCATION})
@@ -94,7 +109,7 @@ class TestGatedLocation(unittest.TestCase):
 
 
 @patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", ())
-class TestForceWindow(unittest.TestCase):
+class TestForceWindow(EmptyTablesTestCase):
     @patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", SKIP_WINDOW)
     def test_checked_without_item_in_zone_forces_bit(self) -> None:
         plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
@@ -125,9 +140,69 @@ class TestForceWindow(unittest.TestCase):
 
 
 @patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
+@patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", ())
+@patch(f"{TICK_MANAGEMENT}.REMOVE_WINDOWS", (RemoveWindow(ITEM, in_zone),))
+class TestRemoveWindow(EmptyTablesTestCase):
+    def test_active_removes_received_item(self) -> None:
+        plan = plan_tick(make_ctx(zone=True, received=True, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM}, to_clear={ITEM})
+
+    def test_active_removes_item_not_received(self) -> None:
+        plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM}, to_clear={ITEM})
+
+    def test_out_of_window_does_nothing(self) -> None:
+        for received in (False, True):
+            with self.subTest(received=received):
+                assert_plan(self, plan_tick(make_ctx(zone=False, received=received, missing=False), frozenset()))
+
+    def test_removal_wins_over_force_window(self) -> None:
+        with patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", (ForceWindow(ITEM, in_zone),)):
+            plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM}, to_clear={ITEM})
+
+    def test_clear_bit_false_only_cuts_forward(self) -> None:
+        with patch(f"{TICK_MANAGEMENT}.REMOVE_WINDOWS", (RemoveWindow(ITEM, in_zone, clear_bit=False),)):
+            plan = plan_tick(make_ctx(zone=True, received=True, missing=False), frozenset())
+        assert_plan(self, plan, forward_cut={ITEM})
+
+    def test_clear_bit_false_out_of_window_does_nothing(self) -> None:
+        with patch(f"{TICK_MANAGEMENT}.REMOVE_WINDOWS", (RemoveWindow(ITEM, in_zone, clear_bit=False),)):
+            assert_plan(self, plan_tick(make_ctx(zone=False, received=True, missing=False), frozenset()))
+
+
+ORIGINAL = b"abc\x00"
+REPLACEMENT = b"xy\x00\x00"
+
+
+@patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
+@patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", ())
+@patch(f"{TICK_MANAGEMENT}.TEXT_PATCHES", (TextPatch(0x300, ORIGINAL, REPLACEMENT, in_zone),))
+class TestTextPatch(EmptyTablesTestCase):
+    def test_active_gives_replace_operation(self) -> None:
+        plan = plan_tick(make_ctx(zone=True, received=False, missing=False), frozenset())
+        self.assertEqual(plan.raw_ops, ((0x300, ReplaceIfOperation(ORIGINAL, REPLACEMENT)),))
+
+    def test_inactive_never_rewrites_original(self) -> None:
+        plan = plan_tick(make_ctx(zone=False, received=False, missing=False), frozenset())
+        self.assertEqual(plan.raw_ops, ())
+
+    def test_new_operation_on_every_tick(self) -> None:
+        ctx = make_ctx(zone=True, received=False, missing=False)
+        first = plan_tick(ctx, frozenset()).raw_ops[0][1]
+        second = plan_tick(ctx, frozenset()).raw_ops[0][1]
+        self.assertIsNot(first, second)
+
+    def test_different_text_sizes_refused(self) -> None:
+        with self.assertRaises(ValueError):
+            TextPatch(0x300, b"abc", b"ab", in_zone)
+
+
+@patch(f"{TICK_MANAGEMENT}.FORCE_WINDOWS", ())
 @patch(f"{TICK_MANAGEMENT}.GATED_LOCATIONS", GATE)
-class TestTickTracker(unittest.TestCase):
+class TestTickTracker(EmptyTablesTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.tracker = TickTracker()
 
     def test_starts_disarmed(self) -> None:
@@ -160,3 +235,80 @@ class TestTickTracker(unittest.TestCase):
         plan = self.tracker.plan(make_ctx(zone=True, received=True, missing=True, bit=True))
         self.assertIn(LOCATION, plan.banned_locations)
         self.assertEqual(plan.to_clear, frozenset({ITEM}))
+
+
+class TestRealSeedScene(unittest.TestCase):
+    """Real tables, for the Magic Seed in Tarayzan's level."""
+
+    TEXT_ADDRESSES = {MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_2_ADDRESS}
+
+    def plan(self, *, option: int = 1, received: bool = False, level: int = 9) -> TickPlan:
+        ctx = TickContext(
+            state={"world_id": 1, "level_id": level, "pos_x": 0, "pos_y": 0},
+            received=frozenset({MAGIC_SEED_ITEM_ID}) if received else frozenset(),
+            missing=frozenset(),
+            location_bits={},
+            slot_data={"magic_seed_as_item": option},
+        )
+        return plan_tick(ctx, frozenset())
+
+    def assert_active(self, plan: TickPlan, active: bool) -> None:
+        self.assertEqual(MAGIC_SEED_ITEM_ID in plan.to_clear, active)
+        self.assertEqual(MAGIC_SEED_ITEM_ID in plan.forward_cut, active)
+        self.assertEqual({address for address, _op in plan.raw_ops}, self.TEXT_ADDRESSES if active else set())
+
+    def test_option_on_not_received_in_level(self) -> None:
+        self.assert_active(self.plan(), True)
+
+    def test_option_off_keeps_vanilla_seed_and_text(self) -> None:
+        # With the option off the item is never received: the scene must not remove the seed given by the game
+        self.assert_active(self.plan(option=0), False)
+
+    def test_missing_option_counts_as_off(self) -> None:
+        ctx = TickContext({"world_id": 1, "level_id": 9, "pos_x": 0, "pos_y": 0}, frozenset(), frozenset(), {}, {})
+        self.assert_active(plan_tick(ctx, frozenset()), False)
+
+    def test_received_in_level_left_to_tarayzan(self) -> None:
+        # No forward, so Tarayzan pops, and no clear, so the seed he gives stays
+        plan = self.plan(received=True)
+        self.assertIn(MAGIC_SEED_ITEM_ID, plan.forward_cut)
+        self.assertNotIn(MAGIC_SEED_ITEM_ID, plan.to_clear)
+
+    def test_received_in_level_restores_original_text(self) -> None:
+        self.assertEqual(dict(self.plan(received=True).raw_ops), {
+            MAGIC_SEED_TEXT_1_ADDRESS: ReplaceIfOperation(MAGIC_SEED_TEXT_1_REPLACEMENT, MAGIC_SEED_TEXT_1_ORIGINAL),
+            MAGIC_SEED_TEXT_2_ADDRESS: ReplaceIfOperation(MAGIC_SEED_TEXT_2_REPLACEMENT, MAGIC_SEED_TEXT_2_ORIGINAL),
+        })
+
+    def test_not_received_in_level_replaces_text(self) -> None:
+        self.assertEqual(dict(self.plan().raw_ops), {
+            MAGIC_SEED_TEXT_1_ADDRESS: ReplaceIfOperation(MAGIC_SEED_TEXT_1_ORIGINAL, MAGIC_SEED_TEXT_1_REPLACEMENT),
+            MAGIC_SEED_TEXT_2_ADDRESS: ReplaceIfOperation(MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT),
+        })
+
+    def test_text_goes_lost_then_back_to_original(self) -> None:
+        # Text patched before the seed is received, then restored: both patches on the same bytes in RAM
+        def apply_text(plan: TickPlan, ram: int) -> int:
+            return dict(plan.raw_ops)[MAGIC_SEED_TEXT_1_ADDRESS].apply(ram)
+
+        ram = int.from_bytes(MAGIC_SEED_TEXT_1_ORIGINAL, "little")
+        ram = apply_text(self.plan(), ram)
+        self.assertEqual(ram, int.from_bytes(MAGIC_SEED_TEXT_1_REPLACEMENT, "little"))
+        ram = apply_text(self.plan(received=True), ram)
+        self.assertEqual(ram, int.from_bytes(MAGIC_SEED_TEXT_1_ORIGINAL, "little"))
+        # Already restored: nothing changes
+        self.assertEqual(apply_text(self.plan(received=True), ram), ram)
+
+    def test_received_outside_level_is_removed(self) -> None:
+        plan = self.plan(received=True, level=8)
+        self.assertIn(MAGIC_SEED_ITEM_ID, plan.forward_cut)
+        self.assertIn(MAGIC_SEED_ITEM_ID, plan.to_clear)
+        self.assertEqual(plan.raw_ops, ())
+
+    def test_option_off_received_is_left_alone(self) -> None:
+        for level in (8, 9):
+            with self.subTest(level=level):
+                self.assert_active(self.plan(option=0, received=True, level=level), False)
+
+    def test_not_received_other_level_does_nothing(self) -> None:
+        self.assert_active(self.plan(level=8), False)
