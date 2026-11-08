@@ -40,9 +40,7 @@ class RaymanClient(BizHawkClient):
     async def check_victory(self, ctx, loc_bits):
         from CommonClient import ClientStatus
 
-        print("vicroty check")
-        if loc_bits[2003] and not ctx.finished_game:
-            print("Victory")
+        if 2003 not in loc_bits and not ctx.finished_game:
             await ctx.send_msgs([
                 {
                     "cmd": "StatusUpdate",
@@ -85,7 +83,6 @@ class RaymanClient(BizHawkClient):
                     for loc_id, data in zip(id_list, reads_from_game[len(STATE_READS):], strict=True)
                 }
 
-            print("Check la victoire")
             await self.check_victory(ctx, loc_bits)
 
             tick_ctx = TickContext(
