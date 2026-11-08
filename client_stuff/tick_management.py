@@ -344,7 +344,7 @@ TRAPS: dict[int, TrapSpec] = {
         item_id=FORCED_RUN_ITEM_ID,
         duration_s=5.0,
         apply=lambda c: [(0x1f43d1, MaskOperation(1, set_mask=0x10))],
-        restore=lambda c: [(0x1f43d1, MaskOperation(1, clear_mask=0x10))],
+        restore=lambda c: [(0x1f43d1, MaskOperation(1, clear_mask=0x10)), (0x1f43d1, MaskOperation(1, clear_mask=0x1))],
         can_start=lambda c: True
     ),
 }

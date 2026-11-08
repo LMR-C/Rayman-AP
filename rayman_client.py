@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
-# from CommonClient import ClientStatus
 from .client_stuff.operation_builder import build_ram_operations
 from .locations import LOCATION_ID_TABLE
 from .client_stuff.ram_map import STATE_READS, IN_GAME
