@@ -22,7 +22,6 @@ class RaymanClient(BizHawkClient):
 
     def __init__(self) -> None:
         super().__init__()
-        self.items_index_counter: int = 0
         # Locations reversed but not yet confirmed by the server (avoids reversing them on every tick)
         self.pending_reversed_ids: set[int] = set()
         self.is_init = False
@@ -36,12 +35,27 @@ class RaymanClient(BizHawkClient):
         ctx.want_slot_data = True
         return ctx.rom_hash == hash_check
 
+    @staticmethod
+    def _delivered_key(ctx: "BizHawkClientContext") -> str:
+        """Data storage key of the number of items whose consumables were already given."""
+        return f"rayman_delivered_{ctx.team}_{ctx.slot}"
+
+    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: dict) -> None:
+        if cmd == "Connected":
+            # Value of a previous connection: wait for the one of this server
+            ctx.stored_data.pop(self._delivered_key(ctx), None)
+
 
 
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
         if ctx.server is None or ctx.slot is None:
             return
 
+        delivered_key = self._delivered_key(ctx)
+        ctx.set_notify(delivered_key)
+        if delivered_key not in ctx.stored_data:   # without it, every consumable would be given again
+            return
+        delivered_consumables: int = ctx.stored_data[delivered_key] or 0
 
         try :
             #States to read 
@@ -91,13 +105,14 @@ class RaymanClient(BizHawkClient):
             item_id_list: list[int] = [item.item for item in ctx.items_received]
 
             operations_dict = build_ram_operations(item_id_list,
-                                                  checked_ids=ctx.checked_locations,  # no-op until resync is implemented
+                                                  checked_ids=ctx.checked_locations,
                                                   to_reverse=to_reverse,
                                                   to_ban =plan.forward_cut,
                                                   to_apply=plan.forced_on,
                                                   to_remove=plan.to_clear,
                                                   raw_ops=plan.raw_ops,
-                                                  counter_state=self.items_index_counter)
+                                                  counter_state=state["items_counter"],
+                                                  delivered_consumables=delivered_consumables)
 
             # Special cases (game-specific operations that do not come from an item/location,
             # e.g. depending on state["world_id"] / state["level_id"] or ctx.slot_data):
@@ -118,7 +133,6 @@ class RaymanClient(BizHawkClient):
                 if new_value != read_value :
                     write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
                     guard_list.append((address,data,"MainRAM"))
-            #To change when counter will be in game's RAM
             delivered = True
             if write_list:
                 start = time.perf_counter()
@@ -126,8 +140,11 @@ class RaymanClient(BizHawkClient):
                 tick_durations["write"] = time.perf_counter() - start
             self.tick_stats.end_tick(tick_durations)
             if delivered:
-                self.items_index_counter = max(self.items_index_counter, len(item_id_list))
                 self.pending_reversed_ids |= to_reverse
+                if len(item_id_list) > delivered_consumables:
+                    # Sent once the items are written: a crash in between can't lose a consumable
+                    await ctx.send_msgs([{"cmd": "Set", "key": delivered_key, "default": 0, "want_reply": False,
+                                          "operations": [{"operation": "max", "value": len(item_id_list)}]}])
                 # Sent only once the reverse is written: a crash in between can't leave a vanilla reward un-reversed
                 await ctx.check_locations(ids_to_check)
 

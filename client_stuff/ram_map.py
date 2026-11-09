@@ -7,14 +7,23 @@ CURRENT_WORLD_ID = 0x1FA688
 CURRENT_LEVEL_ID = 0x1F9A68
 POS_X = 0x1F9A10
 POS_Y = 0x1F9A28
+# Number of items_received already applied, written by the client in the same write as the items
+ITEM_COUNTER_ADDRESS = 0x1F9C52
+ITEM_COUNTER_SIZE = 2
 # name -> (address, size)
 STATE_READS: dict[str, tuple[int, int]] = {
     "menu_state": (MENU_STATE, 1),
     "world_id": (CURRENT_WORLD_ID, 1),
     "level_id": (CURRENT_LEVEL_ID, 1),
     "pos_x": (POS_X,2),
-    "pos_y": (POS_Y,2)
+    "pos_y": (POS_Y,2),
+    "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE),
 }
+
+# Given again when the RAM counter goes back to 0. Other apply_once items are never given twice
+# (see the data storage counter in rayman_client)
+CAGE_ITEM_ID = 3001
+RESTORED_ITEM_IDS = frozenset({CAGE_ITEM_ID})
 
 
 
