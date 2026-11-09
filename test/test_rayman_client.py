@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import worlds._bizhawk as bizhawk
 from NetUtils import NetworkItem
 
-from ..client_stuff.ram_map import CURRENT_LEVEL_ID, IN_GAME, MENU_STATE
+from ..client_stuff.ram_map import CURRENT_LEVEL_ID, IN_GAME, ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE, MENU_STATE
 from ..client_stuff.tick_management import ForceWindow, GatedLocation, RemoveWindow, TextPatch, TickContext
 from ..rayman_client import RaymanClient
 from ..utils import Effect
@@ -67,10 +67,16 @@ class FakeRam:
         return True
 
 
+DELIVERED_KEY = "rayman_delivered_0_1"
+
+
 def make_ctx(missing_locations: set[int] | None = None, items: list[int] | None = None) -> MagicMock:
     ctx = MagicMock()
     ctx.server = object()
     ctx.slot = 1
+    ctx.team = 0
+    ctx.stored_data = {DELIVERED_KEY: None}  # data storage already answered, nothing given yet
+    ctx.send_msgs = AsyncMock()
     ctx.missing_locations = set() if missing_locations is None else missing_locations
     ctx.checked_locations = set()
     ctx.items_received = [NetworkItem(item_id, 0, 1) for item_id in items or []]
@@ -97,6 +103,10 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         self.client = RaymanClient()
         self.ram.set(MENU_STATE, bytes([IN_GAME]))  # the client only works in game
 
+    def items_counter(self) -> int:
+        """Number of applied items, as stored in the game's RAM."""
+        return int.from_bytes(self.ram.get(ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE), "little")
+
     # Guard
 
     async def test_not_in_game_does_nothing(self) -> None:
@@ -106,7 +116,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         await self.client.game_watcher(ctx)
         self.guarded_write.assert_not_awaited()
         ctx.check_locations.assert_not_awaited()
-        self.assertEqual(self.client.items_index_counter, 0)
+        self.assertEqual(self.items_counter(), 0)
 
     async def test_no_server_does_nothing(self) -> None:
         ctx = make_ctx({LOCATION}, [BIT_ITEM])
@@ -144,24 +154,25 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         await self.client.game_watcher(ctx)
         self.guarded_write.assert_awaited_once_with(
             ctx.bizhawk_ctx,
-            [(BIT_ADDRESS, b"\x11", "MainRAM")],
-            [(BIT_ADDRESS, b"\x10", "MainRAM")],
+            [(BIT_ADDRESS, b"\x11", "MainRAM"), (ITEM_COUNTER_ADDRESS, b"\x01\x00", "MainRAM")],
+            [(BIT_ADDRESS, b"\x10", "MainRAM"), (ITEM_COUNTER_ADDRESS, b"\x00\x00", "MainRAM")],
         )
-        self.assertEqual(self.client.items_index_counter, 1)
+        self.assertEqual(self.items_counter(), 1)
 
     async def test_set_bit_already_set_no_write(self) -> None:
         self.ram.set(BIT_ADDRESS, b"\x01")
+        self.ram.set(ITEM_COUNTER_ADDRESS, b"\x01\x00")  # item already counted
         ctx = make_ctx(items=[BIT_ITEM])
         await self.client.game_watcher(ctx)
         self.guarded_write.assert_not_awaited()
-        self.assertEqual(self.client.items_index_counter, 1)
+        self.assertEqual(self.items_counter(), 1)
 
     async def test_failed_guard_keeps_counter(self) -> None:
         self.ram.guard_fails = True
         ctx = make_ctx(items=[COUNTER_ITEM])
         await self.client.game_watcher(ctx)
         self.guarded_write.assert_awaited_once()
-        self.assertEqual(self.client.items_index_counter, 0)
+        self.assertEqual(self.items_counter(), 0)
         self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
 
     async def test_failed_guard_retried_next_tick(self) -> None:
@@ -171,7 +182,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         self.ram.guard_fails = False
         await self.client.game_watcher(ctx)
         self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
-        self.assertEqual(self.client.items_index_counter, 1)
+        self.assertEqual(self.items_counter(), 1)
 
     async def test_add_not_applied_twice(self) -> None:
         ctx = make_ctx(items=[COUNTER_ITEM, COUNTER_ITEM])
@@ -179,7 +190,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         await self.client.game_watcher(ctx)
         self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x02")
         self.guarded_write.assert_awaited_once()
-        self.assertEqual(self.client.items_index_counter, 2)
+        self.assertEqual(self.items_counter(), 2)
 
     async def test_only_new_item_applied(self) -> None:
         ctx = make_ctx(items=[COUNTER_ITEM])
@@ -187,7 +198,7 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         ctx.items_received.append(NetworkItem(COUNTER_ITEM, 0, 1))
         await self.client.game_watcher(ctx)
         self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x02")
-        self.assertEqual(self.client.items_index_counter, 2)
+        self.assertEqual(self.items_counter(), 2)
 
     async def test_set_bit_restored_after_game_reset(self) -> None:
         # BIT is idempotent: re-applied whenever the bit is missing, whatever the counter
@@ -268,18 +279,164 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         await self.client.game_watcher(ctx)
         self.assertEqual(calls, ["write", "check"])
 
-    async def test_received_item_and_vanilla_pickup_same_tick_no_write(self) -> None:
-        # +1 from Archipelago, -1 reverse of the vanilla reward: nothing to write
+    async def test_received_item_and_vanilla_pickup_same_tick_only_counter_written(self) -> None:
+        # +1 from Archipelago, -1 reverse of the vanilla reward cancel out: only the item counter is written
         self.pick_vanilla_location()
         ctx = make_ctx({VANILLA_LOCATION}, [COUNTER_ITEM])
         await self.client.game_watcher(ctx)
-        self.guarded_write.assert_not_awaited()
+        # Only the item counter moves
+        self.guarded_write.assert_awaited_once_with(
+            ctx.bizhawk_ctx,
+            [(ITEM_COUNTER_ADDRESS, b"\x01\x00", "MainRAM")],
+            [(ITEM_COUNTER_ADDRESS, b"\x00\x00", "MainRAM")],
+        )
         self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
-        self.assertEqual(self.client.items_index_counter, 1)
+        self.assertEqual(self.items_counter(), 1)
         self.assertEqual(self.client.pending_reversed_ids, {VANILLA_LOCATION})
 
         await self.client.game_watcher(ctx)
         self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+
+    # Item counter in RAM and location resync. Generated by Claude (Anthropic AI assistant).
+
+    async def test_counter_in_ram_skips_already_applied_items(self) -> None:
+        # Client restarted (reconnection): the RAM counter says the item was already given
+        self.ram.set(ITEM_COUNTER_ADDRESS, b"\x01\x00")
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        await self.client.game_watcher(ctx)
+        self.guarded_write.assert_not_awaited()
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
+        self.assertEqual(self.items_counter(), 1)
+
+    async def test_counter_survives_new_client(self) -> None:
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        await self.client.game_watcher(ctx)
+        self.client = RaymanClient()  # client restarted, the game was not
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+        self.guarded_write.assert_awaited_once()
+
+    async def test_counter_above_received_never_goes_back(self) -> None:
+        self.ram.set(ITEM_COUNTER_ADDRESS, b"\x05\x00")
+        ctx = make_ctx(items=[COUNTER_ITEM, BIT_ITEM])
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.items_counter(), 5)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
+        self.assertEqual(self.ram.get(BIT_ADDRESS, 1), b"\x01")  # BIT given whatever the counter
+
+    async def test_counter_changed_by_game_fails_guard(self) -> None:
+        # Counter changed between the read of the operations and the write (e.g. savestate loaded): nothing written
+        reads = 0
+
+        async def read_then_change_counter(*args) -> list[bytes]:
+            nonlocal reads
+            data = await self.ram.read(*args)
+            reads += 1
+            if reads == 2:  # after the read of the operations, before the guarded write
+                self.ram.set(ITEM_COUNTER_ADDRESS, b"\x01\x00")
+            return data
+
+        self.read.side_effect = read_then_change_counter
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
+
+    async def test_checked_location_flag_resynced(self) -> None:
+        # Location checked on the server, flag lost in game (restart without saving)
+        ctx = make_ctx()
+        ctx.checked_locations.add(LOCATION)
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(LOCATION_ADDRESS, 1), bytes([LOCATION_MASK]))
+        ctx.check_locations.assert_awaited_once_with(set())
+
+    async def test_resynced_vanilla_location_not_reversed(self) -> None:
+        # Flag put back by the client on a checked location: its vanilla reward must not be taken away
+        self.ram.set(COUNTER_ADDRESS, b"\x03")
+        ctx = make_ctx()
+        ctx.checked_locations.add(VANILLA_LOCATION)
+        for _ in range(2):
+            await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(VANILLA_LOCATION_ADDRESS, 1), bytes([VANILLA_LOCATION_MASK]))
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x03")
+
+    # Consumables counter in the data storage. Generated by Claude (Anthropic AI assistant).
+
+    def restored_counter_item(self) -> None:
+        patcher = patch("worlds.rayman.client_stuff.operation_builder.RESTORED_ITEM_IDS", {COUNTER_ITEM})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    @staticmethod
+    def delivered_set(value: int) -> list:
+        return [{"cmd": "Set", "key": DELIVERED_KEY, "default": 0, "want_reply": False,
+                 "operations": [{"operation": "max", "value": value}]}]
+
+    async def test_waits_for_data_storage(self) -> None:
+        ctx = make_ctx({LOCATION}, [COUNTER_ITEM])
+        del ctx.stored_data[DELIVERED_KEY]
+        await self.client.game_watcher(ctx)
+        ctx.set_notify.assert_called_once_with(DELIVERED_KEY)
+        self.read.assert_not_awaited()
+        self.guarded_write.assert_not_awaited()
+        ctx.check_locations.assert_not_awaited()
+
+    async def test_none_in_data_storage_means_nothing_given(self) -> None:
+        await self.client.game_watcher(make_ctx(items=[COUNTER_ITEM]))
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+
+    async def test_delivered_sent_after_write(self) -> None:
+        ctx = make_ctx(items=[COUNTER_ITEM, BIT_ITEM])
+        await self.client.game_watcher(ctx)
+        self.guarded_write.assert_awaited_once()
+        ctx.send_msgs.assert_awaited_once_with(self.delivered_set(2))
+
+    async def test_delivered_not_sent_when_guard_fails(self) -> None:
+        self.ram.guard_fails = True
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        await self.client.game_watcher(ctx)
+        ctx.send_msgs.assert_not_awaited()
+
+    async def test_delivered_not_sent_when_up_to_date(self) -> None:
+        self.ram.set(ITEM_COUNTER_ADDRESS, b"\x01\x00")
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        ctx.stored_data[DELIVERED_KEY] = 1
+        await self.client.game_watcher(ctx)
+        ctx.send_msgs.assert_not_awaited()
+
+    async def test_restart_without_save_consumable_not_given_again(self) -> None:
+        # RAM wiped (counter at 0), but the server remembers the consumable was given
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        ctx.stored_data[DELIVERED_KEY] = 1
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x00")
+        self.assertEqual(self.items_counter(), 1)
+
+    async def test_restart_without_save_other_counter_given_again(self) -> None:
+        # Not a consumable (like a Cage): only follows the RAM counter
+        self.restored_counter_item()
+        ctx = make_ctx(items=[COUNTER_ITEM])
+        ctx.stored_data[DELIVERED_KEY] = 1
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+
+    async def test_new_consumable_after_restart_is_given(self) -> None:
+        ctx = make_ctx(items=[COUNTER_ITEM, COUNTER_ITEM])
+        ctx.stored_data[DELIVERED_KEY] = 1
+        await self.client.game_watcher(ctx)
+        self.assertEqual(self.ram.get(COUNTER_ADDRESS, 1), b"\x01")
+        ctx.send_msgs.assert_awaited_once_with(self.delivered_set(2))
+
+    async def test_connected_forgets_previous_value(self) -> None:
+        ctx = make_ctx()
+        ctx.stored_data[DELIVERED_KEY] = 7
+        self.client.on_package(ctx, "Connected", {})
+        self.assertNotIn(DELIVERED_KEY, ctx.stored_data)
+
+    async def test_other_packages_keep_value(self) -> None:
+        ctx = make_ctx()
+        ctx.stored_data[DELIVERED_KEY] = 7
+        self.client.on_package(ctx, "RoomUpdate", {})
+        self.assertEqual(ctx.stored_data[DELIVERED_KEY], 7)
 
     # Errors
 
@@ -288,14 +445,14 @@ class TestGameWatcher(unittest.IsolatedAsyncioTestCase):
         ctx = make_ctx({LOCATION}, [BIT_ITEM])
         with self.assertNoLogs("Client", level="ERROR"):
             await self.client.game_watcher(ctx)
-        self.assertEqual(self.client.items_index_counter, 0)
+        self.assertEqual(self.items_counter(), 0)
 
     async def test_unexpected_error_is_logged(self) -> None:
         self.read.side_effect = RuntimeError("boom")
         ctx = make_ctx({LOCATION}, [BIT_ITEM])
         with self.assertLogs("Client", level="ERROR"):
             await self.client.game_watcher(ctx)
-        self.assertEqual(self.client.items_index_counter, 0)
+        self.assertEqual(self.items_counter(), 0)
 
 
 # Location detected on the very bit of its vanilla item, like a Betilla gift
