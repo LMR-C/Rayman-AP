@@ -8,6 +8,8 @@ from .ram_map import REVERSED_CONTROL_ITEM_ID, FORCED_RUN_ITEM_ID
 from .ram_map import MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_1_ORIGINAL, MAGIC_SEED_TEXT_1_REPLACEMENT
 from .ram_map import MAGIC_SEED_TEXT_2_ADDRESS, MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT
 
+PREVIOUS_CONTINUE = 5
+
 @dataclass(frozen=True)
 class TrapState:
     seen: int = 0
@@ -149,6 +151,7 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: flo
     Returns:
         The plan of this tick, with the locations armed for the next one in ``armed``.
     """
+    global PREVIOUS_CONTINUE
     forced_on, forward_cut, to_clear, banned, new_armed = set(), set(), set(), set(), set()
     raw_ops: list[tuple[int, RamOperation]] = []
     queue = traps.queue + tuple(i for i in ctx.received_order[traps.seen:] if i in TRAPS)
@@ -366,12 +369,15 @@ TRAPS: dict[int, TrapSpec] = {
 }
 FREE_OPERATIONS: tuple[FreeOperation, ...] = (
     FreeOperation( # Number of starting life option
-        condition=lambda c: c.slot_data["number_of_starting_life"] != 3 and c.state["starting_life_option_applied"] != 1,
+        condition=lambda c: c.slot_data["number_of_starting_life"] != 3 and c.state["starting_life_option_applied"] != 1 and c.state["life_counter"] == 3,
         op=lambda c: [(0x1E4D50, SetOperation(1, c.slot_data["number_of_starting_life"])), (0x1F9B20, SetOperation(1, 1))]
     ),
     FreeOperation( # Reapply the base number of life if a continue has been used
-        condition=lambda c: c.state["continue_counter"] != PREVIOUS_CONTINUE,
+        condition=lambda c: c.state["continue_counter"] < PREVIOUS_CONTINUE,
         op=lambda c: [(0x1F9B20, SetOperation(1, 0))]
+    ),
+    FreeOperation( # Number of continue option
+        condition=lambda c: c.slot_data["number_of_continue"] != 5 and c.state["number_continue_option_applied"] != 1,
+        op=lambda c: [(0x1E5A10, SetOperation(1, c.slot_data["number_of_continue"])), (0x1F9B21, SetOperation(1, 1))]
     )
 )
-PREVIOUS_CONTINUE = 5
