@@ -9,13 +9,13 @@ class NumberOfStartingLife(Range):
     display_name = "Number of starting life"
     range_start = 0
     range_end = 99
-    default = 3
+    default = 4
 
 class NumberOfContinue(Range):
     """
     The base number of continue available when you loose all your lives
     """
-    display_name = "Number of starting life"
+    display_name = "Number of continues"
     range_start = 0
     range_end = 99
     default = 5
@@ -24,7 +24,7 @@ class NumberOfTingsToGetANewLife(Range):
     """
     The number of tings to get in order to obtain a new life
     """
-    display_name = "Number of starting life"
+    display_name = "Number of tings to get a new life"
     range_start = 50
     range_end = 100
     default = 100
