@@ -379,5 +379,9 @@ FREE_OPERATIONS: tuple[FreeOperation, ...] = (
     FreeOperation( # Number of continue option
         condition=lambda c: c.slot_data["number_of_continue"] != 5 and c.state["number_continue_option_applied"] != 1,
         op=lambda c: [(0x1E5A10, SetOperation(1, c.slot_data["number_of_continue"])), (0x1F9B21, SetOperation(1, 1))]
+    ),
+    FreeOperation( # Number of tings to get a new life option
+        condition=lambda c: c.slot_data["number_of_tings_to_get_a_new_life"] != 100 and c.state["tings_counter"] >= c.slot_data["number_of_tings_to_get_a_new_life"],
+        op=lambda c: [(0x1E4D50, SetOperation(1, c.state["life_counter"] + 1)), (0x1E4D56, SetOperation(1, c.state["tings_counter"] - c.slot_data["number_of_tings_to_get_a_new_life"]))]
     )
 )
