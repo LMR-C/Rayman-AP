@@ -1,6 +1,6 @@
 import time
 from dataclasses import dataclass
-from .ram_operation import RamOperation, ReplaceIfOperation, MaskOperation
+from .ram_operation import RamOperation, ReplaceIfOperation, MaskOperation, SetOperation
 from collections.abc import Callable
 from .ram_map import MAGIC_SEED_ITEM_ID, FIST_ITEM_ID, HANG_ITEM_ID, GRAPPLING_FIST_ITEM_ID, HELICOPTER_ITEM_ID
 from .ram_map import BETILLA_GIFT_1_LOCATION_ID, BETILLA_GIFT_2_LOCATION_ID, BETILLA_GIFT_3_LOCATION_ID
@@ -68,6 +68,17 @@ class GatedLocation:
     location_id: int
     item_id: int
     in_zone: Callable[[TickContext], bool]
+
+@dataclass(frozen=True)
+class FreeOperation:
+    """A free operation executed if condition is true
+
+    Attributes:
+        condition: the condition to verify
+        op: the ram operation(s) to apply
+    """
+    condition: Callable[[TickContext], bool]
+    op: Callable[[TickContext], list[RamOperation]]
 
 @dataclass(frozen=True)
 class RemoveWindow:
@@ -173,7 +184,12 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: flo
         if p.active(ctx):
             raw_ops.append((p.address, ReplaceIfOperation(p.original, p.replacement)))
 
+    for fo in FREE_OPERATIONS:
+        if fo.condition(ctx):
+            raw_ops.extend(fo.op(ctx))
+
     forced_on -= to_clear              # removal wins
+    PREVIOUS_CONTINUE = ctx.state["continue_counter"]
 
     # Traps management
     if active is not None:
@@ -348,3 +364,14 @@ TRAPS: dict[int, TrapSpec] = {
         can_start=lambda c: True
     ),
 }
+FREE_OPERATIONS: tuple[FreeOperation, ...] = (
+    FreeOperation( # Number of starting life option
+        condition=lambda c: c.slot_data["number_of_starting_life"] != 3 and c.state["starting_life_option_applied"] != 1,
+        op=lambda c: [(0x1E4D50, SetOperation(1, c.slot_data["number_of_starting_life"])), (0x1F9B20, SetOperation(1, 1))]
+    ),
+    FreeOperation( # Reapply the base number of life if a continue has been used
+        condition=lambda c: c.state["continue_counter"] != PREVIOUS_CONTINUE,
+        op=lambda c: [(0x1F9B20, SetOperation(1, 0))]
+    )
+)
+PREVIOUS_CONTINUE = 5

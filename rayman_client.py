@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
+from .client_stuff.ram_operation import SetOperation
 from .client_stuff.operation_builder import build_ram_operations
 from .locations import LOCATION_ID_TABLE
 from .client_stuff.ram_map import STATE_READS, IN_GAME
@@ -134,6 +135,7 @@ class RaymanClient(BizHawkClient):
                 if new_value != read_value :
                     write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
                     guard_list.append((address,data,"MainRAM"))
+
             #To change when counter will be in game's RAM
             delivered = True
             if write_list:

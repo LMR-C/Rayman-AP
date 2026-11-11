@@ -7,13 +7,19 @@ CURRENT_WORLD_ID = 0x1FA688
 CURRENT_LEVEL_ID = 0x1F9A68
 POS_X = 0x1F9A10
 POS_Y = 0x1F9A28
+LIFE_COUNTER = 0x1E4D50
+CONTINUE_COUNTER = 0x1E5A10
+STARTING_LIFE_OPTION_APPLIED = 0x1F9B20
 # name -> (address, size)
 STATE_READS: dict[str, tuple[int, int]] = {
     "menu_state": (MENU_STATE, 1),
     "world_id": (CURRENT_WORLD_ID, 1),
     "level_id": (CURRENT_LEVEL_ID, 1),
     "pos_x": (POS_X,2),
-    "pos_y": (POS_Y,2)
+    "pos_y": (POS_Y,2),
+    "life_counter": (LIFE_COUNTER, 1),
+    "continue_counter": (CONTINUE_COUNTER, 1),
+    "starting_life_option_applied": (STARTING_LIFE_OPTION_APPLIED, 1)
 }
 
 

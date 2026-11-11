@@ -9,7 +9,7 @@ class NumberOfStartingLife(Range):
     display_name = "Number of starting life"
     range_start = 0
     range_end = 99
-    default = 4
+    default = 3
 
 class NumberOfContinue(Range):
     """
