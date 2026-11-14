@@ -1,4 +1,4 @@
-from collections.abc import Collection
+from collections.abc import Collection, Iterable
 import logging
 
 from ..items import ITEM_ID_TABLE, ItemData
@@ -9,7 +9,7 @@ from .ram_map import ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE, RESTORED_ITEM_IDS
 from ..utils import Effect
 logger = logging.getLogger("OperationBuilder")
 
-def _merge_into(ops: dict[int, RamOperation], new_ops: RamOps) -> None:
+def _merge_into(ops: dict[int, RamOperation], new_ops: Iterable[tuple[int, RamOperation]]) -> None:
     """Merge ``new_ops`` into ``ops`` (in place), one operation per address.
 
     On conflict (see ``RamOperation.merge``), the first operation is kept and an error is logged.

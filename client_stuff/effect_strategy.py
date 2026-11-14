@@ -43,24 +43,24 @@ class EffectStrategy(ABC):
 
 class BitStrategy(EffectStrategy):
     def forward(self, item: ItemData) -> RamOps:
-        return [(item.address, MaskOperation(size=item.size.value, set_mask=item.mask))]
+        return [(address, MaskOperation(size=item.size.value, set_mask=item.mask)) for address in _addresses(item)]
 
     def reverse(self, item: ItemData) -> RamOps:
-        return [(item.address, MaskOperation(size=item.size.value, clear_mask=item.mask))]
+        return [(address, MaskOperation(size=item.size.value, clear_mask=item.mask)) for address in _addresses(item)]
 
 
 class CounterStrategy(EffectStrategy):
     apply_once = True
 
     def forward(self, item: ItemData) -> RamOps:
-        return [(item.address, self._delta(item, item.value))]
+        return [(address, self._delta(item, address, item.value)) for address in _addresses(item)]
 
     def reverse(self, item: ItemData) -> RamOps:
-        return [(item.address, self._delta(item, -item.value))]
+        return [(address, self._delta(item, address, -item.value)) for address in _addresses(item)]
 
     @staticmethod
-    def _delta(item: ItemData, delta: int) -> DeltaOperation:
-        return DeltaOperation(size=item.size.value, delta=delta, cap=_rule_for(item.address).cap)
+    def _delta(item: ItemData, address: int, delta: int) -> DeltaOperation:
+        return DeltaOperation(size=item.size.value, delta=delta, cap=_rule_for(address).cap)
 
 
 class NoneStrategy(EffectStrategy):

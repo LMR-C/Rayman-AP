@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class ItemData :
     id : int
     name : str
-    address : tuple[int, ...]
+    address : int | tuple[int, ...]  # one address, or several (e.g. Big Power: HP and max HP)
     size: BlockSize
     mask: int
     count : int
