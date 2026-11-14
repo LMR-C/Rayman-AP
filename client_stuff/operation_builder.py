@@ -3,7 +3,7 @@ import logging
 
 from ..items import ITEM_ID_TABLE, ItemData
 from ..locations import LOCATION_ID_TABLE
-from .effect_strategy import STRATEGIES, RamOps
+from .effect_strategy import STRATEGIES
 from .ram_operation import RamOperation, MaskOperation, SetOperation
 from .ram_map import ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE, RESTORED_ITEM_IDS
 from ..utils import Effect
