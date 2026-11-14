@@ -4,6 +4,9 @@ from collections.abc import Callable
 from .ram_map import MAGIC_SEED_ITEM_ID
 from .ram_map import MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_1_ORIGINAL, MAGIC_SEED_TEXT_1_REPLACEMENT
 from .ram_map import MAGIC_SEED_TEXT_2_ADDRESS, MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT
+from .ram_map import BETILLA_GIFT_1_LOCATION_ID, BETILLA_GIFT_2_LOCATION_ID, BETILLA_GIFT_3_LOCATION_ID
+from .ram_map import TELESCOPIC_FIST_ITEM_ID, HANGING_ITEM_ID, GRAPPLING_FIST_ITEM_ID
+from .ram_map import BETILLA_PPW_LEVEL, BETILLA_AL_LEVEL, BETILLA_MN_LEVEL
 
 @dataclass(frozen=True)
 class TickContext:
@@ -143,6 +146,11 @@ def plan_tick(ctx: TickContext, armed: frozenset[int]) -> TickPlan:
         if not g.in_zone(ctx):
             banned.add(g.location_id)
             continue
+        # MERGE NOTE (Betilla level): from here on, the gate also acts INSIDE Betilla's level
+        # (power no longer given, bit cleared, then location armed). The Betilla level handling from
+        # the other branch must either replace this block or build on it: both acting on the same
+        # power bit would conflict. Removing it without a replacement sends a false check when
+        # entering the level with the power already received.
         forward_cut.add(g.item_id)
         if g.location_id in armed or not ctx.location_bits.get(g.location_id, True):
             new_armed.add(g.location_id)       # armed: the bit is no longer touched
@@ -241,7 +249,11 @@ SEED_TEXT_RESTORE = all_of(SWAMPS_ZONE, SEED_GIVEN)
 
 #-------collections of template data
 FORCE_WINDOWS: tuple[ForceWindow, ...] = ()
-GATED_LOCATIONS: tuple[GatedLocation, ...] = ()
+GATED_LOCATIONS: tuple[GatedLocation, ...] = (
+    GatedLocation(BETILLA_GIFT_1_LOCATION_ID, TELESCOPIC_FIST_ITEM_ID, in_level(*BETILLA_PPW_LEVEL)),
+    GatedLocation(BETILLA_GIFT_2_LOCATION_ID, HANGING_ITEM_ID, in_level(*BETILLA_AL_LEVEL)),
+    GatedLocation(BETILLA_GIFT_3_LOCATION_ID, GRAPPLING_FIST_ITEM_ID, in_level(*BETILLA_MN_LEVEL)),
+)
 REMOVE_WINDOWS: tuple[RemoveWindow, ...] = (
     #MAGIC_SEED
     RemoveWindow(MAGIC_SEED_ITEM_ID, LOST_SEED_SCENE),                               # not received, in 1-9
