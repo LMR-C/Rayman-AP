@@ -156,7 +156,6 @@ def build_ram_operations(items_received: list[int],
     _add_counter_operation(ops, items_received, counter_state)
     _add_event_operations(ops, to_apply, to_remove)
     _merge_into(ops, raw_ops)
-    _merge_into(ops, raw_ops)
     _add_location_resync_operations(ops, checked_ids)
     _add_location_reverse_operations(ops, to_reverse)
 

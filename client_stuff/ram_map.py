@@ -18,6 +18,13 @@ IS_DEATH_LINK_APPLIED = 0x1F9B22
 # Number of items_received already applied, written by the client in the same write as the items
 ITEM_COUNTER_ADDRESS = 0x1F9C52
 ITEM_COUNTER_SIZE = 2
+
+# Given again when the RAM counter goes back to 0. Other apply_once items are never given twice
+# (see the data storage counter in rayman_client)
+CAGE_ITEM_ID = 3001
+RESTORED_ITEM_IDS = frozenset({CAGE_ITEM_ID})
+# A VERIFIER
+
 # name -> (address, size)
 STATE_READS: dict[str, tuple[int, int]] = {
     "menu_state": (MENU_STATE, 1),
