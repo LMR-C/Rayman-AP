@@ -12,6 +12,9 @@ CONTINUE_COUNTER = 0x1E5A10
 TINGS_COUNTER = 0x1E4D56
 STARTING_LIFE_OPTION_APPLIED = 0x1F9B20
 NUMBER_CONTIUE_OPTION_APPLIED = 0x1F9B21
+RAYMAN_MODE = 0x1E5420
+IS_RAYMAN_DROWNING = 0x1E5950
+IS_DEATH_LINK_APPLIED = 0x1F9B22
 # name -> (address, size)
 STATE_READS: dict[str, tuple[int, int]] = {
     "menu_state": (MENU_STATE, 1),
@@ -24,6 +27,9 @@ STATE_READS: dict[str, tuple[int, int]] = {
     "tings_counter": (TINGS_COUNTER, 1),
     "starting_life_option_applied": (STARTING_LIFE_OPTION_APPLIED, 1),
     "number_continue_option_applied": (NUMBER_CONTIUE_OPTION_APPLIED, 1),
+    "rayman_mode": (RAYMAN_MODE, 1),
+    "is_rayman_drowning": (IS_RAYMAN_DROWNING, 1),
+    "is_death_link_applied": (IS_DEATH_LINK_APPLIED, 1),
 }
 
 

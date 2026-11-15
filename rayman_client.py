@@ -29,6 +29,7 @@ class RaymanClient(BizHawkClient):
         self.is_init = False
         self.tick_tracker = TickTracker()
         self.tick_stats = TickStats()
+        self.deathlink_pending = [False]
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
         hash_check = "BF460FE0" #hash received with BizHawk
@@ -48,6 +49,13 @@ class RaymanClient(BizHawkClient):
                 }
             ])
 
+    def on_deathlink(self, data: dict):
+        super().on_deathlink(data)
+
+        logger.info("DeathLink received")
+
+        self.deathlink_pending[0] = True
+
 
     async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
         if ctx.server is None or ctx.slot is None:
@@ -55,6 +63,7 @@ class RaymanClient(BizHawkClient):
 
 
         try :
+            await ctx.update_death_link(True)
             #States to read 
             state_read_list = [(address, size, "MainRAM") for address, size in STATE_READS.values()]
 
@@ -78,6 +87,9 @@ class RaymanClient(BizHawkClient):
             if state["menu_state"] != IN_GAME:
                 return
 
+            if state["rayman_mode"] == 3 or state["is_rayman_drowning"] == 1:
+                await ctx.send_death("Rayman died")
+
             loc_bits = {
                     loc_id: bool(int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask)
                     for loc_id, data in zip(id_list, reads_from_game[len(STATE_READS):], strict=True)
@@ -91,7 +103,8 @@ class RaymanClient(BizHawkClient):
                 missing=frozenset(id_list),
                 location_bits=loc_bits,
                 slot_data=ctx.slot_data or {},
-                received_order=tuple([item.item for item in ctx.items_received])
+                received_order=tuple([item.item for item in ctx.items_received]),
+                death_link_pending=self.deathlink_pending
             )
             plan = self.tick_tracker.plan(tick_ctx)
 

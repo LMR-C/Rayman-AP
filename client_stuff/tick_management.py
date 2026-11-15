@@ -9,6 +9,8 @@ from .ram_map import MAGIC_SEED_TEXT_1_ADDRESS, MAGIC_SEED_TEXT_1_ORIGINAL, MAGI
 from .ram_map import MAGIC_SEED_TEXT_2_ADDRESS, MAGIC_SEED_TEXT_2_ORIGINAL, MAGIC_SEED_TEXT_2_REPLACEMENT
 
 PREVIOUS_CONTINUE = 5
+LAST_TIME = time.monotonic()
+DEATH_LINK_TO_REMOVE = False
 
 @dataclass(frozen=True)
 class TrapState:
@@ -25,6 +27,7 @@ class TickContext:
     missing: frozenset[int]          # locations not checked yet
     location_bits: dict[int, bool]   # bit read for each missing location (first read)
     slot_data: dict
+    death_link_pending: list[bool, ...]
     received_order: tuple[int, ...] = ()
 
 @dataclass(frozen=True)
@@ -152,6 +155,18 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: flo
         The plan of this tick, with the locations armed for the next one in ``armed``.
     """
     global PREVIOUS_CONTINUE
+    global LAST_TIME
+    global DEATH_LINK_TO_REMOVE
+
+    current_time = time.monotonic()
+    delta = current_time - LAST_TIME
+
+    if delta >= 7.0:
+        LAST_TIME = current_time
+        DEATH_LINK_TO_REMOVE = True
+    else:
+        DEATH_LINK_TO_REMOVE = False
+    
     forced_on, forward_cut, to_clear, banned, new_armed = set(), set(), set(), set(), set()
     raw_ops: list[tuple[int, RamOperation]] = []
     queue = traps.queue + tuple(i for i in ctx.received_order[traps.seen:] if i in TRAPS)
@@ -193,6 +208,9 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState, dt: flo
 
     forced_on -= to_clear              # removal wins
     PREVIOUS_CONTINUE = ctx.state["continue_counter"]
+
+    if ctx.state["is_death_link_applied"] == 1:
+        ctx.death_link_pending[0] = False
 
     # Traps management
     if active is not None:
@@ -383,5 +401,13 @@ FREE_OPERATIONS: tuple[FreeOperation, ...] = (
     FreeOperation( # Number of tings to get a new life option
         condition=lambda c: c.slot_data["number_of_tings_to_get_a_new_life"] != 100 and c.state["tings_counter"] >= c.slot_data["number_of_tings_to_get_a_new_life"],
         op=lambda c: [(0x1E4D50, SetOperation(1, c.state["life_counter"] + 1)), (0x1E4D56, SetOperation(1, c.state["tings_counter"] - c.slot_data["number_of_tings_to_get_a_new_life"]))]
+    ),
+    FreeOperation( # Apply death link
+        condition=lambda c: c.death_link_pending[0] and c.state["is_death_link_applied"] == 0,
+        op=lambda c: [(0x1E5420, SetOperation(1, 3)), (0x1F9B22, SetOperation(1, 1))]
+    ),
+    FreeOperation(
+        condition=lambda c: c.state["is_death_link_applied"] == 1 and DEATH_LINK_TO_REMOVE,
+        op=lambda c: [(0x1F9B22, SetOperation(1, 0))]
     )
 )
