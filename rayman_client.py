@@ -28,7 +28,8 @@ class RaymanClient(BizHawkClient):
         self.is_init = False
         self.tick_tracker = TickTracker()
         self.tick_stats = TickStats()
-        self.deathlink_pending = [False]
+        self.deathlink_pending = False
+        self.was_dead = False   # Rayman was dead at the previous tick: one DeathLink per death
 
     async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
         hash_check = "BF460FE0" #hash received with BizHawk
@@ -48,12 +49,11 @@ class RaymanClient(BizHawkClient):
                 }
             ])
 
-    def on_deathlink(self, data: dict):
-        super().on_deathlink(data)
-
+    def on_deathlink(self, ctx: "BizHawkClientContext", data: dict) -> None:
+        """DeathLink from another player: Rayman dies at the next tick."""
         logger.info("DeathLink received")
 
-        self.deathlink_pending[0] = True
+        self.deathlink_pending = True
 
     @staticmethod
     def _delivered_key(ctx: "BizHawkClientContext") -> str:
@@ -64,6 +64,10 @@ class RaymanClient(BizHawkClient):
         if cmd == "Connected":
             # Value of a previous connection: wait for the one of this server
             ctx.stored_data.pop(self._delivered_key(ctx), None)
+        elif cmd == "Bounced" and "DeathLink" in args.get("tags", []):
+            # The server also sends our own DeathLink back to us: ignore it
+            if args["data"]["source"] != ctx.player_names[ctx.slot]:
+                self.on_deathlink(ctx, args["data"])
 
 
 
@@ -78,7 +82,9 @@ class RaymanClient(BizHawkClient):
         delivered_consumables: int = ctx.stored_data[delivered_key] or 0
 
         try :
-            await ctx.update_death_link(True)
+            death_link = bool(ctx.slot_data["death_link"])
+            if death_link != ("DeathLink" in ctx.tags):   # only when the option and the tag differ
+                await ctx.update_death_link(death_link)
             #States to read 
             state_read_list = [(address, size, "MainRAM") for address, size in STATE_READS.values()]
 
@@ -102,8 +108,12 @@ class RaymanClient(BizHawkClient):
             if state["menu_state"] != IN_GAME:
                 return
 
-            if state["rayman_mode"] == 3 or state["is_rayman_drowning"] == 1:
+            # One DeathLink per death, never for a death that came from DeathLink
+            is_dead = state["rayman_mode"] == 3 or state["is_rayman_drowning"] == 1
+            if (is_dead and not self.was_dead and state["is_death_link_applied"] == 0
+                    and "DeathLink" in ctx.tags):
                 await ctx.send_death("Rayman died")
+            self.was_dead = is_dead
 
             loc_bits = {
                     loc_id: bool(int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask)
@@ -111,6 +121,9 @@ class RaymanClient(BizHawkClient):
                 }
 
             await self.check_victory(ctx, loc_bits)
+
+            if state["is_death_link_applied"] == 1:
+                self.deathlink_pending = False   # the game applied it
 
             tick_ctx = TickContext(
                 state=state,

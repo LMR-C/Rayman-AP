@@ -37,6 +37,7 @@ class RaymanWorld(World):
 
     def fill_slot_data(self) -> dict:
         return {
+            "death_link": self.options.death_link.value,
             "number_of_starting_life": self.options.number_of_starting_life.value,
             "number_of_continue": self.options.number_of_continue.value,
             "number_of_tings_to_get_a_new_life": self.options.number_of_tings_to_get_a_new_life.value,
