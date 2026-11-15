@@ -34,7 +34,7 @@ def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
         ItemData(1002, "Hanging", (0x1f43d0), BlockSize.BYTE, 0x2, 1, Effect.BIT, ItemClassification.progression, None),
         ItemData(1003, "Grappling Fist", (0x1f43d0), BlockSize.BYTE, 0x80, 1, Effect.BIT, ItemClassification.progression, None),
         ItemData(1004, "Helicopter", (0x1f43d0), BlockSize.BYTE, 0x4, 1, Effect.BIT, ItemClassification.progression, None),
-
+        ItemData(1005, "Run", (0x1f43d1), BlockSize.BYTE, 0x1, 1, Effect.BIT,ItemClassification.progression,None),
         # Level Unlock
         # ItemData(5001, "Anguish Lagoon Unlock", (0x1C3378), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
         # ItemData(5002, "The Swamps of Forgetfulness Unlock", (0x1C3384), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
