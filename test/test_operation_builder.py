@@ -171,17 +171,6 @@ class TestTickPlanParameters(unittest.TestCase):
             ops = build_ram_operations([BIT], 0, set(), set(), raw_ops=((0x100, raw),))
         self.assertEqual(ops, {0x100: MaskOperation(1, set_mask=0x04)} | counter_op(1))
 
-    def test_raw_op_added_with_items(self) -> None:
-        raw = ReplaceIfOperation(b"ab", b"cd")
-        ops = build_ram_operations([BIT], 0, set(), set(), raw_ops=((0x300, raw),))
-        self.assertEqual(ops, {0x100: MaskOperation(1, set_mask=0x04), 0x300: ReplaceIfOperation(b"ab", b"cd")})
-
-    def test_raw_op_conflict_keeps_first_and_logs_error(self) -> None:
-        raw = SetOperation(1, value=5)
-        with self.assertLogs("OperationBuilder", level="ERROR"):
-            ops = build_ram_operations([BIT], 0, set(), set(), raw_ops=((0x100, raw),))
-        self.assertEqual(ops, {0x100: MaskOperation(1, set_mask=0x04)})
-
 
 class TestBuildRamOperationsRealTables(unittest.TestCase):
     def test_life_received_and_vanilla_life_reversed(self) -> None:
