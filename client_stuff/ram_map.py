@@ -7,6 +7,14 @@ CURRENT_WORLD_ID = 0x1FA688
 CURRENT_LEVEL_ID = 0x1F9A68
 POS_X = 0x1F9A10
 POS_Y = 0x1F9A28
+LIFE_COUNTER = 0x1E4D50
+CONTINUE_COUNTER = 0x1E5A10
+TINGS_COUNTER = 0x1E4D56
+STARTING_LIFE_OPTION_APPLIED = 0x1F9B20
+NUMBER_CONTIUE_OPTION_APPLIED = 0x1F9B21
+RAYMAN_MODE = 0x1E5420
+IS_RAYMAN_DROWNING = 0x1E5950
+IS_DEATH_LINK_APPLIED = 0x1F9B22
 # Number of items_received already applied, written by the client in the same write as the items
 ITEM_COUNTER_ADDRESS = 0x1F9C52
 ITEM_COUNTER_SIZE = 2
@@ -17,22 +25,17 @@ STATE_READS: dict[str, tuple[int, int]] = {
     "level_id": (CURRENT_LEVEL_ID, 1),
     "pos_x": (POS_X,2),
     "pos_y": (POS_Y,2),
-    "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE),
+    "life_counter": (LIFE_COUNTER, 1),
+    "continue_counter": (CONTINUE_COUNTER, 1),
+    "tings_counter": (TINGS_COUNTER, 1),
+    "starting_life_option_applied": (STARTING_LIFE_OPTION_APPLIED, 1),
+    "number_continue_option_applied": (NUMBER_CONTIUE_OPTION_APPLIED, 1),
+    "rayman_mode": (RAYMAN_MODE, 1),
+    "is_rayman_drowning": (IS_RAYMAN_DROWNING, 1),
+    "is_death_link_applied": (IS_DEATH_LINK_APPLIED, 1),
+    "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE)
+
 }
-
-# Given again when the RAM counter goes back to 0. Other apply_once items are never given twice
-# (see the data storage counter in rayman_client)
-CAGE_ITEM_ID = 3001
-RESTORED_ITEM_IDS = frozenset({CAGE_ITEM_ID})
-
-
-
-
-# Magic Seed as item (option magic_seed_as_item)
-# Raw bytes in the game's charset (lowercase ASCII, "?" = button, texts end with "/").
-# The replacement has the same size as the original (padded with 00).
-
-# "tarayzan gives rayman a magic seed/" -> "tarayzan lost the magic seed/"
 SPAWN_SWAMPS_X = 161
 MAGIC_SEED_ITEM_ID = 2001
 
@@ -43,6 +46,9 @@ BETILLA_GIFT_3_LOCATION_ID = 2003
 TELESCOPIC_FIST_ITEM_ID = 1001
 HANGING_ITEM_ID = 1002
 GRAPPLING_FIST_ITEM_ID = 1003
+HELICOPTER_ITEM_ID = 1004
+REVERSED_CONTROL_ITEM_ID = 10001
+FORCED_RUN_ITEM_ID = 10002
 # (world_id, level_id) of each Betilla level, not checked in game yet
 BETILLA_PPW_LEVEL = (1, 3)
 BETILLA_AL_LEVEL = (1, 8)
