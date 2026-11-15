@@ -210,7 +210,7 @@ def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData,
             3001, LocationProgressType.PRIORITY
         ),
         LocationData(
-            1014, "The Swamps of Forgetfulness Screen 1 cage 2", 0x1F9BCA, BlockSize.BYTE, 0x20, 1, 9,
+            1014, "The Swamps of Forgetfulness Screen 1 cage 2", 0x1F9BC8, BlockSize.BYTE, 0x20, 1, 9,
             "The Swamps of Forgetfulness Screen 1",
             rules.has_fist & rules.has_magic_seed if is_magic_seed else rules.has_fist,
             3001, LocationProgressType.PRIORITY
@@ -227,7 +227,7 @@ def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData,
             LocationProgressType.PRIORITY
         ),
         LocationData(
-            1016, "The Swamps of Forgetfulness Screen 2 cage 2", 0x1F9BEE, BlockSize.HALF_WORD, 0x800, 1, 10,
+            1016, "The Swamps of Forgetfulness Screen 2 cage 2", 0x1F9BEF, BlockSize.BYTE, 0x80, 1, 10,
             "The Swamps of Forgetfulness Screen 2", rules.has_fist,
             3001, LocationProgressType.PRIORITY
         ),

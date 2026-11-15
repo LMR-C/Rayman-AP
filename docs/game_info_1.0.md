@@ -145,10 +145,10 @@ All the items a player can get
 | Anguish Lagoon Screen 3 life 2 | 0x1F9B93 | Byte | value & 0x2 == 0x2 | None |
 | Anguish Lagoon Screen 3 cage 1 | 0x1F9B8B | Half-Word | value & 0x40 == 0x40 | Fist Power |
 | The Swamp of Forgetfulness Screen 1 cage 1 | 0x1F9BC8 | Byte | value & 0x10 == 0x10 | has_fist and has_magic_seed |
-| The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BCA | Byte | value & 0x20 == 0x20 | has_fist and has_magic_seed |
+| The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BC8 | Byte | value & 0x20 == 0x20 | has_fist and has_magic_seed |
 | The Swamp of Forgetfulness Screen 1 life 1 | 0x1F9BCA | Byte | value & 0x8 == 0x8 | has_fist and has_magic_seed |
 | The Swamp of Forgetfulness Screen 2 cage 1 | 0x1F9BEE | Half-Word | value & 0x2 == 0x2 | has_fist |
-| The Swamp of Forgetfulness Screen 2 cage 2 | 0x1F9BEE | Half-Word | value & 0x800 == 0x8000 | has_fist |
+| The Swamp of Forgetfulness Screen 2 cage 2 | 0x1F9BEF | Byte | value & 0x80 == 0x80 | has_fist |
 | The Swamp of Forgetfulness Screen 3 cage 1 | 0x1F9C10 | Byte | value & 0x4 == 0x4 | has_fist |
 | The Swamp of Forgetfulness Screen 3 cage 2 | 0x1F9C10 | Byte | value & 0x2 == 0x2 | has_fist |
 | The Swamp of Forgetfulness Screen 3 magician 1 | 0x1f7f40 | Word | value & 0x20000 == 0x20000 | Fist Power |
