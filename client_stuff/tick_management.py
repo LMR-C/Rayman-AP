@@ -292,7 +292,7 @@ FIST_GIVEN_BY_BETILLA = all_of(in_level(1,3), location_checked(BETILLA_GIFT_1_LO
 FIST_TO_GIVE_TO_SKIP_BETILLA = all_of(in_level(1, 2), in_rect(0xC51, 0xC63, 0x117, 0x13A), not_received(TELESCOPIC_FIST_ITEM_ID), location_checked(BETILLA_GIFT_1_LOCATION_ID))
 
 HANG_GIVEN_BY_BETILLA = all_of(in_level(1,8), location_checked(BETILLA_GIFT_2_LOCATION_ID), not_received(HANGING_ITEM_ID))
-HANG_TO_GIVE_TO_SKIP_BETILLA = all_of(in_level(1,7), in_rect(0x2518, 0x2548, 0x2D, 0x45), not_received(HANGING_ITEM_ID), location_checked(BETILLA_GIFT_2_LOCATION_ID))
+HANG_TO_GIVE_TO_SKIP_BETILLA = all_of(in_level(1,7), in_rect(0x2500, 0x2555, 0x15, 0x75), not_received(HANGING_ITEM_ID), location_checked(BETILLA_GIFT_2_LOCATION_ID))
 
 GRAPPLING_FIST_GIVEN_BY_BETILLA = all_of(in_level(1,17), location_checked(BETILLA_GIFT_3_LOCATION_ID), not_received(GRAPPLING_FIST_ITEM_ID))
 GRAPPLING_FIST_TO_GIVE_TO_SKIP_BETILLA = all_of(in_level(1, 16), not_received(GRAPPLING_FIST_ITEM_ID), location_checked(BETILLA_GIFT_3_LOCATION_ID))
@@ -302,7 +302,7 @@ SEED_GIVEN = all_of(option_on("magic_seed_as_item"), received(MAGIC_SEED_ITEM_ID
 #--------Zones
 SWAMPS_ZONE = in_level(1,9)
 FIST_ZONE = any_of(all_of(in_level(1, 2), in_rect(0xC51, 0xC63, 0x117, 0x13A)), in_level(1, 3))
-HANG_ZONE = any_of(all_of(in_level(1, 7), in_rect(0x2518, 0x2548, 0x2D, 0x45)), in_level(1, 8))
+HANG_ZONE = any_of(all_of(in_level(1, 7), in_rect(0x2500, 0x2555, 0x15, 0x75)), in_level(1, 8))
 GRAPPLING_ZONE = any_of(in_level(1, 16), in_level(1, 17))
 #------SCENES
 LOST_SEED_SCENE = all_of(SWAMPS_ZONE,not_received(MAGIC_SEED_ITEM_ID),option_on("magic_seed_as_item"))
