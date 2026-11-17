@@ -304,6 +304,107 @@ SWAMPS_ZONE = in_level(1,9)
 FIST_ZONE = any_of(all_of(in_level(1, 2), in_rect(0xC51, 0xC63, 0x117, 0x13A)), in_level(1, 3))
 HANG_ZONE = any_of(all_of(in_level(1, 7), in_rect(0x2500, 0x2555, 0x15, 0x75)), in_level(1, 8))
 GRAPPLING_ZONE = any_of(in_level(1, 16), in_level(1, 17))
+
+
+# World 1
+PINK_PLANT_WOOD_CHECKPOINT = all_of(in_level(1,2), in_rect(0x8CC, 0x906, 0x17A, 0x1D2))
+MOSKITO_NEST_CHECKPOINT = all_of(in_level(1,12), in_rect(0xA04, 0xA3A, 0x159, 0x1C2))
+MOSKITO_NEST_CHECKPOINT2 = all_of(in_level(1,13), in_rect(0x1016, 0x104E, 0x87, 0xF2))
+
+WORLD1_CHECKPOINTS = any_of(PINK_PLANT_WOOD_CHECKPOINT, MOSKITO_NEST_CHECKPOINT, MOSKITO_NEST_CHECKPOINT2)
+
+# World 2
+BONGO_HEIGHT_CHECKPOINT = all_of(in_level(2,3), in_rect(0x192, 0x1C2, 0xE5D, 0xEC2))
+BONGO_HEIGHT_CHECKPOINT2 = all_of(in_level(2,3), in_rect(0x235, 0x263, 0x54B, 0x5B2))
+BONGO_HEIGHT_CHECKPOINT3 = all_of(in_level(2,5), in_rect(0x760, 0x7A2, 0x12, 0x62))
+ALEGRO_PRESTO_CHECKPOINT = all_of(in_level(2,8), in_rect(0x795, 0x7D5, 0x352, 0x3A2))
+ALEGRO_PRESTO_CHECKPOINT2 = all_of(in_level(2,9), in_rect(0xD32, 0xD58, 0x268, 0x2C2))
+ALEGRO_PRESTO_CHECKPOINT3 = all_of(in_level(2,10), in_rect(0x6A8, 0x6DE, 0x3AA, 0x402))
+SAX_HULLABALOO_CHECKPOINT3 = all_of(in_level(2,14), in_rect(0x86, 0xB6, 0x1AA, 0x202))
+
+WORLD2_CHECKPOINTS = any_of(
+    BONGO_HEIGHT_CHECKPOINT,
+    BONGO_HEIGHT_CHECKPOINT2,
+    BONGO_HEIGHT_CHECKPOINT3,
+    ALEGRO_PRESTO_CHECKPOINT,
+    ALEGRO_PRESTO_CHECKPOINT2,
+    ALEGRO_PRESTO_CHECKPOINT3,
+    SAX_HULLABALOO_CHECKPOINT3
+)
+
+# world 3
+TWILIGHT_GULCH_CHECKPOINT = all_of(in_level(3,4), in_rect(0x865, 0x899, 0x195, 0x1E2))
+TWILIGHT_GULCH_CHECKPOINT2 = all_of(in_level(3,5), in_rect(0x272, 0x2AC, 0x4CF, 0x522))
+STONE_PEAK_CHECKPOINT = all_of(in_level(3,6), in_rect(0xBFA, 0xC30, 0xB9, 0x102))
+STONE_PEAK_CHECKPOINT2 = all_of(in_level(3,6), in_rect(0x143F, 0x1465, 0x15E, 0x1A2))
+STONE_PEAK_CHECKPOINT3 = all_of(in_level(3,9), in_rect(0x12DC, 0x1308, 0x149, 0x192))
+
+WORLD3_CHECKPOINTS = any_of(
+    TWILIGHT_GULCH_CHECKPOINT,
+    TWILIGHT_GULCH_CHECKPOINT2,
+    STONE_PEAK_CHECKPOINT,
+    STONE_PEAK_CHECKPOINT2,
+    STONE_PEAK_CHECKPOINT3
+)
+
+# world 4
+ERASER_PLAINS_CHECKPOINT = all_of(in_level(4,1), in_rect(0xA1D, 0xA4B, 0x109, 0x152))
+PENCIL_PENTATHLON_CHECKPOINT = all_of(in_level(4,5), in_rect(0x8A1, 0x8CF, 0x14A, 0x1A2))
+PENCIL_PENTATHLON_CHECKPOINT2 = all_of(in_level(4,6), in_rect(0xA66, 0xA94, 0xFA, 0x152))
+PENCIL_PENTATHLON_CHECKPOINT3 = all_of(in_level(4,6), in_rect(0xF04, 0xF3C, 0x14B, 0x192))
+PENCIL_PENTATHLON_CHECKPOINT4 = all_of(in_level(4,7), in_rect(0x4DD, 0x501, 0x142, 0x192))
+MAMA_CRATER_CHECKPOINT = all_of(in_level(4,8), in_rect(0xD30, 0xD66, 0x339, 0x382))
+MAMA_CRATER_CHECKPOINT2 = all_of(in_level(4,9), in_rect(0x61E, 0x64C, 0x58, 0x92))
+MAMA_CRATER_CHECKPOINT3 = all_of(in_level(4,10), in_rect(0x9E, 0xCE, 0x16, 0x62))
+MAMA_CRATER_CHECKPOINT4 = all_of(in_level(4,10), in_rect(0x45D, 0x491, 0x1B1, 0x1F2))
+
+WORLD4_CHECKPOINTS = any_of(
+    ERASER_PLAINS_CHECKPOINT,
+    PENCIL_PENTATHLON_CHECKPOINT,
+    PENCIL_PENTATHLON_CHECKPOINT2,
+    PENCIL_PENTATHLON_CHECKPOINT3,
+    PENCIL_PENTATHLON_CHECKPOINT4,
+    MAMA_CRATER_CHECKPOINT,
+    MAMA_CRATER_CHECKPOINT2,
+    MAMA_CRATER_CHECKPOINT3,
+    MAMA_CRATER_CHECKPOINT4
+)
+
+# world 5
+CRYSTAL_PALACE_CHECKPOINT = all_of(in_level(5,1), in_rect(0x858, 0x88E, 0x19, 0x62))
+CRYSTAL_PALACE_CHECKPOINT2 = all_of(in_level(5,2), in_rect(0xAE7, 0xB0F, 0x1CD, 0x212))
+EAT_AT_JOE_CHECKPOINT = all_of(in_level(5,5), in_rect(0x336, 0x36E, 0x31D, 0x362))
+SKOP_CHECKPOINT = all_of(in_level(5,9), in_rect(0xBAA, 0x38A, 0x36C, 0x3B2))
+
+WORLD5_CHECKPOINTS = any_of(
+    CRYSTAL_PALACE_CHECKPOINT,
+    CRYSTAL_PALACE_CHECKPOINT2,
+    EAT_AT_JOE_CHECKPOINT,
+    SKOP_CHECKPOINT
+)
+
+# world 6
+DARK_DARE_CHECKPOINT = all_of(in_level(6,3), in_rect(0x660, 0x697, 0x25, 0x100))
+DARK_DARE_CHECKPOINT2 = all_of(in_level(6,3), in_rect(0xB1E, 0xB50, 0x245, 0x292))
+DARK_DARE_CHECKPOINT3 = all_of(in_level(6,3), in_rect(0x12F4, 0x132C, 0x272, 0x2C2))
+
+WORLD6_CHECKPOINTS = any_of(
+    DARK_DARE_CHECKPOINT,
+    DARK_DARE_CHECKPOINT2,
+    DARK_DARE_CHECKPOINT3
+)
+
+CHECKPOINTS = any_of(
+    WORLD1_CHECKPOINTS,
+    WORLD2_CHECKPOINTS,
+    WORLD3_CHECKPOINTS,
+    WORLD4_CHECKPOINTS,
+    WORLD5_CHECKPOINTS,
+    WORLD6_CHECKPOINTS
+)
+
+
+
 #------SCENES
 LOST_SEED_SCENE = all_of(SWAMPS_ZONE,not_received(MAGIC_SEED_ITEM_ID),option_on("magic_seed_as_item"))
 NO_SEED_OUTSIDE_SWAMPS = all_of(option_on("magic_seed_as_item"),
@@ -387,7 +488,7 @@ FREE_OPERATIONS: tuple[FreeOperation, ...] = (
         op=lambda c: [(0x1E4D50, SetOperation(1, c.state["life_counter"] + 1)), (0x1E4D56, SetOperation(1, c.state["tings_counter"] - c.slot_data["number_of_tings_to_get_a_new_life"]))]
     ),
     FreeOperation( # Apply death link
-        condition=lambda c: c.death_link_pending and c.state["is_death_link_applied"] == 0,
+        condition=lambda c: c.death_link_pending and c.state["is_death_link_applied"] == 0 and c.state["is_taking_sign"] and not CHECKPOINTS,
         op=lambda c: [(0x1E5420, SetOperation(1, 3)), (0x1F9B22, SetOperation(1, 1))]
     ),
     FreeOperation( # Received death over: Rayman is alive again, the next DeathLink can be applied

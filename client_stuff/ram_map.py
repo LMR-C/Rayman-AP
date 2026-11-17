@@ -15,9 +15,13 @@ NUMBER_CONTIUE_OPTION_APPLIED = 0x1F9B21
 RAYMAN_MODE = 0x1E5420
 IS_RAYMAN_DROWNING = 0x1E5950
 IS_DEATH_LINK_APPLIED = 0x1F9B22
+IS_TAKING_SIGN = 0x1D0B73
 # Number of items_received already applied, written by the client in the same write as the items
 ITEM_COUNTER_ADDRESS = 0x1F9C52
 ITEM_COUNTER_SIZE = 2
+
+# Maybe usefull
+# 0x1fa6a8
 
 # Given again when the RAM counter goes back to 0. Other apply_once items are never given twice
 # (see the data storage counter in rayman_client)
@@ -40,6 +44,7 @@ STATE_READS: dict[str, tuple[int, int]] = {
     "rayman_mode": (RAYMAN_MODE, 1),
     "is_rayman_drowning": (IS_RAYMAN_DROWNING, 1),
     "is_death_link_applied": (IS_DEATH_LINK_APPLIED, 1),
+    "is_taking_sign": (IS_TAKING_SIGN, 1),
     "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE)
 
 }
