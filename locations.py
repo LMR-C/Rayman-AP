@@ -289,7 +289,6 @@ def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData,
         ),
     )
 
-# Can be deleted if useless in the future
 LOCATION_NAME_TABLE = {loc.name: loc for loc in get_location_table()}
 LOCATION_ID_TABLE = {loc.id : loc for loc in get_location_table()}
 # Needed for AP

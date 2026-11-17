@@ -35,6 +35,7 @@ def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
         ItemData(1003, "Grappling Fist", (0x1f43d0), BlockSize.BYTE, 0x80, 1, Effect.BIT, ItemClassification.progression, None),
         ItemData(1004, "Helicopter", (0x1f43d0), BlockSize.BYTE, 0x4, 1, Effect.BIT, ItemClassification.progression, None),
         ItemData(1005, "Run", (0x1f43d1), BlockSize.BYTE, 0x1, 1, Effect.BIT,ItemClassification.progression,None),
+
         # Level Unlock
         # ItemData(5001, "Anguish Lagoon Unlock", (0x1C3378), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
         # ItemData(5002, "The Swamps of Forgetfulness Unlock", (0x1C3384), BlockSize.BYTE, None, 1, Effect.SET_VALUE, ItemClassification.progression, 3),
@@ -56,12 +57,10 @@ def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
         ItemData(9001, "5 tings", (0x1E4D56), BlockSize.BYTE, None, 65 if is_life_sanity else None, Effect.COUNTER, ItemClassification.filler, 1),
 
         # Traps item
-        # TODO: Effect.NONE until a temporary effect exists (a BIT trap would be re-applied on every tick)
         ItemData(10001, "Reversed controls", (0x1f43d1), BlockSize.BYTE, 0x20, None, Effect.NONE, ItemClassification.trap, None),
         ItemData(10002, "Forced Run", (0x1f43d1), BlockSize.BYTE, 0x10, None, Effect.NONE, ItemClassification.trap, None),
     )
 
-# Can be deleted if useless in the future
 ITEM_NAME_TABLE = {item.name: item for item in get_item_table()}
 ITEM_ID_TABLE = { item.id: item for item in get_item_table()}
 # Needed for AP
