@@ -106,6 +106,12 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
         vanilla = ITEM_ID_TABLE.get(loc.vanilla_item) if loc.vanilla_item is not None else None
         if vanilla is not None and vanilla.effect is Effect.BIT:
             continue   # Betilla: the flag IS the power bit, setting it would give the power
+
+        # Unlock levels medalion
+        if loc_id == 7001: # Fist Save
+            _merge_into(ops, [(0x1C34CC, SetOperation(1, 3))])
+        if loc_id == 7002: # Bongo Hills
+            _merge_into(ops, [(0x1C33B4, SetOperation(1, 3)), (0x1C33AC, SetOperation(2, 0xB4)), (0x1C33AE, SetOperation(2, 0xD7))])
         _merge_into(ops, [(loc.address, MaskOperation(size=loc.size.value, set_mask=loc.mask))])
 
 
