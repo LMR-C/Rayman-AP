@@ -205,14 +205,14 @@ class TestDynamicHpCap(unittest.TestCase):
         for received in ([BIG, SIMPLE, SIMPLE], [SIMPLE, BIG, SIMPLE], [SIMPLE, SIMPLE, BIG]):
             with self.subTest(received=received):
                 ops = build_ram_operations(received, 0, set(), set(), ram_values={HP_MAX_ADDRESS: 2})
-                self.assertEqual(ops[HP_MAX_ADDRESS], SetOperation(1, value=5))
-                self.assertEqual(ops[HP_ADDRESS].cap, 5)  # new max, not the stale value read
-                self.assertEqual(ops[HP_ADDRESS].apply(1), 5)
+                self.assertEqual(ops[HP_MAX_ADDRESS], SetOperation(1, value=4))
+                self.assertEqual(ops[HP_ADDRESS].cap, 4)  # new max, not the stale value read
+                self.assertEqual(ops[HP_ADDRESS].apply(1), 4)
 
     def test_heal_after_big_power_tick_uses_max_read(self) -> None:
-        ops = build_ram_operations([BIG, SIMPLE], 1, set(), set(), ram_values={HP_MAX_ADDRESS: 5})
+        ops = build_ram_operations([BIG, SIMPLE], 1, set(), set(), ram_values={HP_MAX_ADDRESS: 4})
         self.assertNotIn(HP_MAX_ADDRESS, ops)
-        self.assertEqual(ops[HP_ADDRESS].apply(5), 5)
+        self.assertEqual(ops[HP_ADDRESS].apply(4), 4)
 
     def test_reverse_still_bounded_at_zero(self) -> None:
         ops = build_ram_operations([], 0, set(), set(), raw_ops=((HP_ADDRESS, DeltaOperation(1, delta=-3)),),

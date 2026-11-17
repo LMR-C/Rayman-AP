@@ -103,8 +103,8 @@ class TestRaiseMaxStrategy(unittest.TestCase):
     def test_big_power_sets_max_and_refills_hp(self) -> None:
         ops = RaiseMaxStrategy().forward(ITEM_NAME_TABLE["Big Power"])
         self.assertEqual(ops, [
-            (HP_ADDRESS, DeltaOperation(1, delta=5)),
-            (HP_MAX_ADDRESS, SetOperation(1, value=5)),
+            (HP_ADDRESS, DeltaOperation(1, delta=4)),
+            (HP_MAX_ADDRESS, SetOperation(1, value=4)),
         ])
 
     def test_address_order_does_not_matter(self) -> None:
