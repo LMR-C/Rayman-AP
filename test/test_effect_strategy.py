@@ -10,8 +10,10 @@ from ..client_stuff.effect_strategy import (
     BitStrategy,
     CounterStrategy,
     NoneStrategy,
+    RaiseMaxStrategy,
     SetValueStrategy,
 )
+from ..client_stuff.ram_map import HP_ADDRESS, HP_MAX_ADDRESS
 from ..client_stuff.ram_operation import DeltaOperation, MaskOperation, SetOperation
 from ..items import ITEM_NAME_TABLE, get_item_table
 from ..utils import BlockSize, Effect
@@ -95,9 +97,37 @@ class TestSetValueStrategy(unittest.TestCase):
         # Re-applied on every tick, it would lock the value (e.g. infinite HP)
         self.assertTrue(SetValueStrategy.apply_once)
 
-    def test_big_power(self) -> None:
-        ops = SetValueStrategy().forward(ITEM_NAME_TABLE["Big Power"])
-        self.assertEqual([address for address, _ in ops], [0x1F6200, 0x1E4D59])
+
+
+class TestRaiseMaxStrategy(unittest.TestCase):
+    def test_big_power_sets_max_and_refills_hp(self) -> None:
+        ops = RaiseMaxStrategy().forward(ITEM_NAME_TABLE["Big Power"])
+        self.assertEqual(ops, [
+            (HP_ADDRESS, DeltaOperation(1, delta=5)),
+            (HP_MAX_ADDRESS, SetOperation(1, value=5)),
+        ])
+
+    def test_address_order_does_not_matter(self) -> None:
+        item = fake_item(42, Effect.RAISE_MAX, (HP_MAX_ADDRESS, HP_ADDRESS), value=5)
+        self.assertEqual(dict(RaiseMaxStrategy().forward(item)), {
+            HP_ADDRESS: DeltaOperation(1, delta=5),
+            HP_MAX_ADDRESS: SetOperation(1, value=5),
+        })
+
+    def test_refill_without_its_max_logs_warning(self) -> None:
+        item = fake_item(43, Effect.RAISE_MAX, (HP_ADDRESS,), value=5)
+        with self.assertLogs("EffectStrategy", level="WARNING"):
+            ops = RaiseMaxStrategy().forward(item)
+        self.assertEqual(ops, [(HP_ADDRESS, DeltaOperation(1, delta=5))])
+
+    def test_no_reverse(self) -> None:
+        self.assertEqual(RaiseMaxStrategy().reverse(ITEM_NAME_TABLE["Big Power"]), [])
+
+    def test_applied_once(self) -> None:
+        self.assertTrue(RaiseMaxStrategy.apply_once)
+
+    def test_hp_rule_takes_cap_from_max_hp(self) -> None:
+        self.assertEqual(COUNTER_RULES[HP_ADDRESS].cap_from, HP_MAX_ADDRESS)
 
 
 class TestCoherence(unittest.TestCase):
