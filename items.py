@@ -53,7 +53,7 @@ def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
         ItemData(8001, "Life Status", (0x1E4D50), BlockSize.BYTE, None, 
                  (12 if is_life_sanity else 0) + (4 if is_magician_sanity else 0),
                  Effect.COUNTER, ItemClassification.filler, 1),
-        ItemData(9001, "5 tings", (0x1E4D56), BlockSize.BYTE, None, 65 if is_life_sanity else None, Effect.COUNTER, ItemClassification.filler, 1),
+        ItemData(9001, "5 tings", (0x1E4D56), BlockSize.BYTE, None, 65 if is_life_sanity else None, Effect.COUNTER, ItemClassification.filler, 5),
 
         # Traps item
         # TODO: Effect.NONE until a temporary effect exists (a BIT trap would be re-applied on every tick)
