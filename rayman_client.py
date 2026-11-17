@@ -156,7 +156,9 @@ class RaymanClient(BizHawkClient):
                                                   to_remove=plan.to_clear,
                                                   raw_ops=plan.raw_ops,
                                                   counter_state=state["items_counter"],
-                                                  delivered_consumables=delivered_consumables)
+                                                  delivered_consumables=delivered_consumables,
+                                                  ram_values={address: state[name]
+                                                              for name, (address, _size) in STATE_READS.items()})
 
             # Special cases (game-specific operations that do not come from an item/location,
             # e.g. depending on state["world_id"] / state["level_id"] or ctx.slot_data):
@@ -178,7 +180,6 @@ class RaymanClient(BizHawkClient):
                     write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
                     guard_list.append((address,data,"MainRAM"))
 
-            #To change when counter will be in game's RAM
             delivered = True
             if write_list:
                 start = time.perf_counter()

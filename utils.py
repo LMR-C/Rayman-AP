@@ -10,4 +10,5 @@ class Effect(Enum):
     BIT ="bit"
     COUNTER = "counter"
     SET_VALUE = "set_value"
+    RAISE_MAX = "raise_max"  # set a max, then refill the counter it bounds (e.g. Big Power)
     NONE = "none"
