@@ -1,10 +1,10 @@
-from collections.abc import Collection, Iterable
+from collections.abc import Collection, Iterable, Mapping
 import logging
 
 from ..items import ITEM_ID_TABLE, ItemData
 from ..locations import LOCATION_ID_TABLE
-from .effect_strategy import STRATEGIES, RamOps
-from .ram_operation import RamOperation, MaskOperation, SetOperation
+from .effect_strategy import STRATEGIES, RamOps, rule_for
+from .ram_operation import DeltaOperation, RamOperation, MaskOperation, SetOperation
 from .ram_map import ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE, RESTORED_ITEM_IDS
 from ..utils import Effect
 logger = logging.getLogger("OperationBuilder")
@@ -128,6 +128,25 @@ def _add_event_operations(ops, to_apply: Collection[int], to_remove: Collection[
         if item := _event_bit_item(item_id, "removal"):
             _merge_into(ops, STRATEGIES[item.effect].reverse(item))
 
+def _resolve_dynamic_caps(ops: dict[int, RamOperation], ram_values: Mapping[int, int]) -> None:
+    """Set the cap of every delta whose rule has ``cap_from``, from the max of this tick (in place).
+
+    Runs once, after every merge, so deltas are summed before being capped. A Set pending on the
+    max address (Big Power in the same tick) wins over the value read, which is still the old max.
+    """
+    for address, op in ops.items():
+        cap_from = rule_for(address).cap_from
+        if cap_from is None or not isinstance(op, DeltaOperation):
+            continue
+        pending = ops.get(cap_from)
+        if isinstance(pending, SetOperation):
+            op.cap = pending.value
+        elif cap_from in ram_values:
+            op.cap = ram_values[cap_from]
+        else:
+            logger.warning(f"No value for the cap of {address:#x} (from {cap_from:#x}), left unbounded")
+
+
 def build_ram_operations(items_received: list[int],
                          counter_state: int,
                          checked_ids: set[int],
@@ -136,7 +155,8 @@ def build_ram_operations(items_received: list[int],
                          to_apply : Collection[int] = frozenset(),
                          to_remove : Collection[int] = frozenset(),
                          raw_ops : Collection[tuple[int, RamOperation]] = (),
-                         delivered_consumables: int = 0) -> dict[int, RamOperation]:
+                         delivered_consumables: int = 0,
+                         ram_values: Mapping[int, int] | None = None) -> dict[int, RamOperation]:
     """Build every RAM operation of a tick, merged by address.
 
     Args:
@@ -147,6 +167,8 @@ def build_ram_operations(items_received: list[int],
         to_reverse: Ids of the locations whose vanilla item must be reversed.
         raw_ops: Ready-made (address, operation) pairs from the tick plan, not tied to an item or a location.
         delivered_consumables: Number of items whose consumables were already given (see ``_add_item_operations``).
+        ram_values: Values already read this tick, by address (``STATE_READS``). Gives the dynamic caps
+            (e.g. max HP), see ``_resolve_dynamic_caps``.
 
     Returns:
         One operation per address, ready to be read, applied and written by the client.
@@ -158,6 +180,7 @@ def build_ram_operations(items_received: list[int],
     _merge_into(ops, raw_ops)
     _add_location_resync_operations(ops, checked_ids)
     _add_location_reverse_operations(ops, to_reverse)
+    _resolve_dynamic_caps(ops, ram_values or {})
 
     return ops
 
