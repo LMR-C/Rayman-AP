@@ -488,12 +488,12 @@ FREE_OPERATIONS: tuple[FreeOperation, ...] = (
         op=lambda c: [(0x1E4D50, SetOperation(1, c.state["life_counter"] + 1)), (0x1E4D56, SetOperation(1, c.state["tings_counter"] - c.slot_data["number_of_tings_to_get_a_new_life"]))]
     ),
     FreeOperation( # Apply death link
-        condition=lambda c: c.death_link_pending and c.state["is_death_link_applied"] == 0 and c.state["is_taking_sign"] and not CHECKPOINTS,
+        condition=lambda c: c.death_link_pending and c.state["is_death_link_applied"] == 0 and c.state["is_taking_sign"] == 0 and not CHECKPOINTS(c),
         op=lambda c: [(0x1E5420, SetOperation(1, 3)), (0x1F9B22, SetOperation(1, 1))]
     ),
     FreeOperation( # Received death over: Rayman is alive again, the next DeathLink can be applied
-        condition=lambda c: c.state["is_death_link_applied"] == 1 and c.state["rayman_mode"] != 3
-                            and c.state["is_rayman_drowning"] == 0,
+        condition=lambda c: c.state["is_death_link_applied"] == 1 and c.state["rayman_mode"] != 3 
+                  and c.state["is_rayman_drowning"] == 0,
         op=lambda c: [(0x1F9B22, SetOperation(1, 0))]
     ),
     FreeOperation( # removed run after trap
