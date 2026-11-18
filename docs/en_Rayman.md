@@ -1,65 +1,98 @@
 # Rayman
 
-## Where is the options page ?
+## Where Can I Find the Options Page?
 
-This world is an unoficially supported wolrd in the APWorld format.
-In order to see the options page you must install it and generate its template options page.
-You can follow the [setup guide](./setup_en.md) in order to do it.
+This world is an unofficially supported Archipelago world in APWorld format.
 
-## What does randomization do to this game ?
+To access the options page, you first need to install the world and generate its options
+template. You can follow the [setup guide](./setup_en.md) for instructions on how to do so.
 
-The game is played similar to a regular playthrough except everything is randomized.
-You must find your powers and cages through the various locations in order to progress.
+## What Does Randomization Change?
 
-## What is the goal of Rayman when randomized ?
+The game plays much like a regular playthrough, but various items and progression elements
+are randomized.
 
-The goal is to defeat Mr.Dark. In order to do it you must break all the necessary cages to unlock
-access to the Mr.Dark's Dare.
+You must find Rayman's powers and cages throughout the different locations in order to
+progress through the game.
 
-## What items and locations get shuffled ?
+## What Is the Goal?
 
-You can find item in the following locations :
-- Level completed
-- Boss defeated
-- Cage
-- Betilla gifts
+The goal is to defeat Mr. Dark.
+
+To reach him, you must collect enough cages to unlock access to Mr. Dark's Dare, then 
+complete it to defeat Mr. Dark.
+
+## Which Items and Locations Are Shuffled?
+
+### Locations
+
+Items can be found in the following locations:
+
+- Level completion
+- Boss defeats
+- Cages
+- Betilla's gifts
 - Life statues
 - Magician challenges
 
-The following items are available as rewards :
-- Powers (Telescopic Fist, Hanging, Grappling Fist, Helicopter, Run)
-- Cages
-- Life statues
-- Special items (Magic Seed, Helicopter Potion, Firefly)
-- Simple Power : Give 1 HP to Rayman
-- Double Power : Give 2 HP to Rayman
-- Big Power : Restore Rayman's health completely and increase his health bar to 5 points. If Rayman loses a life, the effect is cancelled
-- Life : Increase Rayman's life counter by 1
-- 5 Tings : Increase by 5 the tings counter
+### Items
 
-You can also find traps :
-- Reversed Controls : The player's controls will be reversed similar to the start of Mr.Dark's Dare 3
-- Forced Run : For a limited time, Rayman will be temporarely forced to run
+The following items can be found as rewards:
 
-### Special items
+- **Powers:** Telescopic Fist, Hanging, Grappling Fist, Helicopter, Run
+- **Cages**
+- **Life Statues**
+- **Special Items:** Magic Seed, Helicopter Potion, Firefly
+- **Simple Power:** Restores 1 HP to Rayman
+- **Double Power:** Restores 2 HP to Rayman
+- **Big Power:** Fully restores Rayman's health and increases his maximum health to 5 HP.
+This effect is lost if Rayman loses a life.
+- **Life:** Adds 1 life to Rayman's life counter
+- **5 Tings:** Adds 5 Tings to Rayman's Ting counter
 
-for the following items :
+### Traps
+
+You may also receive traps:
+
+- **Reversed Controls:** Reverses the player's controls, similar to the effect at the
+beginning of Mr. Dark's Dare 3, for 60 seconds.
+- **Forced Run:** Forces Rayman to run for 5 seconds.
+
+## Special Items
+
+The following items have special effects:
+
 - Magic Seed
 - Helicopter Potion
 - Firefly
 
-You can't use their effect until you find it. This means that your progress is blocked in
-The Swamps of Forgetfulness and in Mr.Stone's Peaks. For Eat at Joe's you can still progress
-but it will be much harder.
+Their effects cannot be used until you find the corresponding item.
 
-## Wich items can be in another player's world ?
+This means that your progression may be blocked in **The Swamps of Forgetfulness** and
+**Mr. Stone's Peaks** until you find the required items.
 
-Any shuffled item can be in other players's world
+In **Eat at Joe's**, you can still progress without the Firefly, but it will be considerably
+more difficult.
 
-## What does another world's item look like in Rayman
+## Can Items from Rayman Be Sent to Other Players?
 
-Items do not have an appearance in Rayman
+Any shuffled item from Rayman can be placed in another player's world.
 
-## When the player receives an item, what happens ?
+## What Do Items from Other Worlds Look Like in Rayman?
 
-The player is notified through the client and receives the item in game.
+Items received from other worlds have no visual representation in Rayman.
+
+## What Happens When I Receive an Item?
+
+You will be notified through the Archipelago client, and the item will be delivered to
+Rayman in-game.
+
+## What Happens in Betilla's Screens?
+
+In each of Betilla's screens, she grants Rayman a power.
+
+To prevent you from getting stuck in these screens, you will temporarily retain the
+power she gives you until you leave the screen.
+
+Once you leave, if you haven't found the corresponding item yet, the temporary power will
+be removed.
