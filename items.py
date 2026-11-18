@@ -50,11 +50,11 @@ def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
         # Filler item
         ItemData(6001, "Simple Power", (0x1F6200), BlockSize.BYTE, None, None, Effect.COUNTER, ItemClassification.filler, 1),
         ItemData(6002, "Double Power", (0x1F6200), BlockSize.BYTE, None, None, Effect.COUNTER, ItemClassification.filler, 2),
-        ItemData(6003, "Big Power", (0x1F6200, 0x1E4D59), BlockSize.BYTE, None, None, Effect.SET_VALUE, ItemClassification.filler, 5),
+        ItemData(6003, "Big Power", (0x1F6200, 0x1E4D59), BlockSize.BYTE, None, None, Effect.RAISE_MAX, ItemClassification.filler, 4),  # HP stored minus 1: 4 = 5 HP
         ItemData(8001, "Life Status", (0x1E4D50), BlockSize.BYTE, None, 
                  (12 if is_life_sanity else 0) + (4 if is_magician_sanity else 0),
                  Effect.COUNTER, ItemClassification.filler, 1),
-        ItemData(9001, "5 tings", (0x1E4D56), BlockSize.BYTE, None, 65 if is_life_sanity else None, Effect.COUNTER, ItemClassification.filler, 1),
+        ItemData(9001, "5 tings", (0x1E4D56), BlockSize.BYTE, None, 65 if is_life_sanity else None, Effect.COUNTER, ItemClassification.filler, 5),
 
         # Traps item
         ItemData(10001, "Reversed controls", (0x1f43d1), BlockSize.BYTE, 0x20, None, Effect.NONE, ItemClassification.trap, None),

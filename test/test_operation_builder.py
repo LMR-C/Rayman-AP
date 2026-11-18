@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from ..client_stuff.operation_builder import build_ram_operations
-from ..client_stuff.ram_map import ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE
+from ..client_stuff.ram_map import HP_ADDRESS, HP_MAX_ADDRESS, ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE
 from ..client_stuff.ram_operation import DeltaOperation, MaskOperation, ReplaceIfOperation, SetOperation
 from ..items import ITEM_NAME_TO_ID
 from ..locations import LOCATION_NAME_TO_ID
@@ -182,3 +182,44 @@ class TestBuildRamOperationsRealTables(unittest.TestCase):
     def test_vanilla_cage_reversed(self) -> None:
         loc = LOCATION_NAME_TO_ID["Pink Plant Woods Screen 2 cage 1"]
         self.assertEqual(build_ram_operations([], 0, set(), {loc}), {0x1F8138: DeltaOperation(1, delta=-1)})
+
+
+SIMPLE = ITEM_NAME_TO_ID["Simple Power"]
+DOUBLE = ITEM_NAME_TO_ID["Double Power"]
+BIG = ITEM_NAME_TO_ID["Big Power"]
+
+
+class TestDynamicHpCap(unittest.TestCase):
+    """HP deltas are capped by max HP: the Set pending this tick, else the value read."""
+
+    def test_heal_capped_by_max_read(self) -> None:
+        ops = build_ram_operations([SIMPLE], 0, set(), set(), ram_values={HP_MAX_ADDRESS: 2})
+        self.assertEqual(ops[HP_ADDRESS], DeltaOperation(1, delta=1, cap=2))
+        self.assertEqual(ops[HP_ADDRESS].apply(2), 2)  # full HP: no overflow
+
+    def test_heals_summed_then_capped(self) -> None:
+        ops = build_ram_operations([SIMPLE, DOUBLE], 0, set(), set(), ram_values={HP_MAX_ADDRESS: 2})
+        self.assertEqual(ops[HP_ADDRESS].apply(0), 2)
+
+    def test_big_power_and_heals_merge_in_any_order(self) -> None:
+        for received in ([BIG, SIMPLE, SIMPLE], [SIMPLE, BIG, SIMPLE], [SIMPLE, SIMPLE, BIG]):
+            with self.subTest(received=received):
+                ops = build_ram_operations(received, 0, set(), set(), ram_values={HP_MAX_ADDRESS: 2})
+                self.assertEqual(ops[HP_MAX_ADDRESS], SetOperation(1, value=4))
+                self.assertEqual(ops[HP_ADDRESS].cap, 4)  # new max, not the stale value read
+                self.assertEqual(ops[HP_ADDRESS].apply(1), 4)
+
+    def test_heal_after_big_power_tick_uses_max_read(self) -> None:
+        ops = build_ram_operations([BIG, SIMPLE], 1, set(), set(), ram_values={HP_MAX_ADDRESS: 4})
+        self.assertNotIn(HP_MAX_ADDRESS, ops)
+        self.assertEqual(ops[HP_ADDRESS].apply(4), 4)
+
+    def test_reverse_still_bounded_at_zero(self) -> None:
+        ops = build_ram_operations([], 0, set(), set(), raw_ops=((HP_ADDRESS, DeltaOperation(1, delta=-3)),),
+                                   ram_values={HP_MAX_ADDRESS: 2})
+        self.assertEqual(ops[HP_ADDRESS].apply(1), 0)
+
+    def test_no_max_value_logs_warning_and_leaves_unbounded(self) -> None:
+        with self.assertLogs("OperationBuilder", level="WARNING"):
+            ops = build_ram_operations([SIMPLE], 0, set(), set())
+        self.assertIsNone(ops[HP_ADDRESS].cap)

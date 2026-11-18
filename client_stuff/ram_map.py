@@ -19,6 +19,9 @@ IS_TAKING_SIGN = 0x1D0B73
 # Number of items_received already applied, written by the client in the same write as the items
 ITEM_COUNTER_ADDRESS = 0x1F9C52
 ITEM_COUNTER_SIZE = 2
+HP_ADDRESS = 0x1F6200
+HP_MAX_ADDRESS = 0x1E4D59
+
 
 # Maybe usefull
 # 0x1fa6a8
@@ -45,8 +48,8 @@ STATE_READS: dict[str, tuple[int, int]] = {
     "is_rayman_drowning": (IS_RAYMAN_DROWNING, 1),
     "is_death_link_applied": (IS_DEATH_LINK_APPLIED, 1),
     "is_taking_sign": (IS_TAKING_SIGN, 1),
-    "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE)
-
+    "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE),
+    "hp_max": (HP_MAX_ADDRESS,1)
 }
 SPAWN_SWAMPS_X = 161
 MAGIC_SEED_ITEM_ID = 2001
