@@ -96,3 +96,15 @@ power she gives you until you leave the screen.
 
 Once you leave, if you haven't found the corresponding item yet, the temporary power will
 be removed.
+
+## How to Resume Your Game in a Later Session
+
+Before closing the game during your first session, make sure to save your progress using either the in-game memory card or a BizHawk save state.
+
+When you start a new session:
+1. Load your previous save using the memory card or save state.
+2. Launch the Archipelago client and reconnect to the server, following the same steps as during your first session.
+3. Once connected, you can resume playing!
+
+**WARNING:** Do not load a save file that was created while playing with a different seed. Doing so may cause issues with the Archipelago client.
+An issue has already been opened to address this limitation in a future version.
