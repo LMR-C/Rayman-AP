@@ -55,6 +55,7 @@ class TestCounterStrategy(unittest.TestCase):
         for ops in (CounterStrategy().forward(life), CounterStrategy().reverse(life)):
             with self.subTest(ops=ops):
                 ((_, op),) = ops
+                assert isinstance(op, DeltaOperation)
                 self.assertEqual(op.cap, 99)
 
     def test_forward_and_reverse_can_be_merged(self) -> None:
@@ -63,6 +64,7 @@ class TestCounterStrategy(unittest.TestCase):
         ((_, forward),) = CounterStrategy().forward(life)
         ((_, reverse),) = CounterStrategy().reverse(life)
         forward.merge(reverse)
+        assert isinstance(forward, DeltaOperation)
         self.assertEqual(forward.delta, 0)
 
     def test_new_operations_on_each_call(self) -> None:

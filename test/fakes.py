@@ -21,7 +21,8 @@ def fake_item(
     size: BlockSize = BlockSize.BYTE,
 ) -> ItemData:
     """BIT items take ``mask``, COUNTER / SET_VALUE items take ``value``."""
-    return ItemData(item_id, f"Item {item_id}", address, size, mask, 1, effect, ItemClassification.filler, value)
+    # address=None on purpose: some tests check items without any address
+    return ItemData(item_id, f"Item {item_id}", address, size, mask, 1, effect, ItemClassification.filler, value)  # type: ignore[arg-type]
 
 
 def fake_location(
