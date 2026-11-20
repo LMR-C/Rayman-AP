@@ -1,13 +1,15 @@
-from collections.abc import Collection, Iterable, Mapping
 import logging
+from collections.abc import Collection, Iterable, Mapping
 
 from ..items import ITEM_ID_TABLE, ItemData
 from ..locations import LOCATION_ID_TABLE
-from .effect_strategy import STRATEGIES, RamOps, rule_for
-from .ram_operation import DeltaOperation, RamOperation, MaskOperation, SetOperation
-from .ram_map import ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE, RESTORED_ITEM_IDS
 from ..utils import Effect
+from .effect_strategy import STRATEGIES, rule_for
+from .ram_map import ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE, RESTORED_ITEM_IDS
+from .ram_operation import DeltaOperation, MaskOperation, RamOperation, SetOperation
+
 logger = logging.getLogger("OperationBuilder")
+
 
 def _merge_into(ops: dict[int, RamOperation], new_ops: Iterable[tuple[int, RamOperation]]) -> None:
     """Merge ``new_ops`` into ``ops`` (in place), one operation per address.
@@ -25,11 +27,13 @@ def _merge_into(ops: dict[int, RamOperation], new_ops: Iterable[tuple[int, RamOp
                 logger.error(f"Merging of {op} into {target_op} at {address:#x} failed, keeping the first one: {e}")
 
 
-def _add_item_operations(ops: dict[int, RamOperation],
-                         items_received: list[int],
-                         counter_state: int = 0,
-                         to_ban: Collection[int] = frozenset(),
-                         delivered_consumables: int = 0) -> None:
+def _add_item_operations(
+    ops: dict[int, RamOperation],
+    items_received: list[int],
+    counter_state: int = 0,
+    to_ban: Collection[int] = frozenset(),
+    delivered_consumables: int = 0,
+) -> None:
     """Merge the forward operations of the received items into ``ops`` (in place).
 
     Args:
@@ -48,7 +52,7 @@ def _add_item_operations(ops: dict[int, RamOperation],
             continue
         strategy = STRATEGIES[item.effect]
         if item_id in to_ban and not strategy.apply_once:
-                    continue
+            continue
         applied = counter_state if item_id in RESTORED_ITEM_IDS else max(counter_state, delivered_consumables)
         if strategy.apply_once and index < applied:
             continue
@@ -105,7 +109,7 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
             continue
         vanilla = ITEM_ID_TABLE.get(loc.vanilla_item) if loc.vanilla_item is not None else None
         if vanilla is not None and vanilla.effect is Effect.BIT:
-            continue   # Betilla: the flag IS the power bit, setting it would give the power
+            continue  # Betilla: the flag IS the power bit, setting it would give the power
 
         # Local cage counter increments to restore electoons on medalion
         if loc_id in [1001, 1002, 1003, 1004, 1005, 1006]:
@@ -121,10 +125,13 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
             _merge_into(ops, [(0x1C33A1, DeltaOperation(1, 6))])
 
         # Unlock levels medalion
-        if loc_id == 7001: # Fist Save
+        if loc_id == 7001:  # Fist Save
             _merge_into(ops, [(0x1C34CC, SetOperation(1, 3))])
-        if loc_id == 7002: # Bongo Hills
-            _merge_into(ops, [(0x1C33B4, SetOperation(1, 3)), (0x1C33AC, SetOperation(2, 0xB4)), (0x1C33AE, SetOperation(2, 0xD7))])
+        if loc_id == 7002:  # Bongo Hills
+            _merge_into(
+                ops,
+                [(0x1C33B4, SetOperation(1, 3)), (0x1C33AC, SetOperation(2, 0xB4)), (0x1C33AE, SetOperation(2, 0xD7))],
+            )
 
         _merge_into(ops, [(loc.address, MaskOperation(size=loc.size.value, set_mask=loc.mask))])
 
@@ -139,6 +146,7 @@ def _event_bit_item(item_id: int, reason: str) -> ItemData | None:
         return None
     return item
 
+
 def _add_event_operations(ops, to_apply: Collection[int], to_remove: Collection[int]) -> None:
     """Bits forced by the tick plan, independently of items_received. BIT only."""
     for item_id in to_apply:
@@ -147,6 +155,7 @@ def _add_event_operations(ops, to_apply: Collection[int], to_remove: Collection[
     for item_id in to_remove:
         if item := _event_bit_item(item_id, "removal"):
             _merge_into(ops, STRATEGIES[item.effect].reverse(item))
+
 
 def _resolve_dynamic_caps(ops: dict[int, RamOperation], ram_values: Mapping[int, int]) -> None:
     """Set the cap of every delta whose rule has ``cap_from``, from the max of this tick (in place).
@@ -167,16 +176,18 @@ def _resolve_dynamic_caps(ops: dict[int, RamOperation], ram_values: Mapping[int,
             logger.warning(f"No value for the cap of {address:#x} (from {cap_from:#x}), left unbounded")
 
 
-def build_ram_operations(items_received: list[int],
-                         counter_state: int,
-                         checked_ids: set[int],
-                         to_reverse: set[int],
-                         to_ban : Collection[int] = frozenset(),
-                         to_apply : Collection[int] = frozenset(),
-                         to_remove : Collection[int] = frozenset(),
-                         raw_ops : Collection[tuple[int, RamOperation]] = (),
-                         delivered_consumables: int = 0,
-                         ram_values: Mapping[int, int] | None = None) -> dict[int, RamOperation]:
+def build_ram_operations(
+    items_received: list[int],
+    counter_state: int,
+    checked_ids: set[int],
+    to_reverse: set[int],
+    to_ban: Collection[int] = frozenset(),
+    to_apply: Collection[int] = frozenset(),
+    to_remove: Collection[int] = frozenset(),
+    raw_ops: Collection[tuple[int, RamOperation]] = (),
+    delivered_consumables: int = 0,
+    ram_values: Mapping[int, int] | None = None,
+) -> dict[int, RamOperation]:
     """Build every RAM operation of a tick, merged by address.
 
     Args:
@@ -203,5 +214,3 @@ def build_ram_operations(items_received: list[int],
     _resolve_dynamic_caps(ops, ram_values or {})
 
     return ops
-
-

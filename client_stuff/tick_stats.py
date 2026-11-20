@@ -31,9 +31,10 @@ class TickStats:
 
         now = time.perf_counter()
         if now - self.last_summary >= self.SUMMARY_PERIOD_S:
-            parts = [f"{name}: avg={sum(values) / len(values) * 1000:.1f}ms "
-                     f"max={max(values) * 1000:.1f}ms n={len(values)}"
-                     for name, values in self.durations.items()]
+            parts = [
+                f"{name}: avg={sum(values) / len(values) * 1000:.1f}ms max={max(values) * 1000:.1f}ms n={len(values)}"
+                for name, values in self.durations.items()
+            ]
             logger.info("Timings | " + " | ".join(parts))
             self.durations.clear()
             self.last_summary = now

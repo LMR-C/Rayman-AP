@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class RegionData:
     name: str
+
 
 REGIONS: tuple[RegionData, ...] = (
     RegionData(name="worldmap"),

@@ -37,8 +37,8 @@ STATE_READS: dict[str, tuple[int, int]] = {
     "menu_state": (MENU_STATE, 1),
     "world_id": (CURRENT_WORLD_ID, 1),
     "level_id": (CURRENT_LEVEL_ID, 1),
-    "pos_x": (POS_X,2),
-    "pos_y": (POS_Y,2),
+    "pos_x": (POS_X, 2),
+    "pos_y": (POS_Y, 2),
     "life_counter": (LIFE_COUNTER, 1),
     "continue_counter": (CONTINUE_COUNTER, 1),
     "tings_counter": (TINGS_COUNTER, 1),
@@ -49,7 +49,7 @@ STATE_READS: dict[str, tuple[int, int]] = {
     "is_death_link_applied": (IS_DEATH_LINK_APPLIED, 1),
     "is_taking_sign": (IS_TAKING_SIGN, 1),
     "items_counter": (ITEM_COUNTER_ADDRESS, ITEM_COUNTER_SIZE),
-    "hp_max": (HP_MAX_ADDRESS,1)
+    "hp_max": (HP_MAX_ADDRESS, 1),
 }
 SPAWN_SWAMPS_X = 161
 MAGIC_SEED_ITEM_ID = 2001
@@ -71,15 +71,18 @@ BETILLA_MN_LEVEL = (1, 17)
 
 MAGIC_SEED_TEXT_1_ADDRESS = 0x12BAD1
 MAGIC_SEED_TEXT_1_ORIGINAL = bytes.fromhex(
-    "74 61 72 61 79 7A 61 6E 20 67 69 76 65 73 20 72 61 79 6D 61 6E 20 61 20 6D 61 67 69 63 20 73 65 65 64 2F")
+    "74 61 72 61 79 7A 61 6E 20 67 69 76 65 73 20 72 61 79 6D 61 6E 20 61 20 6D 61 67 69 63 20 73 65 65 64 2F"
+)
 MAGIC_SEED_TEXT_1_REPLACEMENT = bytes.fromhex(
-    "74 61 72 61 79 7A 61 6E 20 6C 6F 73 74 20 74 68 65 20 6D 61 67 69 63 20 73 65 65 64 2F 00 00 00 00 00 00")
+    "74 61 72 61 79 7A 61 6E 20 6C 6F 73 74 20 74 68 65 20 6D 61 67 69 63 20 73 65 65 64 2F 00 00 00 00 00 00"
+)
 
 
 # "press the ? button to use the seed/" -> "you need to find it/"
 MAGIC_SEED_TEXT_2_ADDRESS = 0x12BAF9
 MAGIC_SEED_TEXT_2_ORIGINAL = bytes.fromhex(
-    "70 72 65 73 73 20 74 68 65 20 3F 20 62 75 74 74 6F 6E 20 74 6F 20 75 73 65 20 74 68 65 20 73 65 65 64 2F 00")
+    "70 72 65 73 73 20 74 68 65 20 3F 20 62 75 74 74 6F 6E 20 74 6F 20 75 73 65 20 74 68 65 20 73 65 65 64 2F 00"
+)
 MAGIC_SEED_TEXT_2_REPLACEMENT = bytes.fromhex(
-    "79 6F 75 20 6E 65 65 64 20 74 6F 20 66 69 6E 64 20 69 74 2F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
-
+    "79 6F 75 20 6E 65 65 64 20 74 6F 20 66 69 6E 64 20 69 74 2F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
+)

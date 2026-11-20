@@ -1,7 +1,8 @@
 """Per-effect strategy: forward and reverse RAM operations for each item type."""
+
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import logging
 
 from ..items import ItemData
 from ..utils import Effect
@@ -20,6 +21,7 @@ class CounterRule:
     cap: fixed max value written (None = max of the block size).
     cap_from: address whose current value is the max (resolved per tick by operation_builder).
     """
+
     cap: int | None = None
     cap_from: int | None = None
 
@@ -85,6 +87,7 @@ def _addresses(item: ItemData) -> tuple[int, ...]:
 
 class SetValueStrategy(EffectStrategy):
     """Write ``item.value`` at every address of the item."""
+
     apply_once = True  # one-shot: re-applied on every tick it would lock the value (e.g. infinite HP)
 
     def forward(self, item: ItemData) -> RamOps:
@@ -100,6 +103,7 @@ class RaiseMaxStrategy(EffectStrategy):
     Among ``item.address``, an address whose rule has ``cap_from`` is the counter (delta of
     ``item.value``, capped later by operation_builder); the others are maxes (set to ``item.value``).
     """
+
     apply_once = True
 
     def forward(self, item: ItemData) -> RamOps:

@@ -55,6 +55,7 @@ class MaskOperation(RamOperation):
     (``clear_mask`` = all bits of the field, ``set_mask`` = value).
     A bit in both masks ends up set.
     """
+
     set_mask: int = 0
     clear_mask: int = 0
 
@@ -80,6 +81,7 @@ class DeltaOperation(RamOperation):
     ``cap=None`` means the max value of ``size``. ``delta`` can be negative
     (reverse of a counter item).
     """
+
     delta: int = 0
     cap: int | None = None
 
@@ -106,6 +108,7 @@ class DeltaOperation(RamOperation):
 @dataclass
 class SetOperation(RamOperation):
     """Write a fixed ``value``, whatever is currently in RAM."""
+
     value: int = 0
 
     def merge(self, other: RamOperation) -> None:
@@ -122,6 +125,7 @@ class SetOperation(RamOperation):
 @dataclass(init=False)
 class ReplaceIfOperation(RamOperation):
     """Write ``new`` only if RAM currently holds exactly ``expected``, otherwise leave it untouched."""
+
     expected: bytes
     new: bytes
 
