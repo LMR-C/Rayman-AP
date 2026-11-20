@@ -14,7 +14,7 @@ class EntranceData:
     rule: Rule
 
 
-def get_entrance_table(options: RaymanGameOptions = None) -> tuple[EntranceData, ...]:
+def get_entrance_table(options: RaymanGameOptions) -> tuple[EntranceData, ...]:
     is_difficulty_normal = options.difficulty.value == Difficulty.option_normal
     is_magic_seed = options.magic_seed_as_item.value
 

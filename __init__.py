@@ -115,15 +115,15 @@ class RaymanWorld(World):
         )
 
         # Entrance creation
-        for data in get_entrance_table(self.options):
-            source = regions[data.from_region]
-            target = regions[data.to_region]
+        for entrance_data in get_entrance_table(self.options):
+            source = regions[entrance_data.from_region]
+            target = regions[entrance_data.to_region]
 
-            entrance = Entrance(self.player, data.name, source)
+            entrance = Entrance(self.player, entrance_data.name, source)
 
             source.exits.append(entrance)
             entrance.connect(target)
-            self.set_rule(entrance, data.rule)
+            self.set_rule(entrance, entrance_data.rule)
 
         self.create_victory_event()
 
@@ -172,6 +172,7 @@ class RaymanWorld(World):
         # Key item pool
         for data in get_item_table(self.options):
             if data.classification in [ItemClassification.progression, ItemClassification.useful]:
+                assert data.count is not None, f"{data.name}: a progression/useful item needs a count"
                 item_pool.extend(self.create_item(data.name) for _ in range(data.count))
 
         # Filler pool

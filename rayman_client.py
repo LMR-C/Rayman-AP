@@ -40,7 +40,7 @@ class RaymanClient(BizHawkClient):
         return ctx.rom_hash == hash_check
 
     async def check_victory(self, ctx, loc_bits):
-        from CommonClient import ClientStatus
+        from NetUtils import ClientStatus
 
         if 2003 not in loc_bits and not ctx.finished_game:
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])

@@ -12,18 +12,18 @@ class ItemData:
     name: str
     address: int | tuple[int, ...]  # one address, or several (e.g. Big Power: HP and max HP)
     size: BlockSize
-    mask: int
-    count: int
+    mask: int | None  # None: not a bit item
+    count: int | None  # None: no fixed count (filler / trap)
     effect: Effect
     classification: ItemClassification
-    value: int = 0
+    value: int | None = 0
 
 
 class RaymanItem(Item):
     game = "Rayman"
 
 
-def get_item_table(options: RaymanGameOptions = None) -> tuple[ItemData, ...]:
+def get_item_table(options: RaymanGameOptions | None = None) -> tuple[ItemData, ...]:
     is_life_sanity = options is not None and options.include_life_status_in_location.value
     is_magician_sanity = options is not None and options.include_magician_challenges_in_location.value
     is_magic_seed = options is not None and options.magic_seed_as_item.value

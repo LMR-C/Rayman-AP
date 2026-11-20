@@ -19,7 +19,7 @@ class LocationData:
     level_id: int
     region: str
     rule: Rule
-    vanilla_item: int
+    vanilla_item: int | None
     classification: LocationProgressType
 
 
@@ -57,7 +57,7 @@ class RaymanLocation(Location):
             )
 
 
-def get_location_table(options: RaymanGameOptions = None) -> tuple[LocationData, ...]:
+def get_location_table(options: RaymanGameOptions | None = None) -> tuple[LocationData, ...]:
 
     # pre-process of options condition
     is_difficulty_normal = options is not None and options.difficulty.value == Difficulty.option_normal

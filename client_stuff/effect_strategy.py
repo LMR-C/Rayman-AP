@@ -52,9 +52,11 @@ class EffectStrategy(ABC):
 
 class BitStrategy(EffectStrategy):
     def forward(self, item: ItemData) -> RamOps:
+        assert item.mask is not None, f"{item.name}: a BIT item needs a mask"
         return [(address, MaskOperation(size=item.size.value, set_mask=item.mask)) for address in _addresses(item)]
 
     def reverse(self, item: ItemData) -> RamOps:
+        assert item.mask is not None, f"{item.name}: a BIT item needs a mask"
         return [(address, MaskOperation(size=item.size.value, clear_mask=item.mask)) for address in _addresses(item)]
 
 
@@ -62,9 +64,11 @@ class CounterStrategy(EffectStrategy):
     apply_once = True
 
     def forward(self, item: ItemData) -> RamOps:
+        assert item.value is not None, f"{item.name}: a COUNTER item needs a value"
         return [(address, self._delta(item, address, item.value)) for address in _addresses(item)]
 
     def reverse(self, item: ItemData) -> RamOps:
+        assert item.value is not None, f"{item.name}: a COUNTER item needs a value"
         return [(address, self._delta(item, address, -item.value)) for address in _addresses(item)]
 
     @staticmethod
@@ -91,6 +95,7 @@ class SetValueStrategy(EffectStrategy):
     apply_once = True  # one-shot: re-applied on every tick it would lock the value (e.g. infinite HP)
 
     def forward(self, item: ItemData) -> RamOps:
+        assert item.value is not None, f"{item.name}: a SET_VALUE item needs a value"
         return [(address, SetOperation(size=item.size.value, value=item.value)) for address in _addresses(item)]
 
     def reverse(self, item: ItemData) -> RamOps:
@@ -112,6 +117,7 @@ class RaiseMaxStrategy(EffectStrategy):
             cap_from = rule_for(address).cap_from
             if cap_from is not None and cap_from not in addresses:
                 logger.warning(f"{item.name}: refills {address:#x} but does not set its max {cap_from:#x}")
+        assert item.value is not None, f"{item.name}: a RAISE_MAX item needs a value"
         size = item.size.value
         return [(address, self._op(address, size, item.value)) for address in addresses]
 

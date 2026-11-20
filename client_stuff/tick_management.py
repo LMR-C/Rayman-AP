@@ -108,7 +108,7 @@ class FreeOperation:
     """
 
     condition: Callable[[TickContext], bool]
-    op: Callable[[TickContext], list[RamOperation]]
+    op: Callable[[TickContext], list[tuple[int, RamOperation]]]
 
 
 @dataclass(frozen=True)
@@ -170,9 +170,9 @@ class TrapSpec:
     """
 
     item_id: int
-    duration_s: int
-    apply: Callable[[TickContext], list[RamOperation]]
-    restore: Callable[[TickContext], list[RamOperation]]
+    duration_s: float
+    apply: Callable[[TickContext], list[tuple[int, RamOperation]]]
+    restore: Callable[[TickContext], list[tuple[int, RamOperation]]]
     can_start: Callable[[TickContext], bool]
 
 
