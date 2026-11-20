@@ -50,12 +50,15 @@ class RaymanWorld(World):
 
         original_location = self.multiworld.get_location(location_name, self.player)
 
-        event_location = RaymanLocation(self.player, location_name + " event", original_location.parent_region)
+        parent_region = original_location.parent_region
+        assert parent_region is not None, f"{location_name} has no parent region"
+
+        event_location = RaymanLocation(self.player, location_name + " event", parent_region)
 
         event_item = RaymanItem(event_name + " event item", ItemClassification.progression, None, self.player)
 
         event_location.place_locked_item(event_item)
-        event_location.parent_region.locations.append(event_location)
+        parent_region.locations.append(event_location)
 
         self.set_rule(event_location, original_location.access_rule)
 
@@ -132,7 +135,7 @@ class RaymanWorld(World):
         return RaymanItem(item.name, item.classification, item.id, self.player)
 
     def create_filler_pool(self, count: int) -> list[Item]:
-        pool = []
+        pool: list[Item] = []
         trap_percentage = self.options.trap_fill_percentage.value
         number_of_traps = round(count * trap_percentage / 100)
         number_of_fillers = count - number_of_traps

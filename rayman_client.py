@@ -62,6 +62,7 @@ class RaymanClient(BizHawkClient):
             ctx.stored_data.pop(self._delivered_key(ctx), None)
         elif cmd == "Bounced" and "DeathLink" in args.get("tags", []):
             # The server also sends our own DeathLink back to us: ignore it
+            assert ctx.slot is not None, "Bounced received before Connected"
             if args["data"]["source"] != ctx.player_names[ctx.slot]:
                 self.on_deathlink(ctx, args["data"])
 
@@ -76,6 +77,7 @@ class RaymanClient(BizHawkClient):
         delivered_consumables: int = ctx.stored_data[delivered_key] or 0
 
         try:
+            assert ctx.slot_data is not None, "slot_data is received with the slot"
             death_link = bool(ctx.slot_data["death_link"])
             if death_link != ("DeathLink" in ctx.tags):  # only when the option and the tag differ
                 await ctx.update_death_link(death_link)
