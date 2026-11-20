@@ -1,3 +1,5 @@
+from typing import Any
+
 from BaseClasses import Entrance, Item, ItemClassification, Region, Tutorial
 
 from worlds.AutoWorld import WebWorld, World
@@ -34,7 +36,7 @@ class RaymanWorld(World):
     location_name_to_id = LOCATION_NAME_TO_ID
     item_name_to_id = ITEM_NAME_TO_ID
 
-    def fill_slot_data(self) -> dict:
+    def fill_slot_data(self) -> dict[str, Any]:
         return {
             "death_link": self.options.death_link.value,
             "number_of_starting_life": self.options.number_of_starting_life.value,

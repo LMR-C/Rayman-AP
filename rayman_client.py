@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
@@ -39,13 +39,13 @@ class RaymanClient(BizHawkClient):
         ctx.want_slot_data = True
         return ctx.rom_hash == hash_check
 
-    async def check_victory(self, ctx, loc_bits):
+    async def check_victory(self, ctx: "BizHawkClientContext", loc_bits: dict[int, bool]) -> None:
         from NetUtils import ClientStatus
 
         if 2003 not in loc_bits and not ctx.finished_game:
             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
 
-    def on_deathlink(self, ctx: "BizHawkClientContext", data: dict) -> None:
+    def on_deathlink(self, ctx: "BizHawkClientContext", data: dict[str, Any]) -> None:
         """DeathLink from another player: Rayman dies at the next tick."""
         logger.info("DeathLink received")
 
@@ -56,7 +56,7 @@ class RaymanClient(BizHawkClient):
         """Data storage key of the number of items whose consumables were already given."""
         return f"rayman_delivered_{ctx.team}_{ctx.slot}"
 
-    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: dict) -> None:
+    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: dict[str, Any]) -> None:
         if cmd == "Connected":
             # Value of a previous connection: wait for the one of this server
             ctx.stored_data.pop(self._delivered_key(ctx), None)

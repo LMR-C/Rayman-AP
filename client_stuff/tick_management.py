@@ -1,6 +1,7 @@
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 from .ram_map import (
     BETILLA_GIFT_1_LOCATION_ID,
@@ -43,7 +44,7 @@ class TickContext:
     received: frozenset[int]  # ids of the received items
     missing: frozenset[int]  # locations not checked yet
     location_bits: dict[int, bool]  # bit read for each missing location (first read)
-    slot_data: dict
+    slot_data: dict[str, Any]
     received_order: tuple[int, ...] = ()
     death_link_pending: bool = False  # DeathLink received, not applied in game yet
 
@@ -269,7 +270,7 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState = NO_TRA
 class TickTracker:
     """Keep the memory needed between ticks (the armed locations) and build each plan."""
 
-    def __init__(self, clock=time.monotonic) -> None:
+    def __init__(self, clock: Callable[[], float] = time.monotonic) -> None:
         self.armed: frozenset[int] = frozenset()
         self.traps = TrapState()
         self.clock = clock
@@ -337,11 +338,11 @@ def not_(cond: Callable[[TickContext], bool]) -> Callable[[TickContext], bool]:
     return lambda c: not cond(c)
 
 
-def all_of(*conds):
+def all_of(*conds: Callable[[TickContext], bool]) -> Callable[[TickContext], bool]:
     return lambda c: all(cond(c) for cond in conds)
 
 
-def any_of(*conds):
+def any_of(*conds: Callable[[TickContext], bool]) -> Callable[[TickContext], bool]:
     return lambda c: any(cond(c) for cond in conds)
 
 

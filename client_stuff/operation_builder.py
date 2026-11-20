@@ -147,7 +147,7 @@ def _event_bit_item(item_id: int, reason: str) -> ItemData | None:
     return item
 
 
-def _add_event_operations(ops, to_apply: Collection[int], to_remove: Collection[int]) -> None:
+def _add_event_operations(ops: dict[int, RamOperation], to_apply: Collection[int], to_remove: Collection[int]) -> None:
     """Bits forced by the tick plan, independently of items_received. BIT only."""
     for item_id in to_apply:
         if item := _event_bit_item(item_id, "apply"):
