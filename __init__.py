@@ -1,4 +1,5 @@
 from BaseClasses import Entrance, Item, ItemClassification, Region, Tutorial
+
 from worlds.AutoWorld import WebWorld, World
 
 from . import rayman_client as rayman_client

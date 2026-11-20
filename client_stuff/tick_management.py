@@ -32,6 +32,9 @@ class TrapState:
     remaining_s: float = 0.0
 
 
+NO_TRAPS = TrapState()  # default trap state (TrapState is frozen, so one shared instance is safe)
+
+
 @dataclass(frozen=True)
 class TickContext:
     """Snapshot of the game and the server for one tick, taken from the first read."""
@@ -173,7 +176,7 @@ class TrapSpec:
     can_start: Callable[[TickContext], bool]
 
 
-def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState = TrapState(), dt: float = 0.0) -> TickPlan:
+def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState = NO_TRAPS, dt: float = 0.0) -> TickPlan:
     """Build the plan of one tick from the template tables.
 
     Pure function: it only reads ``ctx``, ``armed`` and the tables. A removal wins over a forced bit.
@@ -187,7 +190,7 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState = TrapSt
     Returns:
         The plan of this tick, with the locations armed for the next one in ``armed``.
     """
-    global PREVIOUS_CONTINUE
+    global PREVIOUS_CONTINUE  # noqa: PLW0603
 
     forced_on, forward_cut, to_clear, banned, new_armed = set(), set(), set(), set(), set()
     raw_ops: list[tuple[int, RamOperation]] = []
@@ -225,9 +228,8 @@ def plan_tick(ctx: TickContext, armed: frozenset[int], traps: TrapState = TrapSt
             if r.clear_bit:
                 to_clear.add(r.item_id)
 
-    for p in TEXT_PATCHES:  # a new operation on     every tick
-        if p.active(ctx):
-            raw_ops.append((p.address, ReplaceIfOperation(p.original, p.replacement)))
+    # a new operation on every tick
+    raw_ops.extend((p.address, ReplaceIfOperation(p.original, p.replacement)) for p in TEXT_PATCHES if p.active(ctx))
 
     for fo in FREE_OPERATIONS:
         if fo.condition(ctx):
