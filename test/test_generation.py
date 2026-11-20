@@ -174,3 +174,27 @@ class TestTrapWeightNone(RaymanGenerationBase):
         names = Counter(item.name for item in self.world.create_filler_pool(100))
         self.assertEqual(names["Reversed controls"], 0)
         self.assertEqual(names["Forced Run"], 100)
+
+
+# ---- C6: slot data read by the client
+
+class TestSlotData(RaymanGenerationBase):
+    options = {"death_link": True, "number_of_starting_life": 7, "number_of_continue": 2,
+               "number_of_tings_to_get_a_new_life": 50, "magic_seed_as_item": True,
+               "include_life_status_in_location": True, "include_magician_challenges_in_location": False}
+
+    def test_slot_data_carries_the_options(self) -> None:
+        self.assertEqual(self.world.fill_slot_data(), {
+            "death_link": 1,
+            "number_of_starting_life": 7,
+            "number_of_continue": 2,
+            "number_of_tings_to_get_a_new_life": 50,
+            "magic_seed_as_item": 1,
+            "include_life_status_in_location": 1,
+            "include_magician_challenges_in_location": 0,
+        })
+
+    def test_slot_data_has_every_key_read_by_the_client(self) -> None:
+        keys = {"death_link", "number_of_starting_life", "number_of_continue", "number_of_tings_to_get_a_new_life",
+                "magic_seed_as_item"}
+        self.assertLessEqual(keys, set(self.world.fill_slot_data()))
