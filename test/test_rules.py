@@ -22,9 +22,15 @@ SF_S2 = "The Swamps of Forgetfulness Screen 2"
 MN_S1 = "Moskito's Nest Screen 1"
 MN_BETILLA = "Moskito's Nest Betilla"
 
+# Life status in the pool turns off the Fist lock on Betilla 1 (prototype limit, see __init__.py).
+# Without it, the locked Fist is swept into every state and the rules can no longer be tested alone.
+RULE_OPTIONS = {"include_life_status_in_location": True}
+
 
 class TestRuleObjects(RaymanTestBase):
     """Each rule of rules.py, resolved on the world and evaluated on a state."""
+
+    options = RULE_OPTIONS
 
     def check(self, rule, state) -> bool:
         return rule.resolve(self.world)(state)
@@ -73,6 +79,8 @@ class TestRuleObjects(RaymanTestBase):
 class TestLevelChain(RaymanTestBase):
     """Order of the levels in normal difficulty: PPW -> Anguish Lagoon -> Swamps -> Moskito's Nest."""
 
+    options = RULE_OPTIONS
+
     def test_start_only_reaches_the_beginning_of_pink_plant_woods(self) -> None:
         state = self.state_with()
         self.assertTrue(self.reach_location(state, "Betilla Gift 1 (fist)"))
@@ -101,6 +109,8 @@ class TestLevelChain(RaymanTestBase):
 class TestVictory(RaymanTestBase):
     """The goal (Moskito beaten, at Moskito's Nest Betilla)."""
 
+    options = RULE_OPTIONS
+
     def test_fist_and_hang_are_enough(self) -> None:
         self.assertTrue(self.multiworld.can_beat_game(self.state_with(FIST, HANG)))
 
@@ -119,6 +129,8 @@ class TestVictory(RaymanTestBase):
 
 class TestCageRules(RaymanTestBase):
     """Cages with a rule other than the Fist alone."""
+
+    options = RULE_OPTIONS
 
     def test_anguish_lagoon_cage_1_needs_helicopter_or_grappling(self) -> None:
         cage = "Anguish Lagoon Screen 1 cage 1"
@@ -149,7 +161,7 @@ class TestCageRules(RaymanTestBase):
 class TestHardDifficulty(RaymanTestBase):
     """Hard difficulty: Pink Plant Woods can be finished without the Fist."""
 
-    options = {"difficulty": "hard"}
+    options = RULE_OPTIONS | {"difficulty": "hard"}
 
     def test_pink_plant_woods_finished_without_fist(self) -> None:
         self.assertTrue(self.reach_location(self.state_with(HANG), "Pink Plant Woods finished"))
@@ -167,11 +179,25 @@ class TestHardDifficulty(RaymanTestBase):
 class TestNormalDifficultyDiffers(RaymanTestBase):
     """Counterpart of TestHardDifficulty in normal difficulty."""
 
+    options = RULE_OPTIONS
+
     def test_pink_plant_woods_not_finished_without_fist(self) -> None:
         self.assertFalse(self.reach_location(self.state_with(HANG), "Pink Plant Woods finished"))
 
     def test_anguish_lagoon_closed_with_hang_only(self) -> None:
         self.assertFalse(self.reach_region(self.state_with(HANG), AL_S1))
+
+
+class TestFistLockedByDefault(RaymanTestBase):
+    """Default options: the Fist is locked on Betilla 1, reachable from the start, so every state holds it."""
+
+    def test_start_state_already_holds_the_fist(self) -> None:
+        state = self.state_with()
+        self.assertTrue(state.has(FIST, self.player))
+        self.assertTrue(self.reach_region(state, AL_S1))
+
+    def test_not_beatable_without_hang(self) -> None:
+        self.assertFalse(self.multiworld.can_beat_game(self.state_without(HANG)))
 
 
 class TestMagicSeed(RaymanTestBase):

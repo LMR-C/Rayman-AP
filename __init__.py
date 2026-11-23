@@ -106,6 +106,15 @@ class RaymanWorld(World):
             regions[data.region].locations.append(location)
             self.set_rule(location, data.rule)
 
+            # force telescopic with vanilla locations
+            if (
+                not self.options.include_life_status_in_location
+                and not self.options.include_magician_challenges_in_location
+                and data.id == 2001
+            ):
+                telescopic_fist = self.create_item("Telescopic Fist")
+                location.place_locked_item(telescopic_fist)
+
             # forbid trap item on specific locations
             if (data.id >= 3000 and data.id <= 3999) or (data.id >= 7000 and data.id <= 7999):
                 location.item_rule = lambda item: item.name not in TRAP_ITEMS
@@ -138,8 +147,9 @@ class RaymanWorld(World):
 
     def create_filler_pool(self, count: int) -> list[Item]:
         pool: list[Item] = []
+        forbidden_trap_location_number: int = 5
         trap_percentage = self.options.trap_fill_percentage.value
-        number_of_traps = round(count * trap_percentage / 100)
+        number_of_traps = max(0, round((count - forbidden_trap_location_number) * trap_percentage / 100))
         number_of_fillers = count - number_of_traps
 
         if trap_percentage > 0:
@@ -178,6 +188,11 @@ class RaymanWorld(World):
         for data in get_item_table(self.options):
             if data.classification in [ItemClassification.progression, ItemClassification.useful]:
                 assert data.count is not None, f"{data.name}: a progression/useful item needs a count"
+                if (
+                    self.multiworld.get_location("Betilla Gift 1 (fist)", self.player).locked
+                    and data.name == "Telescopic Fist"
+                ):
+                    continue
                 item_pool.extend(self.create_item(data.name) for _ in range(data.count))
 
         # Filler pool
