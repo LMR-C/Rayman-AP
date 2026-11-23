@@ -145,8 +145,9 @@ class RaymanWorld(World):
 
     def create_filler_pool(self, count: int) -> list[Item]:
         pool: list[Item] = []
+        forbidden_trap_location_number : int = 5
         trap_percentage = self.options.trap_fill_percentage.value
-        number_of_traps = round(count * trap_percentage / 100)
+        number_of_traps = max(0,round((count-forbidden_trap_location_number) * trap_percentage / 100))
         number_of_fillers = count - number_of_traps
 
         if trap_percentage > 0:
