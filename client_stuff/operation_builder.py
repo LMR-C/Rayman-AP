@@ -10,6 +10,13 @@ from .ram_operation import DeltaOperation, MaskOperation, RamOperation, SetOpera
 
 logger = logging.getLogger("OperationBuilder")
 
+MEDALLION_CAGES: dict[int, range] = {  # cage counter of the level medallion (+1 per cage) -> ids of the level cages
+    0x1C3365: range(1001, 1007),  # Pink Plant Woods
+    0x1C3379: range(1007, 1013),  # Anguish Lagoon
+    0x1C338D: range(1013, 1019),  # The Swamps of Forgetfulness
+    0x1C33A1: range(1019, 1025),  # Moskito's Nest
+}
+
 
 def _merge_into(ops: dict[int, RamOperation], new_ops: Iterable[tuple[int, RamOperation]]) -> None:
     """Merge ``new_ops`` into ``ops`` (in place), one operation per address.
@@ -111,19 +118,6 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
         if vanilla is not None and vanilla.effect is Effect.BIT:
             continue  # Betilla: the flag IS the power bit, setting it would give the power
 
-        # Local cage counter increments to restore electoons on medalion
-        if loc_id in [1001, 1002, 1003, 1004, 1005, 1006]:
-            _merge_into(ops, [(0x1C3365, DeltaOperation(1, 6))])
-
-        if loc_id in [1007, 1008, 1009, 1010, 1011, 1012]:
-            _merge_into(ops, [(0x1C3379, DeltaOperation(1, 6))])
-
-        if loc_id in [1013, 1014, 1015, 1016, 1017, 1018]:
-            _merge_into(ops, [(0x1C338D, DeltaOperation(1, 6))])
-
-        if loc_id in [1019, 1020, 1021, 1022, 1023, 1024]:
-            _merge_into(ops, [(0x1C33A1, DeltaOperation(1, 6))])
-
         # Unlock levels medalion
         if loc_id == 7001:  # Fist Save
             _merge_into(ops, [(0x1C34CC, SetOperation(1, 3))])
@@ -134,6 +128,12 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
             )
 
         _merge_into(ops, [(loc.address, MaskOperation(size=loc.size.value, set_mask=loc.mask))])
+
+    # Cages on the medallions: a Set (+1 per checked cage), not a Delta, so every tick writes the same value
+    for address, cage_ids in MEDALLION_CAGES.items():
+        checked_cages = sum(1 for loc_id in cage_ids if loc_id in checked_ids)
+        if checked_cages:
+            _merge_into(ops, [(address, SetOperation(1, checked_cages))])
 
 
 def _event_bit_item(item_id: int, reason: str) -> ItemData | None:
