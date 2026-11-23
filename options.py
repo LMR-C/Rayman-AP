@@ -61,6 +61,7 @@ class Goal(Choice):
     display_name = "Goal"
     option_cages = 0
 
+
 class NumberOfRequiredCages(Range):
     """
     The number of cages required to unlock Mr.Dark's Dare
@@ -114,12 +115,14 @@ class MagicSeedAsItem(Toggle):
 
     display_name = "Magic Seed as item"
 
+
 class SuperHelicopterPotionAsItem(Toggle):
     """
     If active: you need to find the Super Helicopter Potion in order to use it in the Mr.Stone's Peaks
     """
 
     display_name = "Super Helicopter Potion as item"
+
 
 class FireflyAsItem(Toggle):
     """
@@ -144,6 +147,7 @@ class IncludeMagicianChallengeInLocation(Toggle):
 
     display_name = "Include Magician challenges in location checks"
 
+
 class SimplePowerWeight(Choice):
     """
     The likelyhood of receiving a Simple Power as filler item
@@ -154,6 +158,7 @@ class SimplePowerWeight(Choice):
     option_low = 0.5
     option_medium = 1
     option_high = 1.5
+
 
 class DoublePowerWeight(Choice):
     """
@@ -166,6 +171,7 @@ class DoublePowerWeight(Choice):
     option_medium = 1
     option_high = 1.5
 
+
 class BigPowerWeight(Choice):
     """
     The likelyhood of receiving a Big Power as filler item
@@ -177,6 +183,7 @@ class BigPowerWeight(Choice):
     option_medium = 1
     option_high = 1.5
 
+
 class LifeStatuesWeight(Choice):
     """
     The likelyhood of receiving a Life Statue as filler item
@@ -187,6 +194,7 @@ class LifeStatuesWeight(Choice):
     option_low = 0.5
     option_medium = 1
     option_high = 1.5
+
 
 class TingsWeight(Choice):
     """
@@ -203,19 +211,22 @@ class TingsWeight(Choice):
 rayman_options_groups = [
     OptionGroup("Quality of life", [NumberOfStartingLife, NumberOfContinue, NumberOfTingsToGetANewLife]),
     OptionGroup("General Options", [Difficulty, NumberOfRequiredCages]),
-    OptionGroup("Item Options", [
-        TrapFillPercentage,
-        ReversedControlsWeight,
-        ForcedRunWeight,
-        MagicSeedAsItem,
-        SuperHelicopterPotionAsItem,
-        FireflyAsItem,
-        SimplePowerWeight,
-        DoublePowerWeight,
-        BigPowerWeight,
-        LifeStatuesWeight,
-        TingsWeight
-    ]),
+    OptionGroup(
+        "Item Options",
+        [
+            TrapFillPercentage,
+            ReversedControlsWeight,
+            ForcedRunWeight,
+            MagicSeedAsItem,
+            SuperHelicopterPotionAsItem,
+            FireflyAsItem,
+            SimplePowerWeight,
+            DoublePowerWeight,
+            BigPowerWeight,
+            LifeStatuesWeight,
+            TingsWeight,
+        ],
+    ),
     OptionGroup(
         "Location Options",
         [
