@@ -56,10 +56,3 @@ We only ask that you respect the development roadmap outlined in the [version pl
 We would like to keep some room to learn, experiment, and implement our own ideas as part of the development process.
 
 However, contributions such as bug fixes and new feature ideas that are not already listed in the roadmap are always welcome!
-
-## Known Issues
-
-The following issues are already known. Please do not open new issues to report them.
-
-- **Electoon Cutscene:** The Electoon filing level medalion cutscene always plays on the World Map
-(*only after resync of the save when it is beyoud the client state*), where it should be played just once.
