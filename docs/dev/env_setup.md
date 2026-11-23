@@ -73,3 +73,25 @@ From `~/dev/Archipelago` with the venv active:
 4. From `~/dev/Archipelago` with the venv active, run `python BizHawkClient.py --connect localhost:38281`. It should log `Connected to BizHawk`.
 
 Client logs: `~/dev/Archipelago/logs/BizHawkClient_<date>.txt`.
+
+## 7. Lint, types and tests
+
+Dev tools only: install them in the venv, never in `worlds/rayman/requirements.txt` (Archipelago installs it on players' machines).
+
+```bash
+pip install ruff mypy
+```
+
+From `~/dev/Archipelago` with the venv active, before each commit:
+
+```bash
+ruff check worlds/rayman            # lint, add --fix for automatic fixes
+ruff format worlds/rayman           # format, --check to only verify
+python -m mypy --follow-imports=silent worlds/rayman                                            # types, tests included
+python -m mypy --strict --follow-imports=silent worlds/rayman --exclude worlds/rayman/test     # strict, world code only
+python -m pytest -q worlds/rayman/test
+```
+
+- ruff reads `worlds/rayman/ruff.toml`: Archipelago's rules (120 columns, py311) plus RUF012 and long lines in `options.py`.
+- The data lists in `items.py` and `locations.py` stay one entry per line, under `# fmt: off`, with `# noqa: E501` on long lines.
+- mypy uses Archipelago's root `mypy.ini`. The errors in `typings/kivy/clock.pyi` come from Archipelago, ignore them.
