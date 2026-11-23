@@ -1,98 +1,65 @@
 # Rayman Archipelago
 
-This world is still under developpement. Bellow you will find our ideal
-vision for the final version of this AP World. If you wish to view the
-release schedule, you can find it [here](docs/planning_version.md). To follow the progress of the developpement,
-you can consult the [roadmap](docs/roadmap.md).
+This Archipelago world is still under development, so you may encounter bugs or
+unfinished features.
 
-## Goal
-- Defeat Mr.Dark : Defeat Mr.Dark to save the Rayman's world ! You can choose
-how many cages needed to unlock Mr.Dark's Dare.
-- Great Protoon pieces : The Great Protoon has split into multiple pieces,
-find the pieces to complete the run, or additionally, find them all and 
-then beat Mr.Dark
-- Boss Rush : Find Mr.Dark's generals and defeat them, then beat Mr.Dark
+If you run into any issues, please refer to the **Issues** section of this repository.
 
-## Game modifications
+You can find an overview of the planned features and upcoming releases in
+the [version roadmap](docs/dev/planning_version.md).
 
-- Level order randomnization : the level order in the world map is randomnized
-- Level unlocks as items : you need to find an item to unlock each level
-- Sub-level randomnization : Randomnize sub-level between levels
-- Object shuffle : Shuffle in-level items position :
-    - Cage
-    - Magicians
-    - Ennemies
-    - Life Status
-    - Sings
-    - Checkpoints
-    - Tings
+## Setup Guide
 
-## Locations
-- Powers
-- Cages
-- Boss
-- Life Status
-- Magician bonus
-- Beating a level
+You can find the installation and setup instructions [here](docs/setup_en.md).
 
-## Items
+## What Does Randomization Change?
 
-### Key items
-- Fist Power : Give Rayman the ability to throw his fist
-- Hanging : Give Rayman the ability to hang on platforms
-- Grappling Fist : Give Rayman the ability to grab lives and pink rings
-- Helicopter : Give Rayman the ability to helicopter with his hair
-- Running : Give Rayman the ability to run
-- Cages : One of the 102 cages in the game
-- Life status : One of the 60 unique life status in the game
-- Magician challenges : One of the 10 unique magician challenge in the game
-- Protoon piece : A fragment of the great protoon (custom Archipelago item)
-- Level Unlock : Unlock the acess to a level
-- Magic Seed : Find the Magic Seed so you can use it
-- Helicopter Potion : Find the Helicopter Potion so you can use it
-- Firefly : Find the firefly so you can use it in Eat At Joe's first screen
+Want to know what gets randomized and how it affects the game?
 
-### Filler items
-- Simple Power : Give 1 HP to Rayman
-- Double Power : Give 2 HP to Rayman
-- Big Power : Restore Rayman's health completely and increase his health bar to 5 points. If Rayman loses a life, the effect is cancelled
-- Speed Fist : Increase Rayman's fist range and speed
-- Gold Fist : Increase Rayman's fist strenght
-- Life : Increase Rayman's life counter by 1
-- 5 Tings : Increase by 5 the tings counter
+Check out the [game documentation](docs/en_Rayman.md) for a detailed explanation.
 
-### Traps
-- Reversed Controls : The player's controls will be reversed similar to the start of Mr.Dark's Dare 3
-- Forced Run : For a limited time, Rayman will be temporarely forced to run
-- Elf Trap : For a limited time, Rayman will be temporarely shrunken, making him
-slower and his jumps lower
+## I Found a Bug. What Should I Do?
 
-## Settings
+If you encounter a bug, head over to the **Issues** section of this repository.
 
-quality of life :
-- Number of starting lives
-- Number of continue
-- Number of tings to get a new life
+Before opening a new issue, please check whether someone has already reported the same 
+problem. If not, feel free to open a new issue and provide as much information and context
+as possible. This will help us reproduce the issue and fix it more efficiently.
 
-General settings :
-- Difficulty
-- Goal
-- Shuffle objects position inside levels
-- Open World
-- Randomnize Level
+Please make sure to add the `Bug` label to your issue.
 
-Item settings :
-- Trap fill percentage
-- Reversed Controls Weight
-- Force Run Weight
-- Magic Seed as item
-- Super Helicopter
-- Firefly as item
+If an issue about the same bug already exists, feel free to add any additional information
+that might help.
 
-Location settings :
-- Level unlock as location and item
-- Number of cages required to unlock Mr.Dark's Dare
-- Number of great protoon piece to unlock Mr.Dark's Dare
-- Include life status
-- Include magician challenges
-- Location to exclude
+## I Have an Idea for a New Feature
+
+If you think this Archipelago world is missing a feature or could be improved, feel free
+to suggest it by opening an issue.
+
+Before doing so, please check the **Issues** section to see if someone has already suggested
+the same idea. If an issue already exists, feel free to join the discussion and share your
+thoughts.
+
+## Feedback and Suggestions
+
+If you would like to help us improve the project, feel free to share your advice or suggestions by opening an issue with the `Advice` label.
+
+We are still beginners when it comes to Archipelago world development and open-source projects, so we are always happy to receive feedback,
+suggestions, and constructive criticism!
+
+## Contributing
+
+If you would like to contribute to the project, feel free to fork the repository and submit a pull request.
+
+We only ask that you respect the development roadmap outlined in the [version planning document](docs/dev/planning_version.md).
+
+We would like to keep some room to learn, experiment, and implement our own ideas as part of the development process.
+
+However, contributions such as bug fixes and new feature ideas that are not already listed in the roadmap are always welcome!
+
+## Known Issues
+
+The following issues are already known. Please do not open new issues to report them.
+
+- **Electoon Cutscene:** The Electoon filing level medalion cutscene always plays on the World Map
+(*only after resync of the save when it is beyoud the client state*), where it should be played just once.

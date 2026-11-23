@@ -1,80 +1,210 @@
 import logging
-from typing import TYPE_CHECKING
+import time
+from typing import TYPE_CHECKING, Any
 
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
+from .client_stuff.operation_builder import build_ram_operations
+from .client_stuff.ram_map import IN_GAME, STATE_READS
+from .client_stuff.tick_management import TickContext, TickTracker
+from .client_stuff.tick_stats import TickStats
 from .locations import LOCATION_ID_TABLE
-from .ram_operation import build_item_operations
 
 logger = logging.getLogger("Client")
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
 
-class RaymanClient(BizHawkClient):
-    game="Rayman"
-    system = "PSX"
-    patch_suffix = None  #no patches
-    items_index_counter: int = 0
 
+class RaymanClient(BizHawkClient):
+    game = "Rayman"
+    system = "PSX"
+    patch_suffix = None  # no patches
 
     def __init__(self) -> None:
         super().__init__()
-        self.items_index_counter = 0
+        # Locations reversed but not yet confirmed by the server (avoids reversing them on every tick)
+        self.pending_reversed_ids: set[int] = set()
+        self.is_init = False
+        self.tick_tracker = TickTracker()
+        self.tick_stats = TickStats()
+        self.deathlink_pending = False
+        self.was_dead = False  # Rayman was dead at the previous tick: one DeathLink per death
 
-
-
-    async def validate_rom(self, ctx:"BizHawkClientContext") -> bool:
-        hash_check = "BF460FE0" #hash received with BizHawk
+    async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
+        hash_check = "BF460FE0"  # hash received with BizHawk
         ctx.game = self.game
-        ctx.items_handling= 0b111
-        ctx.want_slot_data = False
+        ctx.items_handling = 0b111
+        ctx.want_slot_data = True
         return ctx.rom_hash == hash_check
 
-    async def game_watcher(self,ctx:"BizHawkClientContext") -> None:
+    async def check_victory(self, ctx: "BizHawkClientContext", loc_bits: dict[int, bool]) -> None:
+        from NetUtils import ClientStatus
+
+        if 2003 not in loc_bits and not ctx.finished_game:
+            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+
+    def on_deathlink(self, ctx: "BizHawkClientContext", data: dict[str, Any]) -> None:
+        """DeathLink from another player: Rayman dies at the next tick."""
+        logger.info("DeathLink received")
+
+        self.deathlink_pending = True
+
+    @staticmethod
+    def _delivered_key(ctx: "BizHawkClientContext") -> str:
+        """Data storage key of the number of items whose consumables were already given."""
+        return f"rayman_delivered_{ctx.team}_{ctx.slot}"
+
+    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: dict[str, Any]) -> None:
+        if cmd == "Connected":
+            # Value of a previous connection: wait for the one of this server
+            ctx.stored_data.pop(self._delivered_key(ctx), None)
+        elif cmd == "Bounced" and "DeathLink" in args.get("tags", []):
+            # The server also sends our own DeathLink back to us: ignore it
+            assert ctx.slot is not None, "Bounced received before Connected"
+            if args["data"]["source"] != ctx.player_names[ctx.slot]:
+                self.on_deathlink(ctx, args["data"])
+
+    async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         if ctx.server is None or ctx.slot is None:
             return
 
-        try :
-            #Location check part
-            id_list = list(ctx.missing_locations)
-            read_list =[(LOCATION_ID_TABLE[id].address, LOCATION_ID_TABLE[id].size.value, "MainRAM") for id in id_list]
-            locations_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
-            # if adress & mask =1 : adding loc_id in set
-            ids_to_check = {
-                loc_id for loc_id, data in zip(id_list, locations_from_game, strict=True)
-                if int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask
+        delivered_key = self._delivered_key(ctx)
+        ctx.set_notify(delivered_key)
+        if delivered_key not in ctx.stored_data:  # without it, every consumable would be given again
+            return
+        delivered_consumables: int = ctx.stored_data[delivered_key] or 0
+
+        try:
+            assert ctx.slot_data is not None, "slot_data is received with the slot"
+            death_link = bool(ctx.slot_data["death_link"])
+            if death_link != ("DeathLink" in ctx.tags):  # only when the option and the tag differ
+                await ctx.update_death_link(death_link)
+            # States to read
+            state_read_list = [(address, size, "MainRAM") for address, size in STATE_READS.values()]
+
+            # Location check part
+            id_list = [loc_id for loc_id in ctx.missing_locations if loc_id in LOCATION_ID_TABLE]
+            loc_read_list = [
+                (LOCATION_ID_TABLE[loc_id].address, LOCATION_ID_TABLE[loc_id].size.value, "MainRAM")
+                for loc_id in id_list
+            ]
+
+            # Merging for one read_list
+            read_list = state_read_list + loc_read_list
+
+            tick_durations: dict[str, float] = {}
+            start = time.perf_counter()
+            reads_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
+            tick_durations["read_state"] = time.perf_counter() - start
+
+            # Checking that we are at the first "game screen"
+            state = {
+                name: int.from_bytes(raw, "little") for name, raw in zip(STATE_READS, reads_from_game, strict=False)
             }
-            #send ids to server for checking
-            await ctx.check_locations(ids_to_check)
-            #Op
+            if state["menu_state"] != IN_GAME:
+                return
+
+            # One DeathLink per death, never for a death that came from DeathLink
+            is_dead = state["rayman_mode"] == 3 or state["is_rayman_drowning"] == 1
+            if is_dead and not self.was_dead and state["is_death_link_applied"] == 0 and "DeathLink" in ctx.tags:
+                await ctx.send_death("Rayman died")
+            self.was_dead = is_dead
+
+            loc_bits = {
+                loc_id: bool(int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask)
+                for loc_id, data in zip(id_list, reads_from_game[len(STATE_READS) :], strict=True)
+            }
+
+            await self.check_victory(ctx, loc_bits)
+
+            if state["is_death_link_applied"] == 1:
+                self.deathlink_pending = False  # the game applied it
+
+            tick_ctx = TickContext(
+                state=state,
+                received=frozenset(item.item for item in ctx.items_received),
+                missing=frozenset(id_list),
+                location_bits=loc_bits,
+                slot_data=ctx.slot_data or {},
+                received_order=tuple([item.item for item in ctx.items_received]),
+                death_link_pending=self.deathlink_pending,
+            )
+            plan = self.tick_tracker.plan(tick_ctx)
+
+            # if adress & mask =1 : adding loc_id in set
+            locations_from_game = reads_from_game[len(STATE_READS) :]
+            ids_to_check = {
+                loc_id
+                for loc_id, data in zip(id_list, locations_from_game, strict=True)
+                if (int.from_bytes(data, "little") & LOCATION_ID_TABLE[loc_id].mask)
+                and loc_id not in plan.banned_locations
+            }
+            # Forget the locations confirmed by the server, then reverse only the new ones
+            self.pending_reversed_ids &= ctx.missing_locations
+            to_reverse = ids_to_check - self.pending_reversed_ids
+            # Op
             item_id_list: list[int] = [item.item for item in ctx.items_received]
-            operations_item_dict = build_item_operations(item_id_list,self.items_index_counter)
 
-            #Reading item to modify
-            read_list = [(address, op.size, "MainRAM") for address, op in operations_item_dict.items()]
+            operations_dict = build_ram_operations(
+                item_id_list,
+                checked_ids=ctx.checked_locations,
+                to_reverse=to_reverse,
+                to_ban=plan.forward_cut,
+                to_apply=plan.forced_on,
+                to_remove=plan.to_clear,
+                raw_ops=plan.raw_ops,
+                counter_state=state["items_counter"],
+                delivered_consumables=delivered_consumables,
+                ram_values={address: state[name] for name, (address, _size) in STATE_READS.items()},
+            )
 
-            #building items modifications
+            # Special cases (game-specific operations that do not come from an item/location,
+            # e.g. depending on state["world_id"] / state["level_id"] or ctx.slot_data):
+            # add them HERE, after build_ram_operations and before the read, merged into operations_dict.
+
+            # Reading item to modify
+            read_list = [(address, op.size, "MainRAM") for address, op in operations_dict.items()]
+
+            # building items modifications
             write_list = []
             guard_list = []
-            items_from_game = await bizhawk.read (ctx.bizhawk_ctx, read_list)
-            for (address, op), data in zip(operations_item_dict.items(),items_from_game,strict=True):
-                read_value = int.from_bytes(data,"little")
-                new_value,_overflow = op.apply(read_value)
-                if new_value != read_value :
-                    write_list.append((address, new_value.to_bytes(op.size,"little"), "MainRAM"))
-                    guard_list.append((address,data,"MainRAM"))
-            #To change when counter will be in game's RAM
+            start = time.perf_counter()
+            items_from_game = await bizhawk.read(ctx.bizhawk_ctx, read_list)
+            tick_durations["read_ops"] = time.perf_counter() - start
+            for (address, op), data in zip(operations_dict.items(), items_from_game, strict=True):
+                read_value = int.from_bytes(data, "little")
+                new_value = op.apply(read_value)
+                if new_value != read_value:
+                    write_list.append((address, new_value.to_bytes(op.size, "little"), "MainRAM"))
+                    guard_list.append((address, data, "MainRAM"))
+
             delivered = True
             if write_list:
+                start = time.perf_counter()
                 delivered = await bizhawk.guarded_write(ctx.bizhawk_ctx, write_list, guard_list)
+                tick_durations["write"] = time.perf_counter() - start
+            self.tick_stats.end_tick(tick_durations)
             if delivered:
-                self.items_index_counter = max(self.items_index_counter, len(item_id_list))
+                self.pending_reversed_ids |= to_reverse
+                if len(item_id_list) > delivered_consumables:
+                    # Sent once the items are written: a crash in between can't lose a consumable
+                    await ctx.send_msgs(
+                        [
+                            {
+                                "cmd": "Set",
+                                "key": delivered_key,
+                                "default": 0,
+                                "want_reply": False,
+                                "operations": [{"operation": "max", "value": len(item_id_list)}],
+                            }
+                        ]
+                    )
+                # Sent only once the reverse is written: a crash in between can't leave a vanilla reward un-reversed
+                await ctx.check_locations(ids_to_check)
 
         except bizhawk.RequestFailedError:
             pass
         except Exception as e:
             logger.exception(e)
-
-

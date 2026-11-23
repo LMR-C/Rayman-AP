@@ -56,7 +56,7 @@ All addresses here stands for the US version.
 | Allegro Presto Screen 1 | 2 | 7 |
 | Allegro Presto Screen 2 | 2 | 8 |
 | Allegro Presto Screen 3 | 2 | 9 |
-| Allegro Presto Screen 4 | 2 | 10 |
+| Allegro Presto Screen 4 **Only accessible when Mr.Sax hasn't been defeated**| 2 | 10 |
 | Allegro Presto Betilla | 2 | 11 |
 | Gong Height Screen 1 | 2 | 12 |
 | Gong Height Screen 2 | 2 | 13 |

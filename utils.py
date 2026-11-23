@@ -6,10 +6,10 @@ class BlockSize(Enum):
     HALF_WORD = 2
     WORD = 4
 
+
 class Effect(Enum):
-    SET_BIT ="set_bit"
-    ADD = "add"
-    SUB = "sub"
+    BIT = "bit"
+    COUNTER = "counter"
     SET_VALUE = "set_value"
-    TEMPORARY = "temporary"
+    RAISE_MAX = "raise_max"  # set a max, then refill the counter it bounds (e.g. Big Power)
     NONE = "none"

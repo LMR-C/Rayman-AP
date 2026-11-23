@@ -46,7 +46,7 @@ All the items a player can get
 | Cage | One of the 102 cages in the game | Increments by 1 the ``Total cage counter`` variable |
 | Protoon piece | An imaginary item for Archipelago, if you got the necessary amount it unlocks access to Mr.Dark's Dare | Intern logic |
 | Anguish Lagoon Unlock | Unlock access to Anguish Lagoon | 0x1C3378 = 3 |
-| The Swamps of Forgetfulness Unlock | Unlock access to The Swamps of Forgetfulness | 0x1C3384 = 3 |
+| The Swamps of Forgetfulness Unlock | Unlock access to The Swamps of Forgetfulness | 0x1C338C = 3 |
 | Bongo Hills Unlock | Unlock access to Bongo Hills | 0x1C33B4 = 3 |
 | Moskito's Nest Unlcok | Unlock access to Moskito's Nest | 0x1C33A0 = 3 |
 | Allegro Presto Unlock | Unlock access to Allegro Presto | 0x1C33C8 = 3 |
@@ -106,7 +106,7 @@ All the items a player can get
 | Mr.Skops phase 1 | 0x1F4EE8 | Byte | 0x40 | Fist Power,  |
 | Mr.Dark | 0x1F4E8 | Byte | 0x80 | Fist Power, Hanging, Grappling Fist, Helicopter, Run |
 | Pink Plant Wood finished | 0x1C3378 | Byte | 0x3 | entrance rule |
-| Anguish Lagoon finished | 0x1C3384 | Byte | 0x3 | entrance rule |
+| Anguish Lagoon finished | 0x1C338C | Byte | 0x3 | entrance rule |
 | The Swamp of Forgetfulness finished | 0x1C33A0 | Byte | 0x3 | entrance rule |
 | Bongo Hills finished | 0x1C33C8 | Byte | 0x3 | entrance rule |
 | Allegro Presto finished | 0x1C33DC | Byte | 0x3 | entrance rule |
@@ -142,13 +142,13 @@ All the items a player can get
 | Anguish Lagoon Screen 1 cage 5 | 0x1F9B4C | Byte | value & 0x8 == 0x8 | has_fist |
 | Anguish Lagoon Screen 1 life 1 | 0x1F9B4A | Byte | value & 0x10 == 0x10 | has_fist |
 | Anguish Lagoon Screen 3 life 1 | 0x1F9B92 | Byte | value & 0x4 == 0x4 | None |
-| Anguish Lagoon Screen 3 life 2 | 0xAF9B93 | Byte | value & 0x2 == 0x2 | None |
+| Anguish Lagoon Screen 3 life 2 | 0x1F9B93 | Byte | value & 0x2 == 0x2 | None |
 | Anguish Lagoon Screen 3 cage 1 | 0x1F9B8B | Half-Word | value & 0x40 == 0x40 | Fist Power |
 | The Swamp of Forgetfulness Screen 1 cage 1 | 0x1F9BC8 | Byte | value & 0x10 == 0x10 | has_fist and has_magic_seed |
-| The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BCA | Byte | value & 0x20 == 0x20 | has_fist and has_magic_seed |
+| The Swamp of Forgetfulness Screen 1 cage 2 | 0x1F9BC8 | Byte | value & 0x20 == 0x20 | has_fist and has_magic_seed |
 | The Swamp of Forgetfulness Screen 1 life 1 | 0x1F9BCA | Byte | value & 0x8 == 0x8 | has_fist and has_magic_seed |
 | The Swamp of Forgetfulness Screen 2 cage 1 | 0x1F9BEE | Half-Word | value & 0x2 == 0x2 | has_fist |
-| The Swamp of Forgetfulness Screen 2 cage 2 | 0x1F9BEE | Half-Word | value & 0x800 == 0x8000 | has_fist |
+| The Swamp of Forgetfulness Screen 2 cage 2 | 0x1F9BEF | Byte | value & 0x80 == 0x80 | has_fist |
 | The Swamp of Forgetfulness Screen 3 cage 1 | 0x1F9C10 | Byte | value & 0x4 == 0x4 | has_fist |
 | The Swamp of Forgetfulness Screen 3 cage 2 | 0x1F9C10 | Byte | value & 0x2 == 0x2 | has_fist |
 | The Swamp of Forgetfulness Screen 3 magician 1 | 0x1f7f40 | Word | value & 0x20000 == 0x20000 | Fist Power |

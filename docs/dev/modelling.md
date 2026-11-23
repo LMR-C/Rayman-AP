@@ -29,15 +29,7 @@ and rules of this world
     - classification : to qualify the item for placement logic
 
 ```python
-fist_power = ItemData(
-    101,
-    "Fist Power",
-    0x1f43d0,
-    1,
-    0x1,
-    1,
-    Classification.progression
-)
+fist_power = ItemData(101, "Fist Power", 0x1F43D0, 1, 0x1, 1, Classification.progression)
 ```
 
 ### Item Init
@@ -164,16 +156,7 @@ For every level unlock
 
 ```python
 ppw_s1_life1 = LocationData(
-    4001,
-    "Pink Plant Wood Screen 1 life 1",
-    0x1F9AC8,
-    1,
-    0x80,
-    1,
-    1,
-    Region.ppw_s1,
-    None,
-    Classification.DEFAULT
+    4001, "Pink Plant Wood Screen 1 life 1", 0x1F9AC8, 1, 0x80, 1, 1, Region.ppw_s1, None, Classification.DEFAULT
 )
 ```
 
