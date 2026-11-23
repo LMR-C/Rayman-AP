@@ -19,6 +19,8 @@ MAGICIAN_LOCATIONS = 4
 
 LIFE_AND_MAGICIAN = {"include_life_status_in_location": True, "include_magician_challenges_in_location": True}
 TRAPS_ON = {"trap_fill_percentage": 50, "reversed_controls_weight": "medium", "forced_run_weight": "high"}
+# Prototype limit: traps need the extra filler places of life status / magician (see create_filler_pool)
+TRAPS_ON_WITH_EXTRA_LOCATIONS = TRAPS_ON | LIFE_AND_MAGICIAN
 
 
 def is_trap_forbidden(location_id: int) -> bool:
@@ -34,15 +36,29 @@ class RaymanGenerationBase(RaymanTestBase):
     def pool_names(self) -> Counter:
         return Counter(item.name for item in self.multiworld.itempool)
 
+    def all_item_names(self) -> Counter:
+        """Pool items + items already locked on a real location (e.g. Telescopic Fist on Betilla 1)."""
+        locked = [loc.item for loc in self.real_locations() if loc.item is not None]
+        return Counter(item.name for item in [*self.multiworld.itempool, *locked])
+
 
 # ---- A: option sets (each class also runs the 3 WorldTestBase tests: reach all, reach something, fill)
 
 
 class TestTrapsOn(RaymanGenerationBase):
-    options = TRAPS_ON
+    options = TRAPS_ON_WITH_EXTRA_LOCATIONS
 
     def test_pool_contains_traps(self) -> None:
         self.assertTrue(any(name in TRAP_ITEMS for name in self.pool_names()))
+
+
+class TestNoTrapWithoutExtraLocations(RaymanGenerationBase):
+    """Prototype limit: without life status / magician, only 3 filler places, all kept for non-traps."""
+
+    options = TRAPS_ON
+
+    def test_pool_has_no_trap(self) -> None:
+        self.assertFalse([name for name in self.pool_names() if name in TRAP_ITEMS])
 
 
 # ---- C1: number of locations
@@ -83,10 +99,17 @@ class TestLocationCountLifeAndMagician(RaymanGenerationBase):
 
 class TestItemPoolDefault(RaymanGenerationBase):
     def test_one_copy_of_each_power(self) -> None:
-        pool = self.pool_names()
+        items = self.all_item_names()
         for power in POWERS:
             with self.subTest(power=power):
-                self.assertEqual(pool[power], 1)
+                self.assertEqual(items[power], 1)
+
+    def test_telescopic_fist_locked_on_betilla_1(self) -> None:
+        betilla_1 = self.multiworld.get_location("Betilla Gift 1 (fist)", self.player)
+        self.assertTrue(betilla_1.locked)
+        assert betilla_1.item is not None
+        self.assertEqual(betilla_1.item.name, "Telescopic Fist")
+        self.assertNotIn("Telescopic Fist", self.pool_names())
 
     def test_24_cages(self) -> None:
         self.assertEqual(self.pool_names()["Cage"], 24)
@@ -100,8 +123,8 @@ class TestItemPoolDefault(RaymanGenerationBase):
         self.assertLessEqual(set(others), FILLERS)
         self.assertEqual(sum(others.values()), DEFAULT_LOCATIONS - len(POWERS) - 24)
 
-    def test_one_item_per_location(self) -> None:
-        self.assertEqual(len(self.multiworld.itempool), len(self.real_locations()))
+    def test_one_item_per_empty_location(self) -> None:
+        self.assertEqual(len(self.multiworld.itempool), len(self.multiworld.get_unfilled_locations(self.player)))
 
 
 class TestItemPoolMagicSeed(RaymanGenerationBase):
@@ -110,8 +133,8 @@ class TestItemPoolMagicSeed(RaymanGenerationBase):
     def test_one_magic_seed(self) -> None:
         self.assertEqual(self.pool_names()["Magic Seed"], 1)
 
-    def test_one_item_per_location(self) -> None:
-        self.assertEqual(len(self.multiworld.itempool), len(self.real_locations()))
+    def test_one_item_per_empty_location(self) -> None:
+        self.assertEqual(len(self.multiworld.itempool), len(self.multiworld.get_unfilled_locations(self.player)))
 
 
 class TestItemPoolLifeAndMagician(RaymanGenerationBase):
@@ -159,12 +182,13 @@ class TestTrapItemRule(RaymanGenerationBase):
 class TestTrapCount(RaymanGenerationBase):
     options = TRAPS_ON
 
-    def test_number_of_traps_is_the_percentage_of_fillers(self) -> None:
-        for count in (0, 1, 10, 20, 33):
+    def test_number_of_traps_is_the_percentage_of_fillers_minus_forbidden_places(self) -> None:
+        # traps = max(0, round((count - 5) * 50 / 100)), 5 = places where a trap is forbidden; round() is banker's
+        for count, traps in ((0, 0), (1, 0), (5, 0), (10, 2), (20, 8), (33, 14)):
             with self.subTest(count=count):
                 pool = self.world.create_filler_pool(count)
                 self.assertEqual(len(pool), count)
-                self.assertEqual(sum(item.name in TRAP_ITEMS for item in pool), round(count * 50 / 100))
+                self.assertEqual(sum(item.name in TRAP_ITEMS for item in pool), traps)
 
     def test_both_traps_can_appear(self) -> None:
         names = {item.name for item in self.world.create_filler_pool(200)}
@@ -182,7 +206,7 @@ class TestTrapWeightNone(RaymanGenerationBase):
     def test_trap_with_weight_none_never_appears(self) -> None:
         names = Counter(item.name for item in self.world.create_filler_pool(100))
         self.assertEqual(names["Reversed controls"], 0)
-        self.assertEqual(names["Forced Run"], 100)
+        self.assertEqual(names["Forced Run"], 95)  # 100 % of (100 - 5 forbidden places)
 
 
 # ---- C6: slot data read by the client
