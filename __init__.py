@@ -106,7 +106,7 @@ class RaymanWorld(World):
             regions[data.region].locations.append(location)
             self.set_rule(location, data.rule)
 
-            # force telescopic en default setting
+            # force telescopic with vanilla locations
             if (not self.options.include_life_status_in_location
                 and not self.options.include_magician_challenges_in_location
                 and data.id == 2001):
