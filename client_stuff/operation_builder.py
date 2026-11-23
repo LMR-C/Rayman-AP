@@ -10,13 +10,12 @@ from .ram_operation import DeltaOperation, MaskOperation, RamOperation, SetOpera
 
 logger = logging.getLogger("OperationBuilder")
 
-MEDALLION_CAGES: dict[int, range] = {  # electoon counter of the level medallion -> ids of the level cages
+MEDALLION_CAGES: dict[int, range] = {  # cage counter of the level medallion (+1 per cage) -> ids of the level cages
     0x1C3365: range(1001, 1007),  # Pink Plant Woods
     0x1C3379: range(1007, 1013),  # Anguish Lagoon
     0x1C338D: range(1013, 1019),  # The Swamps of Forgetfulness
     0x1C33A1: range(1019, 1025),  # Moskito's Nest
 }
-ELECTOONS_PER_CAGE = 6
 
 
 def _merge_into(ops: dict[int, RamOperation], new_ops: Iterable[tuple[int, RamOperation]]) -> None:
@@ -130,11 +129,11 @@ def _add_location_resync_operations(ops: dict[int, RamOperation], checked_ids: s
 
         _merge_into(ops, [(loc.address, MaskOperation(size=loc.size.value, set_mask=loc.mask))])
 
-    # Electoons on the medallions: a Set (6 per checked cage), not a Delta, so every tick writes the same value
+    # Cages on the medallions: a Set (+1 per checked cage), not a Delta, so every tick writes the same value
     for address, cage_ids in MEDALLION_CAGES.items():
         checked_cages = sum(1 for loc_id in cage_ids if loc_id in checked_ids)
         if checked_cages:
-            _merge_into(ops, [(address, SetOperation(1, ELECTOONS_PER_CAGE * checked_cages))])
+            _merge_into(ops, [(address, SetOperation(1, checked_cages))])
 
 
 def _event_bit_item(item_id: int, reason: str) -> ItemData | None:
