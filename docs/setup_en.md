@@ -13,7 +13,7 @@ Before getting started, make sure you have the following:
 
 1. Download and install [Archipelago](<https://github.com/ArchipelagoMW/Archipelago/releases/latest>). **The installer 
 file is located in the assets section at the bottom of the version information.**
-2.Download the [Rayman AP World]()
+2.Download the [Rayman AP World](https://github.com/LMR-C/Rayman-AP/releases/download/0.0.0-alpha/Rayman.apworld)
 2. Open the Archipelago Launcher and search for the `Install APWorld` option then click `Open`. Then choose
 the Rayman APWorld file
 3. Download and install [BizHawk](https://tasvideos.org/BizHawk) and launch it

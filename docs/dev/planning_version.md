@@ -1,6 +1,6 @@
 # Planning Versions 
 
-## 1.0
+## 0.1.0
 
 ### Goal
 
@@ -65,7 +65,7 @@ Location settings :
 - Include magician challenges
 - Location to exclude
 
-## 1.1
+## 0.2.0
 
 ### Goal
 
@@ -87,7 +87,7 @@ Location settings :
 - Level unlock as location and item
 - Number of great protoon piece to unlock Mr.Dark's Dare
 
-## 2.0
+## 0.3.0
 
 ### Game modifications
 Level order randomnization : the level order in the world map is randomnized
@@ -101,7 +101,7 @@ Level order randomnization : the level order in the world map is randomnized
 General settings :
 - Randomnize Level
 
-## 3.0
+## 0.4.0
 
 ### Goal
 
@@ -115,18 +115,18 @@ Sub-level randomnization : Randomnize sub-level between levels
 
 General settings :
 - Goal
-- Randomnize Level
+- Randomnize sub-level
 
-## 4.0
+## 0.5.0
 
 ### Game modifications
 
-- Object shuffle : Shuffle in-level items position :
+- Object shuffle : Shuffle in-level items position by screen:
     - Cage
     - Magicians
     - Ennemies
     - Life Status
-    - Sings
+    - Signs
     - Checkpoints
     - Tings
 
